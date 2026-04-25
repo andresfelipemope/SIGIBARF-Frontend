@@ -28,22 +28,22 @@ export function Navbar() {
   };
 
   const handleUser = () => {
-    route.push("/login")
+    router.push("/login")
   }
 
   const handleCart = () => {
-    route.push("/cart")
+    router.push("/cart")
   }
 
   return (
     <div className="flex justify-between p-3 items-center border-b-2 border-green-600">
 
-      <div className="flex gap-2 items-center font-bold">
+      <div className="flex flex-1 gap-2 items-center font-bold justify-start">
         <img src="/images/AthleticBarf.png" alt="logo" className="w-16 h-16" />
         <p className="text-2xl">ATHLETIC BARF</p>
       </div>
 
-      <div className="flex gap-6 text-lg">
+      <div className="flex shrink-0 gap-6 text-lg justify-center">
         <p className={`cursor-pointer
         ${active.catalogo
             ? "border-b-2 border-green-500 text-green-700 transition-all duration-300"
@@ -79,7 +79,7 @@ export function Navbar() {
 
       </div>
 
-      <div className="flex gap-4">
+      <div className="flex flex-1 gap-4 justify-end">
         <User className="cursor-pointer" onClick={() => handleUser()} />
         <ShoppingCart className="cursor-pointer" onClick={() => handleCart()} />
       </div>
