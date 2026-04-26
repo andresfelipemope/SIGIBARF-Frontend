@@ -5,7 +5,7 @@ import { Mail, Phone, MapPin } from "lucide-react";
 
 export function Footer() {
     return (
-        <footer className="bg-black border-t border-gray-200 ">
+        <footer className="bg-black border-t border-gray-200 border-t-2 border-green-600">
             <div className="max-w-6xl mx-auto pt-4 pb-4 grid grid-cols-1 md:grid-cols-3 gap-8 justify-items-center text-center">
 
                 <div className="flex flex-col items-center">
@@ -22,13 +22,13 @@ export function Footer() {
                     <h3 className="font-bold text-green-700 mb-3 text-lg">Navegación</h3>
                     <ul className="space-y-2 text-white text-sm">
                         <li className="cursor-pointer hover:text-green-600 transition">
-                            Catálogo
+                            <a href="/catalogo">Catálogo</a>
                         </li>
                         <li className="cursor-pointer hover:text-green-600 transition">
-                            Calculadora nutricional
+                            <a href="/calculadora">Calculadora nutricional</a>
                         </li>
                         <li className="cursor-pointer hover:text-green-600 transition">
-                            Nosotros
+                            <a href="/nosotros">Nosotros</a>
                         </li>
                     </ul>
                 </div>
@@ -50,7 +50,7 @@ export function Footer() {
                         </a>
                     </div>
 
-                    {/* 🔹 Redes */}
+
                     <div className="flex justify-center gap-4 mt-2">
                         <a
                             href="https://www.instagram.com/athleticbarf"

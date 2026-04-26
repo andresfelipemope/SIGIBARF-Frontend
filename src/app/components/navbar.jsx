@@ -7,7 +7,8 @@ import { ShoppingCart, User } from 'lucide-react';
 export function Navbar() {
   const router = useRouter();
   const [active, setActive] = useState({
-    catalogo: true,
+    home: true,
+    catalogo: false,
     calculadora: false,
     nosotros: false,
     gestion: false,
@@ -17,6 +18,7 @@ export function Navbar() {
 
   const handleClick = (section, route) => {
     setActive({
+      home: false,
       catalogo: false,
       calculadora: false,
       nosotros: false,
@@ -24,11 +26,13 @@ export function Navbar() {
       [section]: true,
     });
 
-    //route.push(route);
+    router.push(route);
   };
 
   const handleUser = () => {
-    router.push("/login")
+    const token = localStorage.getItem("access");
+    if(!token) router.push("/login")
+    else router.push("/user");
   }
 
   const handleCart = () => {
@@ -38,12 +42,20 @@ export function Navbar() {
   return (
     <div className="flex justify-between p-3 items-center border-b-2 border-green-600">
 
-      <div className="flex flex-1 gap-2 items-center font-bold justify-start">
+      <a href="/home" className="flex flex-1 gap-2 items-center font-bold justify-start">
         <img src="/images/AthleticBarf.png" alt="logo" className="w-16 h-16" />
         <p className="text-2xl">ATHLETIC BARF</p>
-      </div>
+      </a>
 
       <div className="flex shrink-0 gap-6 text-lg justify-center">
+        <p className={`cursor-pointer
+        ${active.home
+            ? "border-b-2 border-green-500 text-green-700 transition-all duration-300"
+            : "hover:border-b-2 border-gray-200 transition-all duration-300"
+          }`}
+          onClick={() => handleClick("home", "/home")}>
+          Inicio
+        </p>
         <p className={`cursor-pointer
         ${active.catalogo
             ? "border-b-2 border-green-500 text-green-700 transition-all duration-300"
