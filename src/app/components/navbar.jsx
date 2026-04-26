@@ -67,14 +67,14 @@ export function Navbar() {
         <p className={`cursor-pointer
         ${active.calculadora
             ? "border-b-2 border-green-500 text-green-700 transition-all duration-300"
-            : "hover:border-b-2 border-gray-200 text transition-all duration-300"
+            : "hover:border-b-2 border-gray-200 transition-all duration-300"
           }`}
           onClick={() => handleClick("calculadora", "/calculadora")}>
           Calculadora nutricional
         </p>
         <p className={`cursor-pointer
         ${active.nosotros
-            ? "border-b-2 order-green-500 text-green-700 transition-all duration-300"
+            ? "border-b-2 border-green-500 text-green-700 transition-all duration-300"
             : "hover:border-b-2 border-gray-200 transition-all duration-300"
           }`}
           onClick={() => handleClick("nosotros", "/nosotros")}>
