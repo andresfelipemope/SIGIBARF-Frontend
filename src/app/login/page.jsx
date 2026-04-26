@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Lock, Mail, Loader2 } from 'lucide-react';
-import { CheckCircle2Icon, AlertCircleIcon } from "lucide-react"
+import { CheckCircle2Icon, AlertCircleIcon,PawPrint } from "lucide-react"
 import {
   Alert,
   AlertDescription,
@@ -39,6 +39,7 @@ export default function Login() {
   const [recoverSuccess, setRecoverSuccess] = useState(false);
   const [errorRecovery, setErrorRecovery] = useState(false);
   const [isSending, setIsSending] = useState(false);
+
 
   const handleRecover = async (e) => {
     e.preventDefault();
@@ -114,8 +115,8 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-cyan-50">
-
+    <div className=" min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-200 to-orange-50 ">
+      
       {isLoading && (
         <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/60 backdrop-blur-sm">
           <div className="bg-white p-6 rounded-xl shadow-2xl flex flex-col items-center">
@@ -175,9 +176,10 @@ export default function Login() {
               </AlertDescription>
             </Alert>
           )}
-          <FieldGroup className="space-y-5">
+          <FieldGroup className="space-y-5 pt-8 ">
+            
             <Field>
-              <FieldLabel htmlFor="email" className="text-xl">Correo Electrónico</FieldLabel>
+              <FieldLabel htmlFor="email" className="text-xl ">Correo Electrónico</FieldLabel>
               <div className="relative">
                 <Mail className="absolute left-3 top-2 w-5 h-5 text-slate-400 z-10" />
                 <Input
@@ -212,7 +214,7 @@ export default function Login() {
 
             <Button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 rounded-lg font-medium transition-all"
+              className="w-full mt-1 bg-green-500 hover:bg-green-600 text-white py-6 rounded-lg font-medium transition-all"
             >
               Iniciar Sesión
             </Button>
@@ -225,11 +227,9 @@ export default function Login() {
             ¿Olvidaste tu contraseña?
           </div>
           <Dialog open={openRecovery} onOpenChange={setOpenRecovery}>
-            <DialogTrigger asChild>
-              <Button variant="outline" onClick={() => setOpenRecovery(true)}>
-                Recuperar Contraseña
-              </Button>
-            </DialogTrigger>
+    <DialogTrigger>
+  Recuperar Contraseña
+</DialogTrigger>
 
             <DialogContent className="sm:max-w-sm">
 
