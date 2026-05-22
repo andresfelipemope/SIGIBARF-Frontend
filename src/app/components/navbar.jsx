@@ -14,7 +14,7 @@ export function Navbar() {
     gestion: false,
   });
 
-  const [admin, setAdmin] = useState(false);
+  const [admin, setAdmin] = useState(true);
 
   const handleClick = (section, route) => {
     setActive({
@@ -86,7 +86,7 @@ export function Navbar() {
             : "hover:border-b-2 border-gray-200 transition-all duration-300"
           }`}
           onClick={() => handleClick("gestion", "/gestion")}>
-          Gestion de Inventario
+          Gestion
         </p>)}
 
       </div>

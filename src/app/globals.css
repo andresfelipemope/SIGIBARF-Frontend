@@ -46,10 +46,6 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-.font-title {
-  font-family: var(--font-title);
-}
-
 body {
   font-family: var(--font-body);
 }
