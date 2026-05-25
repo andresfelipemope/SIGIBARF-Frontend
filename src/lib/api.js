@@ -1,237 +1,169 @@
-const BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  "https://backend-pongase-trucha.onrender.com";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://backend-pongase-trucha.onrender.com';
 
-/**
- * Helper para realizar peticiones HTTP de forma segura y estandarizada.
- * Maneja el parseo de respuestas y la extracción de errores del backend.
- */
-async function apiRequest(
-  endpoint,
-  { method = "GET", body = null, headers = {} } = {},
-) {
-  const url = `${BASE_URL.replace(/\/$/, "")}${endpoint}`;
+// ── Token helpers ────────────────────────────────────────────────────
+function getAccess()  { return typeof window !== 'undefined' ? localStorage.getItem('access')  : null; }
+function getRefresh() { return typeof window !== 'undefined' ? localStorage.getItem('refresh') : null; }
+
+function saveTokens({ access, refresh }) {
+  if (access)  localStorage.setItem('access',  access);
+  if (refresh) localStorage.setItem('refresh', refresh);
+}
+
+function clearTokens() {
+  localStorage.removeItem('access');
+  localStorage.removeItem('refresh');
+}
+
+function redirectToLogin() {
+  if (typeof window !== 'undefined') window.location.href = '/auth/login';
+}
+
+// ── Renovar access token usando el refresh ───────────────────────────
+async function refreshAccessToken() {
+  const refresh = getRefresh();
+  if (!refresh) throw new Error('No hay refresh token');
+
+  const res = await fetch(`${BASE_URL}/api/usuarios/auth/refresh/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ refresh }),
+  });
+
+  if (!res.ok) throw new Error('Refresh inválido');
+
+  const data = await res.json();
+  saveTokens(data); // guarda el nuevo access (y refresh si viene rotado)
+  return data.access;
+}
+
+// ── Helper principal ─────────────────────────────────────────────────
+export async function apiRequest(endpoint, { method = 'GET', body = null, headers = {} } = {}, _retry = false) {
+  const url = `${BASE_URL.replace(/\/$/, '')}${endpoint}`;
 
   const config = {
     method,
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       ...headers,
     },
   };
 
-  if (body) {
-    config.body = JSON.stringify(body);
-  }
+  if (body) config.body = JSON.stringify(body);
 
   try {
     const response = await fetch(url, config);
 
-    // Si es 204 No Content, no intentamos parsear JSON
-    if (response.status === 204) {
-      return { success: true };
-    }
+    if (response.status === 204) return { success: true };
 
     const data = await response.json().catch(() => null);
 
+    // 401 → intentar refresh una sola vez
+    if (response.status === 401 && !_retry) {
+      try {
+        const newAccess = await refreshAccessToken();
+        // Reintentar con el token nuevo
+        return apiRequest(endpoint, {
+          method,
+          body: body ? JSON.parse(config.body) : null,
+          headers: { ...headers, Authorization: `Bearer ${newAccess}` },
+        }, true);
+      } catch {
+        clearTokens();
+        redirectToLogin();
+        throw new Error('Sesión expirada. Redirigiendo al login...');
+      }
+    }
+
     if (!response.ok) {
-      // Extraemos el error del backend de forma estructurada
-      const error = new Error(
-        data?.detail || "Ha ocurrido un error en la solicitud.",
-      );
+      const error = new Error(data?.detail || 'Ha ocurrido un error en la solicitud.');
       error.status = response.status;
-      error.data = data; // Guardamos los errores de campos (por ejemplo, de validación de contraseña)
+      error.data   = data;
       throw error;
     }
 
     return data;
   } catch (error) {
     if (error.status) throw error;
-
-    // Error de red o parseo
-    const networkError = new Error(
-      "No se pudo establecer comunicación con el servidor. Por favor, verifica tu conexión.",
-    );
+    const networkError = new Error('No se pudo establecer comunicación con el servidor. Por favor, verifica tu conexión.');
     networkError.status = 500;
     throw networkError;
   }
 }
 
+// ── Auth service ─────────────────────────────────────────────────────
 export const authService = {
-  /**
-   * Iniciar sesión con correo y contraseña.
-   * @param {string} correo
-   * @param {string} password
-   */
   async login(correo, password) {
-    return apiRequest("/api/usuarios/auth/login/", {
-      method: "POST",
+    return apiRequest('/api/usuarios/auth/login/', {
+      method: 'POST',
       body: { correo, password },
     });
   },
 
-  /**
-   * Registrar un nuevo usuario (rol Cliente por defecto en backend).
-   * @param {Object} userData
-   */
-  async register({
-    correo,
-    password,
-    password_confirm,
-    nombre,
-    apellido,
-    telefono = "",
-    direccion = "",
-  }) {
-    return apiRequest("/api/usuarios/auth/register/", {
-      method: "POST",
-      body: {
-        correo,
-        password,
-        password_confirm,
-        nombre,
-        apellido,
-        telefono,
-        direccion,
-      },
+  async register({ correo, password, password_confirm, nombre, apellido, telefono = '', direccion = '' }) {
+    return apiRequest('/api/usuarios/auth/register/', {
+      method: 'POST',
+      body: { correo, password, password_confirm, nombre, apellido, telefono, direccion },
     });
   },
 
-  /**
-   * Iniciar sesión o registrar con Google Identity Services token.
-   * @param {string} idToken
-   */
   async googleLogin(idToken) {
-    return apiRequest("/api/usuarios/auth/google/", {
-      method: "POST",
+    return apiRequest('/api/usuarios/auth/google/', {
+      method: 'POST',
       body: { id_token: idToken },
     });
   },
 
-  /**
-   * Solicitar el enlace de recuperación de contraseña.
-   * @param {string} correo
-   */
   async requestPasswordReset(correo) {
-    return apiRequest("/api/usuarios/auth/password-reset/", {
-      method: "POST",
+    return apiRequest('/api/usuarios/auth/password-reset/', {
+      method: 'POST',
       body: { correo },
     });
   },
 
-  /**
-   * Validar que el token de recuperación siga vigente antes de mostrar el formulario.
-   * @param {string} uidb64
-   * @param {string} token
-   */
   async validateResetToken(uidb64, token) {
-    return apiRequest(
-      `/api/usuarios/auth/password-reset/confirm/${uidb64}/${token}/`,
-      {
-        method: "GET",
-      },
-    );
+    return apiRequest(`/api/usuarios/auth/password-reset/confirm/${uidb64}/${token}/`, { method: 'GET' });
   },
 
-  /**
-   * Establecer la nueva contraseña tras validar uid/token.
-   * @param {string} uidb64
-   * @param {string} token
-   * @param {string} new_password
-   * @param {string} new_password_confirm
-   */
-  async confirmPasswordReset(
-    uidb64,
-    token,
-    new_password,
-    new_password_confirm,
-  ) {
-    return apiRequest(
-      `/api/usuarios/auth/password-reset/confirm/${uidb64}/${token}/`,
-      {
-        method: "POST",
-        body: { new_password, new_password_confirm },
-      },
-    );
+  async confirmPasswordReset(uidb64, token, new_password, new_password_confirm) {
+    return apiRequest(`/api/usuarios/auth/password-reset/confirm/${uidb64}/${token}/`, {
+      method: 'POST',
+      body: { new_password, new_password_confirm },
+    });
   },
 
-  /**
-   * Obtener el perfil del usuario autenticado.
-   */
   async getProfile() {
-    const token =
-      typeof window !== "undefined" ? localStorage.getItem("access") : null;
-    return apiRequest("/api/usuarios/me/", {
-      method: "GET",
+    const token = getAccess();
+    return apiRequest('/api/usuarios/me/', {
+      method: 'GET',
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
   },
 
-  /**
-   * Actualizar el perfil del usuario autenticado.
-   */
   async updateProfile(profileData) {
-    const token =
-      typeof window !== "undefined" ? localStorage.getItem("access") : null;
-    return apiRequest("/api/usuarios/me/", {
-      method: "PATCH",
+    const token = getAccess();
+    return apiRequest('/api/usuarios/me/', {
+      method: 'PATCH',
       body: profileData,
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
   },
 
-  /**
-   * Cambiar la contraseña del usuario logueado.
-   */
   async changePassword(current_password, new_password, new_password_confirm) {
-    const token =
-      typeof window !== "undefined" ? localStorage.getItem("access") : null;
-    return apiRequest("/api/usuarios/auth/change-password/", {
-      method: "POST",
+    const token = getAccess();
+    return apiRequest('/api/usuarios/auth/change-password/', {
+      method: 'POST',
       body: { current_password, new_password, new_password_confirm },
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
   },
+
+  async logout(refresh) {
+    const token = getAccess();
+    await apiRequest('/api/usuarios/auth/logout/', {
+      method: 'POST',
+      body: { refresh },
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    }).catch(() => {}); // aunque falle, limpiamos local
+    clearTokens();
+  },
 };
-
-// ── Exports para módulos de gestión (ingredientes, inventario, alertas) ──
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-
-export const API = {
-  inventario: `${API_BASE}/api/inventario`,
-  usuarios: `${API_BASE}/api/usuarios`,
-};
-
-export function authHeaders() {
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("access") : null;
-  return {
-    "Content-Type": "application/json",
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  };
-}
-
-export async function apiFetch(url, options = {}) {
-  const res = await fetch(url, {
-    ...options,
-    headers: {
-      ...authHeaders(),
-      ...(options.headers || {}),
-    },
-  });
-
-  if (res.status === 204) return null;
-
-  const data = await res.json().catch(() => ({}));
-
-  if (!res.ok) {
-    const msg =
-      data?.detail ||
-      Object.values(data).flat().join(" · ") ||
-      `Error ${res.status}`;
-    throw new Error(msg);
-  }
-
-  return data;
-}

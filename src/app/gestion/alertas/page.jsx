@@ -5,7 +5,7 @@ import {
   AlertTriangle, Clock, TrendingDown, Package,
   ChevronDown, ChevronUp, RefreshCw, Loader2
 } from "lucide-react";
-import { API, apiFetch } from "@/lib/api";
+import { inventarioService } from "@/services/inventario";
 
 const DIAS_ALERTA_VENCIMIENTO = 30;
 
@@ -40,7 +40,7 @@ function generarAlertas(ingredientes, productos) {
     }
   });
 
-  // Vencimiento — ingredientes (campo fecha_vencimiento si existe)
+  // Vencimiento — ingredientes
   ingredientes.forEach(i => {
     const dias = diasRestantes(i.fecha_vencimiento);
     if (dias !== null && dias <= DIAS_ALERTA_VENCIMIENTO) {
@@ -72,8 +72,10 @@ function AlertCard({ title, subtitle, icon: Icon, iconColor, bgColor, borderColo
   const [expanded, setExpanded] = useState(true);
   return (
     <div className={`rounded-2xl border ${borderColor} ${bgColor} overflow-hidden`}>
-      <button onClick={() => setExpanded(e => !e)}
-        className="w-full flex items-center justify-between px-5 py-4 hover:brightness-95 transition">
+      <button
+        onClick={() => setExpanded(e => !e)}
+        className="w-full flex items-center justify-between px-5 py-4 hover:brightness-95 transition"
+      >
         <div className="flex items-center gap-3">
           <Icon className={`size-5 ${iconColor}`} />
           <div className="text-left">
@@ -85,7 +87,9 @@ function AlertCard({ title, subtitle, icon: Icon, iconColor, bgColor, borderColo
           <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold border ${borderColor} ${iconColor} bg-white`}>
             {count} {count === 1 ? "ítem" : "ítems"}
           </span>
-          {expanded ? <ChevronUp className="size-4 text-gray-400" /> : <ChevronDown className="size-4 text-gray-400" />}
+          {expanded
+            ? <ChevronUp className="size-4 text-gray-400" />
+            : <ChevronDown className="size-4 text-gray-400" />}
         </div>
       </button>
       {expanded && (
@@ -114,7 +118,10 @@ function StockRow({ alerta }) {
         </p>
         <div className="flex items-center gap-2 mt-1.5">
           <div className="w-28 rounded-full bg-gray-100 h-1.5">
-            <div className={`h-1.5 rounded-full ${agotado ? "bg-red-500" : "bg-orange-500"}`} style={{ width: `${pct}%` }} />
+            <div
+              className={`h-1.5 rounded-full ${agotado ? "bg-red-500" : "bg-orange-500"}`}
+              style={{ width: `${pct}%` }}
+            />
           </div>
           <span className="text-[10px] font-bold text-gray-400">{pct}%</span>
         </div>
@@ -142,7 +149,11 @@ function VencimientoRow({ alerta }) {
       <div>
         <p className="text-sm font-semibold text-black">{alerta.nombre}</p>
         <p className="text-xs text-gray-400 mt-0.5">
-          {alerta.lote ? `Lote: ${alerta.lote}` : alerta.proveedor ? `Proveedor: ${alerta.proveedor}` : ""}
+          {alerta.lote
+            ? `Lote: ${alerta.lote}`
+            : alerta.proveedor
+            ? `Proveedor: ${alerta.proveedor}`
+            : ""}
         </p>
       </div>
       <div className="text-right shrink-0 ml-4">
@@ -166,10 +177,9 @@ export default function AlertasPage() {
     setLoading(true);
     setError("");
     try {
-      // Ambos endpoints privados requieren JWT (authHeaders los agrega automáticamente)
       const [ings, prods] = await Promise.all([
-        apiFetch(`${API.inventario}/ingredientes/`),
-        apiFetch(`${API.inventario}/productos/`),
+        inventarioService.getIngredientes(),
+        inventarioService.getProductos(),
       ]);
       setIngredientes(Array.isArray(ings) ? ings : []);
       setProductos(Array.isArray(prods) ? prods : []);
@@ -184,11 +194,11 @@ export default function AlertasPage() {
 
   const alertas = generarAlertas(ingredientes, productos);
 
-  const stockProductos = alertas.filter(a => a.tipo === "stock_producto");
+  const stockProductos    = alertas.filter(a => a.tipo === "stock_producto");
   const stockIngredientes = alertas.filter(a => a.tipo === "stock_ingrediente");
-  const vencProd = alertas.filter(a => a.tipo === "vencimiento_producto");
-  const vencIng = alertas.filter(a => a.tipo === "vencimiento_ingrediente");
-  const totalAlertas = alertas.length;
+  const vencProd          = alertas.filter(a => a.tipo === "vencimiento_producto");
+  const vencIng           = alertas.filter(a => a.tipo === "vencimiento_ingrediente");
+  const totalAlertas      = alertas.length;
 
   return (
     <div className="space-y-6 text-black">
@@ -196,7 +206,9 @@ export default function AlertasPage() {
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-extrabold text-black tracking-tight">Alertas del Sistema</h1>
-          <p className="text-sm text-gray-500 mt-1">Monitorea problemas críticos de inventario que requieren atención.</p>
+          <p className="text-sm text-gray-500 mt-1">
+            Monitorea problemas críticos de inventario que requieren atención.
+          </p>
         </div>
         <div className="flex items-center gap-3">
           {!loading && totalAlertas > 0 && (
@@ -205,15 +217,19 @@ export default function AlertasPage() {
               {totalAlertas} alerta{totalAlertas > 1 ? "s" : ""} activa{totalAlertas > 1 ? "s" : ""}
             </div>
           )}
-          <button onClick={fetchData}
-            className="flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50 transition">
+          <button
+            onClick={fetchData}
+            className="flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50 transition"
+          >
             <RefreshCw className="size-3.5" /> Actualizar
           </button>
         </div>
       </div>
 
       {error && (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 font-medium">{error}</div>
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 font-medium">
+          {error}
+        </div>
       )}
 
       {loading ? (
@@ -234,7 +250,8 @@ export default function AlertasPage() {
             subtitle="Productos con stock por debajo del mínimo"
             icon={TrendingDown} iconColor="text-red-600"
             bgColor="bg-red-50/40" borderColor="border-red-200"
-            count={stockProductos.length}>
+            count={stockProductos.length}
+          >
             {stockProductos.map(a => <StockRow key={a.id} alerta={a} />)}
           </AlertCard>
 
@@ -243,7 +260,8 @@ export default function AlertasPage() {
             subtitle="Insumos con stock por debajo del mínimo"
             icon={TrendingDown} iconColor="text-red-600"
             bgColor="bg-red-50/40" borderColor="border-red-200"
-            count={stockIngredientes.length}>
+            count={stockIngredientes.length}
+          >
             {stockIngredientes.map(a => <StockRow key={a.id} alerta={a} />)}
           </AlertCard>
 
@@ -252,7 +270,8 @@ export default function AlertasPage() {
             subtitle="Lotes de productos próximos a vencer"
             icon={Clock} iconColor="text-orange-600"
             bgColor="bg-orange-50/30" borderColor="border-orange-200"
-            count={vencProd.length}>
+            count={vencProd.length}
+          >
             {vencProd.map(a => <VencimientoRow key={a.id} alerta={a} />)}
           </AlertCard>
 
@@ -261,7 +280,8 @@ export default function AlertasPage() {
             subtitle="Insumos con fecha de vencimiento próxima"
             icon={Clock} iconColor="text-orange-600"
             bgColor="bg-orange-50/30" borderColor="border-orange-200"
-            count={vencIng.length}>
+            count={vencIng.length}
+          >
             {vencIng.map(a => <VencimientoRow key={a.id} alerta={a} />)}
           </AlertCard>
         </div>
