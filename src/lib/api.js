@@ -4,7 +4,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://backend-pongase-tru
  * Helper para realizar peticiones HTTP de forma segura y estandarizada.
  * Maneja el parseo de respuestas y la extracción de errores del backend.
  */
-async function apiRequest(endpoint, { method = 'GET', body = null, headers = {} } = {}) {
+export async function apiRequest(endpoint, { method = 'GET', body = null, headers = {} } = {}) {
   const url = `${BASE_URL.replace(/\/$/, '')}${endpoint}`;
   
   const config = {

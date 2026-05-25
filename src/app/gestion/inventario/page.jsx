@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   Boxes, 
   AlertTriangle, 
@@ -8,53 +8,166 @@ import {
   Coins, 
   Search, 
   Filter,
-  Plus
+  Plus,
+  Loader2,
+  X,
+  CheckCircle
 } from "lucide-react";
+import { inventarioService } from "@/services/inventario";
 
 export default function InventarioPage() {
+  const [productos, setProductos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("todos");
+  const [statusFilter, setStatusFilter] = useState("todos");
 
+  // Modal y Formulario
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    nombre: "",
+    precio: "",
+    stock_actual: 0,
+    stock_minimo: 0,
+    inhabilitado: false
+  });
+  const [formLoading, setFormLoading] = useState(false);
+  const [formError, setFormError] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [successMessage, setSuccessMessage] = useState(null);
+
+  const fetchProductos = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await inventarioService.getProductos();
+      setProductos(data);
+    } catch (err) {
+      setError(err.message || "Error al cargar los productos");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProductos();
+  }, []);
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+    // Limpiar error del campo al escribir
+    if (fieldErrors[name]) {
+      setFieldErrors(prev => ({ ...prev, [name]: null }));
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setFormError(null);
+    setFieldErrors({});
+    
+    // Frontend validaciones simples
+    if (!formData.nombre.trim()) {
+      setFieldErrors(prev => ({ ...prev, nombre: "El nombre es obligatorio" }));
+      return;
+    }
+    if (Number(formData.precio) <= 0 || isNaN(Number(formData.precio))) {
+      setFieldErrors(prev => ({ ...prev, precio: "El precio debe ser mayor a 0" }));
+      return;
+    }
+
+    try {
+      setFormLoading(true);
+      // Asegurar tipos para el backend
+      const payload = {
+        ...formData,
+        precio: String(formData.precio), // El backend pide string decimal
+        stock_actual: parseInt(formData.stock_actual, 10) || 0,
+        stock_minimo: parseInt(formData.stock_minimo, 10) || 0,
+      };
+
+      await inventarioService.createProducto(payload);
+      
+      // Éxito
+      setSuccessMessage("Producto registrado correctamente");
+      setIsModalOpen(false);
+      setFormData({
+        nombre: "",
+        precio: "",
+        stock_actual: 0,
+        stock_minimo: 0,
+        inhabilitado: false
+      });
+      fetchProductos(); // Refrescar lista
+
+      // Quitar mensaje de éxito después de 3 seg
+      setTimeout(() => setSuccessMessage(null), 3000);
+
+    } catch (err) {
+      if (err.data && typeof err.data === 'object') {
+        // Errores de validación del backend por campos
+        setFieldErrors(err.data);
+      } else {
+        setFormError(err.message || "Error al registrar el producto");
+      }
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  // Calcular métricas
+  const totalItems = productos.length;
+  const itemsInAlert = productos.filter(p => !p.inhabilitado && p.stock_actual <= p.stock_minimo).length;
+  
   const metrics = [
-    { label: "Existencias Totales", value: "1,240.5 Kg", icon: Boxes, color: "text-green-700 bg-green-50 border-green-100" },
-    { label: "Insumos en Alerta", value: "3 Ítems", icon: AlertTriangle, color: "text-rose-600 bg-rose-50 border-rose-100" },
-    { label: "Mermas (Este Mes)", value: "18.4 Kg", icon: TrendingDown, color: "text-orange-600 bg-orange-50 border-orange-100" },
-    { label: "Valor del Inventario", value: "$4,850 USD", icon: Coins, color: "text-emerald-700 bg-emerald-50 border-emerald-100" }
-  ];
-
-  const inventoryItems = [
-    { id: "INS-001", name: "Carne de Res Premium (Lomo)", category: "Proteínas", stock: 350, minStock: 100, status: "suficiente" },
-    { id: "INS-002", name: "Hígado de Pollo Fresco", category: "Vísceras", stock: 15, minStock: 30, status: "bajo" },
-    { id: "INS-003", name: "Zanahoria Orgánica Rallada", category: "Vegetales", stock: 120, minStock: 40, status: "suficiente" },
-    { id: "INS-004", name: "Corazón de Cerdo Selección", category: "Proteínas", stock: 210, minStock: 75, status: "suficiente" },
-    { id: "INS-005", name: "Manzana Verde Sin Semilla", category: "Frutas", stock: 45, minStock: 20, status: "suficiente" },
-    { id: "INS-006", name: "Aceite de Salmón Silvestre", category: "Suplementos", stock: 8, minStock: 15, status: "bajo" },
-    { id: "INS-007", name: "Vísceras de Res Mezcladas", category: "Vísceras", stock: 290, minStock: 80, status: "suficiente" },
-    { id: "INS-008", name: "Calcio de Hueso Micro-molido", category: "Suplementos", stock: 0, minStock: 10, status: "agotado" },
+    { label: "Total Productos", value: loading ? "..." : totalItems.toString(), icon: Boxes, color: "text-green-700 bg-green-50 border-green-100" },
+    { label: "Alertas de Stock", value: loading ? "..." : `${itemsInAlert} Ítems`, icon: AlertTriangle, color: "text-rose-600 bg-rose-50 border-rose-100" },
+    { label: "Mermas (Este Mes)", value: "N/A", icon: TrendingDown, color: "text-orange-600 bg-orange-50 border-orange-100" },
+    { label: "Valor del Inventario", value: "N/A", icon: Coins, color: "text-emerald-700 bg-emerald-50 border-emerald-100" }
   ];
 
   // Filtering Logic
-  const filteredItems = inventoryItems.filter(item => {
-    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) || item.id.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = categoryFilter === "todos" || item.category.toLowerCase() === categoryFilter.toLowerCase();
-    return matchesSearch && matchesCategory;
+  const filteredItems = productos.filter(item => {
+    const searchMatch = item.nombre.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                       item.id.toString().includes(searchTerm);
+    
+    let statusMatch = true;
+    if (statusFilter === "activos") statusMatch = !item.inhabilitado;
+    if (statusFilter === "inhabilitados") statusMatch = item.inhabilitado;
+    if (statusFilter === "alerta") statusMatch = !item.inhabilitado && item.stock_actual <= item.stock_minimo;
+
+    return searchMatch && statusMatch;
   });
 
   return (
-    <div className="space-y-8 animate-fade-in text-black">
+    <div className="space-y-8 animate-fade-in text-black relative">
+      {successMessage && (
+        <div className="absolute top-0 right-0 z-50 flex items-center gap-2 bg-emerald-100 border border-emerald-500 text-emerald-800 px-4 py-3 rounded-xl shadow-lg animate-slide-in-right">
+          <CheckCircle className="size-5" />
+          <span className="font-medium text-sm">{successMessage}</span>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-extrabold text-black tracking-tight">
-            Inventario de Insumos
+            Gestión de Productos
           </h1>
           <p className="text-sm text-gray-500 mt-1 font-medium">
-            Control de materias primas para formulaciones y preparación de lotes BARF.
+            Control de productos finales del inventario administrativo.
           </p>
         </div>
-        <button className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-orange-500/20 hover:bg-orange-600 transition-all duration-200">
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-orange-500/20 hover:bg-orange-600 transition-all duration-200"
+        >
           <Plus className="size-4" />
-          Registrar Insumo
+          Registrar Producto
         </button>
       </div>
 
@@ -84,7 +197,7 @@ export default function InventarioPage() {
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
-              placeholder="Buscar insumo por nombre o ID..."
+              placeholder="Buscar producto por nombre o ID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full rounded-xl border border-gray-200 bg-gray-50/50 py-2 pl-10 pr-4 text-sm text-black placeholder-gray-400 focus:border-green-600 focus:bg-white focus:outline-hidden transition-all duration-200"
@@ -94,71 +207,84 @@ export default function InventarioPage() {
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
               <Filter className="size-4 text-gray-500" />
-              <span className="text-xs font-semibold text-gray-500">Filtro:</span>
+              <span className="text-xs font-semibold text-gray-500">Estado:</span>
             </div>
             <select
-              value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
               className="rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2 text-xs font-bold text-gray-700 hover:bg-green-50/20 transition-colors focus:outline-hidden"
             >
-              <option value="todos">Todos los Grupos</option>
-              <option value="proteínas">Proteínas</option>
-              <option value="vísceras">Vísceras</option>
-              <option value="vegetales">Vegetales</option>
-              <option value="frutas">Frutas</option>
-              <option value="suplementos">Suplementos</option>
+              <option value="todos">Todos</option>
+              <option value="activos">Activos</option>
+              <option value="inhabilitados">Inhabilitados</option>
+              <option value="alerta">En Alerta (Stock Bajo)</option>
             </select>
           </div>
         </div>
+
+        {/* Error State */}
+        {error && !loading && (
+          <div className="mt-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-medium flex items-center gap-2">
+            <AlertTriangle className="size-4" />
+            {error}
+          </div>
+        )}
 
         {/* Inventory List Table */}
         <div className="mt-6 overflow-x-auto">
           <table className="w-full border-collapse text-left">
             <thead>
               <tr className="border-b border-gray-100 text-xs font-bold uppercase tracking-wider text-gray-400">
-                <th className="py-4 px-3">Código</th>
-                <th className="py-4 px-3">Insumo</th>
-                <th className="py-4 px-3">Categoría</th>
-                <th className="py-4 px-3 text-right">Cant. Disponible</th>
-                <th className="py-4 px-3 text-right">Mínimo Crítico</th>
+                <th className="py-4 px-3">ID</th>
+                <th className="py-4 px-3">Producto</th>
+                <th className="py-4 px-3 text-right">Precio</th>
+                <th className="py-4 px-3 text-right">Stock Actual</th>
+                <th className="py-4 px-3 text-right">Mínimo</th>
                 <th className="py-4 px-3 text-center">Estado</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filteredItems.length > 0 ? (
+              {loading ? (
+                <tr>
+                  <td colSpan="6" className="py-12 text-center">
+                    <Loader2 className="size-8 animate-spin text-green-600 mx-auto" />
+                    <p className="text-sm text-gray-500 mt-2 font-medium">Cargando productos...</p>
+                  </td>
+                </tr>
+              ) : filteredItems.length > 0 ? (
                 filteredItems.map((item) => (
-                  <tr key={item.id} className="hover:bg-green-50/10 transition-colors group">
-                    <td className="py-4 px-3 text-xs font-bold text-green-700">
-                      {item.id}
+                  <tr key={item.id} className={`transition-colors group ${item.inhabilitado ? 'bg-gray-50/50 opacity-70' : 'hover:bg-green-50/10'}`}>
+                    <td className="py-4 px-3 text-xs font-bold text-gray-500">
+                      #{item.id}
                     </td>
                     <td className="py-4 px-3 text-sm font-semibold text-black">
-                      {item.name}
+                      {item.nombre}
                     </td>
-                    <td className="py-4 px-3">
-                      <span className="inline-flex items-center rounded-lg bg-green-50/30 px-2.5 py-0.5 text-xs font-bold text-green-700 border border-green-100">
-                        {item.category}
-                      </span>
+                    <td className="py-4 px-3 text-right text-sm font-bold text-gray-700">
+                      ${parseFloat(item.precio).toLocaleString()}
                     </td>
                     <td className="py-4 px-3 text-right text-sm font-bold text-black">
-                      {item.stock} Kg
+                      {item.stock_actual}
                     </td>
                     <td className="py-4 px-3 text-right text-xs font-semibold text-gray-400">
-                      {item.minStock} Kg
+                      {item.stock_minimo}
                     </td>
                     <td className="py-4 px-3 text-center">
-                      {item.status === "suficiente" && (
-                        <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-100">
-                          Suficiente
+                      {item.inhabilitado ? (
+                        <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-[10px] font-bold text-gray-600 border border-gray-200">
+                          Inhabilitado
                         </span>
-                      )}
-                      {item.status === "bajo" && (
+                      ) : item.stock_actual <= 0 ? (
+                        <span className="inline-flex items-center rounded-full bg-rose-50 px-2.5 py-0.5 text-[10px] font-bold text-rose-700 border border-rose-100">
+                          Agotado
+                        </span>
+                      ) : item.stock_actual <= item.stock_minimo ? (
                         <span className="inline-flex items-center rounded-full bg-orange-50 px-2.5 py-0.5 text-[10px] font-bold text-orange-700 border border-orange-100 animate-pulse">
                           Stock Bajo
                         </span>
-                      )}
-                      {item.status === "agotado" && (
-                        <span className="inline-flex items-center rounded-full bg-rose-50 px-2.5 py-0.5 text-[10px] font-bold text-rose-700 border border-rose-100">
-                          Agotado
+                      ) : (
+                        <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-100">
+                          Suficiente
                         </span>
                       )}
                     </td>
@@ -167,7 +293,7 @@ export default function InventarioPage() {
               ) : (
                 <tr>
                   <td colSpan="6" className="py-8 text-center text-xs font-medium text-gray-500">
-                    No se encontraron insumos que coincidan con la búsqueda.
+                    No se encontraron productos que coincidan con los filtros.
                   </td>
                 </tr>
               )}
@@ -175,6 +301,146 @@ export default function InventarioPage() {
           </table>
         </div>
       </div>
+
+      {/* Modal Registrar Producto */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="flex items-center justify-between p-6 border-b border-gray-100">
+              <h2 className="text-xl font-extrabold text-black">Registrar Nuevo Producto</h2>
+              <button 
+                onClick={() => setIsModalOpen(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+                disabled={formLoading}
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleSubmit} className="p-6 overflow-y-auto flex-1">
+              {formError && (
+                <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-medium flex items-start gap-2">
+                  <AlertTriangle className="size-4 shrink-0 mt-0.5" />
+                  <span>{formError}</span>
+                </div>
+              )}
+
+              <div className="space-y-5">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1.5">
+                    Nombre del Producto <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="nombre"
+                    value={formData.nombre}
+                    onChange={handleInputChange}
+                    className={`w-full rounded-xl border ${fieldErrors.nombre ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-green-600'} bg-gray-50/50 px-4 py-2.5 text-sm text-black focus:bg-white focus:outline-hidden transition-all`}
+                    placeholder="Ej. Mezcla Premium Res"
+                    disabled={formLoading}
+                  />
+                  {fieldErrors.nombre && <p className="text-red-500 text-xs mt-1 font-medium">{Array.isArray(fieldErrors.nombre) ? fieldErrors.nombre[0] : fieldErrors.nombre}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1.5">
+                    Precio <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      name="precio"
+                      value={formData.precio}
+                      onChange={handleInputChange}
+                      className={`w-full rounded-xl border ${fieldErrors.precio ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-green-600'} bg-gray-50/50 pl-8 pr-4 py-2.5 text-sm text-black focus:bg-white focus:outline-hidden transition-all`}
+                      placeholder="0.00"
+                      disabled={formLoading}
+                    />
+                  </div>
+                  {fieldErrors.precio && <p className="text-red-500 text-xs mt-1 font-medium">{Array.isArray(fieldErrors.precio) ? fieldErrors.precio[0] : fieldErrors.precio}</p>}
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-1.5">
+                      Stock Actual
+                    </label>
+                    <input
+                      type="number"
+                      name="stock_actual"
+                      value={formData.stock_actual}
+                      onChange={handleInputChange}
+                      min="0"
+                      className={`w-full rounded-xl border ${fieldErrors.stock_actual ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-green-600'} bg-gray-50/50 px-4 py-2.5 text-sm text-black focus:bg-white focus:outline-hidden transition-all`}
+                      disabled={formLoading}
+                    />
+                    {fieldErrors.stock_actual && <p className="text-red-500 text-xs mt-1 font-medium">{Array.isArray(fieldErrors.stock_actual) ? fieldErrors.stock_actual[0] : fieldErrors.stock_actual}</p>}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-1.5">
+                      Stock Mínimo
+                    </label>
+                    <input
+                      type="number"
+                      name="stock_minimo"
+                      value={formData.stock_minimo}
+                      onChange={handleInputChange}
+                      min="0"
+                      className={`w-full rounded-xl border ${fieldErrors.stock_minimo ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-green-600'} bg-gray-50/50 px-4 py-2.5 text-sm text-black focus:bg-white focus:outline-hidden transition-all`}
+                      disabled={formLoading}
+                    />
+                    {fieldErrors.stock_minimo && <p className="text-red-500 text-xs mt-1 font-medium">{Array.isArray(fieldErrors.stock_minimo) ? fieldErrors.stock_minimo[0] : fieldErrors.stock_minimo}</p>}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 pt-2">
+                  <input
+                    type="checkbox"
+                    id="inhabilitado"
+                    name="inhabilitado"
+                    checked={formData.inhabilitado}
+                    onChange={handleInputChange}
+                    className="size-4 rounded border-gray-300 text-green-600 focus:ring-green-600"
+                    disabled={formLoading}
+                  />
+                  <label htmlFor="inhabilitado" className="text-sm font-medium text-gray-700">
+                    Producto inhabilitado (no visible en tienda)
+                  </label>
+                </div>
+                {fieldErrors.inhabilitado && <p className="text-red-500 text-xs font-medium">{Array.isArray(fieldErrors.inhabilitado) ? fieldErrors.inhabilitado[0] : fieldErrors.inhabilitado}</p>}
+              </div>
+
+              <div className="mt-8 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-5 py-2.5 text-sm font-bold text-gray-600 hover:text-gray-900 transition-colors"
+                  disabled={formLoading}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={formLoading}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-green-600 px-6 py-2.5 text-sm font-bold text-white shadow-md hover:bg-green-700 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                  {formLoading ? (
+                    <>
+                      <Loader2 className="size-4 animate-spin" />
+                      Guardando...
+                    </>
+                  ) : (
+                    'Guardar Producto'
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
