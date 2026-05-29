@@ -7,7 +7,8 @@ import { produccionesService } from "@/services/producciones.service";
 export default function ProduccionForm({ productos, onClose, onSuccess }) {
   const [formData, setFormData] = useState({
     id_producto: "",
-    cantidad_producida: ""
+    cantidad_producida: "",
+    fecha_vencimiento: ""
   });
   
   const [loading, setLoading] = useState(false);
@@ -35,11 +36,17 @@ export default function ProduccionForm({ productos, onClose, onSuccess }) {
       return;
     }
 
+    if (!formData.fecha_vencimiento) {
+      setError("Por favor, selecciona una fecha de vencimiento.");
+      return;
+    }
+
     try {
       setLoading(true);
       await produccionesService.createProduccion({
         id_producto: parseInt(formData.id_producto, 10),
-        cantidad_producida: cantidad
+        cantidad_producida: cantidad,
+        fecha_vencimiento: formData.fecha_vencimiento
       });
       
       onSuccess("Producción registrada con éxito. Inventario actualizado.");
@@ -138,6 +145,20 @@ export default function ProduccionForm({ productos, onClose, onSuccess }) {
               <p className="text-xs text-gray-500 font-medium mt-2">
                 Se descontarán automáticamente los ingredientes de tu inventario según la fórmula registrada.
               </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-1.5">
+                Fecha de Vencimiento <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="date"
+                name="fecha_vencimiento"
+                value={formData.fecha_vencimiento}
+                onChange={(e) => setFormData(prev => ({ ...prev, fecha_vencimiento: e.target.value }))}
+                className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-black font-semibold focus:border-orange-500 focus:bg-white focus:outline-hidden transition-all"
+                disabled={loading}
+              />
             </div>
           </div>
 
