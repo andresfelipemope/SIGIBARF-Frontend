@@ -25,7 +25,7 @@ export function Navbar() {
     gestion: false,
   });
 
-  const [admin, setAdmin] = useState(true);
+  const [admin, setAdmin] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -34,6 +34,20 @@ export function Navbar() {
     const checkAuth = () => {
       const token = localStorage.getItem("access");
       setIsLoggedIn(!!token);
+
+      const userString = localStorage.getItem("user");
+      if (token && userString) {
+        try {
+          const userObj = JSON.parse(userString);
+          // Cambia a true si el rol es exactamente "Administrador"
+          setAdmin(userObj.rol === "Administrador");
+        } catch (error) {
+          console.error("Error al parsear el usuario del localStorage:", error);
+          setAdmin(false);
+        }
+      } else {
+        setAdmin(false);
+      }
     };
 
     checkAuth();
@@ -63,13 +77,13 @@ export function Navbar() {
       router.push("/auth/login");
       return;
     }
-
     setShowDropdown((prev) => !prev);
   };
 
   const handleLogout = () => {
     localStorage.removeItem("access");
     localStorage.removeItem("refresh");
+    setAdmin(false);
     localStorage.removeItem("user");
 
     setIsLoggedIn(false);
