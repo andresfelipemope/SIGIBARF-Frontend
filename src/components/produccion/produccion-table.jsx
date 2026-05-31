@@ -14,9 +14,7 @@ export default function ProduccionTable({ producciones, productos, loading }) {
 
   const filteredItems = producciones.filter(item => {
     const p = productosMap[item.id_producto];
-    const matchNombre = p?.nombre?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchId = item.id.toString().includes(searchTerm);
-    return matchNombre || matchId;
+    return p?.nombre?.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
   return (
@@ -30,7 +28,7 @@ export default function ProduccionTable({ producciones, productos, loading }) {
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
-            placeholder="Buscar por ID o producto..."
+            placeholder="Buscar producto..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full rounded-xl border border-gray-200 bg-gray-50/50 py-2 pl-10 pr-4 text-sm text-black placeholder-gray-400 focus:border-green-600 focus:bg-white focus:outline-hidden transition-all duration-200"
@@ -42,18 +40,16 @@ export default function ProduccionTable({ producciones, productos, loading }) {
         <table className="w-full border-collapse text-left">
           <thead>
             <tr className="border-b border-gray-100 text-xs font-bold uppercase tracking-wider text-gray-400">
-              <th className="py-4 px-3">ID Prod.</th>
               <th className="py-4 px-3">Producto Final</th>
               <th className="py-4 px-3 text-right">Cantidad</th>
               <th className="py-4 px-3">Fecha de Producción</th>
               <th className="py-4 px-3">Fecha de Vencimiento</th>
-              <th className="py-4 px-3 text-center">Estado</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {loading ? (
               <tr>
-                <td colSpan="6" className="py-12 text-center">
+                <td colSpan="4" className="py-12 text-center">
                   <Loader2 className="size-8 animate-spin text-green-600 mx-auto" />
                   <p className="text-sm text-gray-500 mt-2 font-medium">Cargando historial...</p>
                 </td>
@@ -101,9 +97,6 @@ export default function ProduccionTable({ producciones, productos, loading }) {
 
                 return (
                   <tr key={item.id} className="transition-colors hover:bg-green-50/10">
-                    <td className="py-4 px-3 text-xs font-bold text-gray-500">
-                      #{item.id}
-                    </td>
                     <td className="py-4 px-3 text-sm font-semibold text-black">
                       {producto ? producto.nombre : `Desconocido (ID: ${item.id_producto})`}
                     </td>
@@ -120,17 +113,12 @@ export default function ProduccionTable({ producciones, productos, loading }) {
                         {formattedVencimiento}
                       </div>
                     </td>
-                    <td className="py-4 px-3 text-center">
-                      <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-100">
-                        Completado
-                      </span>
-                    </td>
                   </tr>
                 );
               })
             ) : (
               <tr>
-                <td colSpan="6" className="py-12 text-center">
+                <td colSpan="4" className="py-12 text-center">
                   <Factory className="size-8 text-gray-300 mx-auto mb-3" />
                   <p className="text-sm text-gray-500 font-medium">No se encontraron producciones.</p>
                 </td>
