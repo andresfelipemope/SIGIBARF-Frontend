@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ShoppingCart, Eye, Star, ImageOff } from "lucide-react";
+import { ShoppingCart, Eye, ImageOff } from "lucide-react";
 import { formatPrice } from "@/lib/format-price";
 import QuantitySelector from "@/components/catalogo/quantity-selector";
 
@@ -16,26 +16,6 @@ const CATEGORY_COLORS = {
   Snacks:              "bg-orange-100 text-orange-700",
 };
 
-/**
- * Componente de estrellas de rating.
- */
-function StarRating({ rating }) {
-  return (
-    <div className="flex items-center gap-0.5">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <Star
-          key={star}
-          size={12}
-          className={
-            star <= rating
-              ? "fill-amber-400 text-amber-400"
-              : "fill-gray-200 text-gray-200"
-          }
-        />
-      ))}
-    </div>
-  );
-}
 
 /**
  * Placeholder elegante cuando no hay imagen disponible.
@@ -76,24 +56,24 @@ export default function ProductCard({ product, onAddToCart }) {
       <div className="relative h-52 bg-gray-50 overflow-hidden">
         {!imgError ? (
           <img
-            src={product.image}
-            alt={product.name}
+            src={product.image || "/images/products/placeholder.png"}
+            alt={product.nombre}
             onError={() => setImgError(true)}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
-          <ImagePlaceholder category={product.category} />
+          <ImagePlaceholder category={product.categoria || "Producto"} />
         )}
 
         {/* Badge categoría */}
         <span
           className={`absolute top-3 left-3 text-xs font-semibold px-2.5 py-1 rounded-full ${badgeClass}`}
         >
-          {product.category}
+          {product.categoria || "General"}
         </span>
 
         {/* Badge stock bajo */}
-        {product.stock <= 10 && product.stock > 0 && (
+        {product.stock_actual <= 10 && product.stock_actual > 0 && (
           <span className="absolute top-3 right-3 text-xs font-semibold px-2.5 py-1 rounded-full bg-red-100 text-red-600">
             ¡Últimas unidades!
           </span>
@@ -103,28 +83,25 @@ export default function ProductCard({ product, onAddToCart }) {
       {/* Contenido */}
       <div className="flex flex-col flex-1 p-4 gap-3">
 
-        {/* Rating */}
-        <StarRating rating={product.rating} />
-
         {/* Nombre */}
         <h3 className="font-bold text-gray-800 text-base leading-snug line-clamp-2 group-hover:text-green-700 transition-colors duration-200">
-          {product.name}
+          {product.nombre}
         </h3>
 
         {/* Descripción corta */}
         <p className="text-gray-500 text-xs leading-relaxed line-clamp-2 flex-1">
-          {product.shortDescription}
+          {product.Descripción || "Sin descripción"}
         </p>
 
         {/* Precio y peso */}
         <div className="flex items-end justify-between">
           <div>
             <p className="text-green-600 text-xl font-bold">
-              {formatPrice(product.price)}
+              {formatPrice(parseFloat(product.precio || 0))}
             </p>
-            <p className="text-gray-400 text-xs mt-0.5">{product.weight}</p>
+            <p className="text-gray-400 text-xs mt-0.5">{product.unidad_medida || "1 unidad"}</p>
           </div>
-          {product.stock > 0 ? (
+          {product.stock_actual > 0 ? (
             <span className="text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded-full">
               Disponible
             </span>
@@ -153,12 +130,12 @@ export default function ProductCard({ product, onAddToCart }) {
             value={quantity}
             onChange={setQuantity}
             min={1}
-            max={product.stock || 1}
+            max={product.stock_actual || 1}
           />
           <button
             type="button"
             onClick={handleAddToCart}
-            disabled={product.stock === 0}
+            disabled={product.stock_actual === 0}
             className="flex-1 flex items-center justify-center gap-2 py-2 rounded-xl bg-green-600 text-white text-sm font-semibold hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
           >
             <ShoppingCart size={15} />

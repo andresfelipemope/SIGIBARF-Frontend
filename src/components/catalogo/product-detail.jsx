@@ -5,7 +5,6 @@ import Link from "next/link";
 import {
   ArrowLeft,
   ShoppingCart,
-  Star,
   Package,
   Weight,
   CalendarClock,
@@ -66,27 +65,6 @@ function Breadcrumb({ productName }) {
   );
 }
 
-function StarRating({ rating }) {
-  return (
-    <div className="flex items-center gap-1.5">
-      <div className="flex items-center gap-0.5">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <Star
-            key={star}
-            size={16}
-            className={
-              star <= rating
-                ? "fill-amber-400 text-amber-400"
-                : "fill-gray-200 text-gray-200"
-            }
-          />
-        ))}
-      </div>
-      <span className="text-sm font-semibold text-gray-700">{rating}.0</span>
-      <span className="text-xs text-gray-400">/ 5 estrellas</span>
-    </div>
-  );
-}
 
 function ImagePlaceholder({ category }) {
   return (
@@ -133,9 +111,9 @@ export default function ProductDetail({ product, onAddToCart }) {
   const [imgError, setImgError] = useState(false);
   const [cartState, setCartState] = useState("idle"); // "idle" | "added"
 
-  const colors = CATEGORY_COLORS[product.category] ?? CATEGORY_FALLBACK;
-  const inStock = product.stock > 0;
-  const lowStock = product.stock > 0 && product.stock <= 10;
+  const colors = CATEGORY_COLORS[product.categoria] ?? CATEGORY_FALLBACK;
+  const inStock = product.stock_actual > 0;
+  const lowStock = product.stock_actual > 0 && product.stock_actual <= 10;
 
   const handleAddToCart = () => {
     if (!inStock) return;
@@ -151,7 +129,7 @@ export default function ProductDetail({ product, onAddToCart }) {
 
         {/* ── Breadcrumb + Volver ── */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
-          <Breadcrumb productName={product.name} />
+          <Breadcrumb productName={product.nombre} />
           <Link
             href="/catalogo"
             className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-green-600 transition-colors duration-200 mb-6 sm:mb-0 group"
@@ -174,19 +152,19 @@ export default function ProductDetail({ product, onAddToCart }) {
             <div className="relative rounded-3xl overflow-hidden border border-gray-200 bg-white shadow-sm aspect-square">
               {!imgError ? (
                 <img
-                  src={product.image}
-                  alt={product.name}
+                  src={product.image || "/images/products/placeholder.png"}
+                  alt={product.nombre}
                   onError={() => setImgError(true)}
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <ImagePlaceholder category={product.category} />
+                <ImagePlaceholder category={product.categoria || "Producto"} />
               )}
 
               {/* Badges flotantes sobre la imagen */}
               <div className="absolute top-4 left-4 flex flex-col gap-2">
                 <span className={`text-xs font-semibold px-3 py-1 rounded-full ${colors.badge}`}>
-                  {product.category}
+                  {product.categoria || "General"}
                 </span>
                 {lowStock && (
                   <span className="text-xs font-semibold px-3 py-1 rounded-full bg-red-100 text-red-600 border border-red-200">
@@ -208,12 +186,11 @@ export default function ProductDetail({ product, onAddToCart }) {
           {/* ══ COLUMNA DERECHA — Info + acciones ══ */}
           <div className="flex flex-col gap-6">
 
-            {/* Nombre y rating */}
+            {/* Nombre */}
             <div className="flex flex-col gap-3">
               <h1 className="text-3xl xl:text-4xl font-bold text-gray-800 leading-tight">
-                {product.name}
+                {product.nombre}
               </h1>
-              <StarRating rating={product.rating} />
             </div>
 
             {/* Precio + peso */}
@@ -223,10 +200,10 @@ export default function ProductDetail({ product, onAddToCart }) {
                   Precio por unidad
                 </p>
                 <p className="text-4xl font-bold text-green-600">
-                  {formatPrice(product.price)}
+                  {formatPrice(parseFloat(product.precio || 0))}
                 </p>
                 <p className="text-sm text-gray-400 mt-1">
-                  Presentación: <span className="font-semibold text-gray-600">{product.weight}</span>
+                  Presentación: <span className="font-semibold text-gray-600">{product.unidad_medida || "1 unidad"}</span>
                 </p>
               </div>
 
@@ -238,7 +215,7 @@ export default function ProductDetail({ product, onAddToCart }) {
                       <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                       <span className="text-sm font-semibold text-green-600">Disponible</span>
                     </div>
-                    <span className="text-xs text-gray-400">{product.stock} en stock</span>
+                    <span className="text-xs text-gray-400">{product.stock_actual} en stock</span>
                   </div>
                 ) : (
                   <div className="flex flex-col items-end gap-1">
@@ -258,25 +235,31 @@ export default function ProductDetail({ product, onAddToCart }) {
                 Descripción
               </h2>
               <p className="text-gray-600 text-sm leading-relaxed">
-                {product.description}
+                {product.Descripción || "Sin descripción detallada disponible."}
               </p>
             </div>
 
-            {/* Detalles del producto */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-              <div className="px-5 py-3 border-b border-gray-100 bg-gray-50/80">
-                <h2 className="text-sm font-bold text-gray-700">
-                  Información del producto
-                </h2>
+
+            {/* Composición del producto */}
+            {product.composicion && product.composicion.length > 0 && (
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="px-5 py-3 border-b border-gray-100 bg-gray-50/80">
+                  <h2 className="text-sm font-bold text-gray-700">
+                    Composición del producto
+                  </h2>
+                </div>
+                <div className="px-5 py-4">
+                  <ul className="space-y-2">
+                    {product.composicion.map((item, index) => (
+                      <li key={index} className="flex items-center justify-between text-sm text-gray-600 border-b border-dashed border-gray-200 pb-2 last:border-0 last:pb-0">
+                        <span>{item.ingrediente_nombre}</span>
+                        <span className="font-semibold text-gray-800">{parseFloat(item.porcentaje_ingrediente)}%</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
-              <div className="px-5">
-                <DetailRow icon={Package}        label="Stock disponible"    value={`${product.stock} unidades`} />
-                <DetailRow icon={Weight}         label="Peso neto"           value={product.weight} />
-                <DetailRow icon={CalendarClock}  label="Fecha de producción" value={formatDate(product.productionDate)} />
-                <DetailRow icon={CalendarCheck2} label="Fecha de vencimiento" value={formatDate(product.expirationDate)} />
-                <DetailRow icon={Hash}           label="Número de lote"      value={product.lot} />
-              </div>
-            </div>
+            )}
 
             {/* Selector cantidad + botón carrito */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-4">
@@ -286,7 +269,7 @@ export default function ProductDetail({ product, onAddToCart }) {
                   value={quantity}
                   onChange={setQuantity}
                   min={1}
-                  max={product.stock || 1}
+                  max={product.stock_actual || 1}
                 />
               </div>
 
@@ -294,7 +277,7 @@ export default function ProductDetail({ product, onAddToCart }) {
               <div className="flex items-center justify-between text-sm border-t border-gray-100 pt-3">
                 <span className="text-gray-500">Subtotal estimado</span>
                 <span className="font-bold text-gray-800 text-base">
-                  {formatPrice(product.price * quantity)}
+                  {formatPrice(parseFloat(product.precio || 0) * quantity)}
                 </span>
               </div>
 

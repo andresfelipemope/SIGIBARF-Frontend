@@ -1,47 +1,55 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { Leaf } from "lucide-react";
-import { products } from "@/data/products";
+import { useState, useMemo, useEffect } from "react";
+import { Leaf, AlertCircle } from "lucide-react";
 import ProductFilters from "@/components/catalogo/product-filters";
 import ProductGrid from "@/components/catalogo/product-grid";
+import { catalogoService } from "@/services/catalogo.service";
 
 /**
  * Página principal del catálogo de productos.
- *
- * Arquitectura preparada para API:
- * - Reemplazar `products` por `await getProducts()` en un Server Component,
- *   o por un `useEffect` + `fetch()` si se mantiene como Client Component.
- * - Los filtros de búsqueda y categoría funcionan localmente con mock data.
- * - Para filtrado en backend, pasar los parámetros como query params al fetch.
  */
 export default function CatalogoPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
+  const [productos, setProductos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  /**
-   * Filtrado local — reemplazar por llamada a API con query params cuando exista backend.
-   * Ej: fetch(`/api/products?search=${searchQuery}&category=${activeCategory}`)
-   */
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true);
+        const data = await catalogoService.getProductos();
+        setProductos(data || []);
+      } catch (err) {
+        setError(err.message || "Error al cargar los productos del catálogo.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
   const filteredProducts = useMemo(() => {
-    let result = products;
+    let result = productos;
 
+    // Se mantiene por si se añaden categorías al backend en el futuro
     if (activeCategory !== "all") {
-      result = result.filter((p) => p.category === activeCategory);
+      result = result.filter((p) => p.categoria === activeCategory);
     }
 
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       result = result.filter(
         (p) =>
-          p.name.toLowerCase().includes(query) ||
-          p.shortDescription.toLowerCase().includes(query) ||
-          p.category.toLowerCase().includes(query)
+          (p.nombre && p.nombre.toLowerCase().includes(query)) ||
+          (p.Descripción && p.Descripción.toLowerCase().includes(query))
       );
     }
 
     return result;
-  }, [searchQuery, activeCategory]);
+  }, [searchQuery, activeCategory, productos]);
 
   /**
    * Handler add to cart.
@@ -114,11 +122,18 @@ export default function CatalogoPage() {
           )}
         </div>
 
-        <ProductGrid
-          products={filteredProducts}
-          isLoading={false}
-          onAddToCart={handleAddToCart}
-        />
+        {error ? (
+          <div className="flex flex-col items-center justify-center py-24 text-center gap-4 text-red-500">
+            <AlertCircle size={40} />
+            <p className="font-medium text-lg">{error}</p>
+          </div>
+        ) : (
+          <ProductGrid
+            products={filteredProducts}
+            isLoading={loading}
+            onAddToCart={handleAddToCart}
+          />
+        )}
       </section>
     </>
   );
