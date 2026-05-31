@@ -1,14 +1,17 @@
+// components/formulaciones/formulaciones-cards.jsx
 "use client";
 
-import { Edit, Eye, Trash2, FlaskConical } from "lucide-react";
+import { Edit, Trash2, FlaskConical, AlertTriangle } from "lucide-react";
 
+/**
+ * Vista de cards para mostrar formulaciones agrupadas por producto
+ */
 export default function FormulacionesCards({
   formulaciones,
   productosMap,
   ingredientesMap,
   loading,
   onEdit,
-  onDetail,
   onDelete,
 }) {
   if (loading && formulaciones.length === 0) {
@@ -19,6 +22,7 @@ export default function FormulacionesCards({
     return <EmptyState />;
   }
 
+  // Agrupar formulaciones por producto
   const formulacionesPorProducto = formulaciones.reduce((acc, f) => {
     if (!acc[f.id_producto]) {
       acc[f.id_producto] = [];
@@ -35,7 +39,7 @@ export default function FormulacionesCards({
         
         return (
           <div key={productoId} className="rounded-2xl border border-gray-200 bg-white shadow-xs overflow-hidden">
-            {}
+            {/* Header del producto */}
             <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-4">
@@ -49,7 +53,9 @@ export default function FormulacionesCards({
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                
+                {/* Botones de acción */}
+                <div className="flex items-center gap-1">
                   <button
                     onClick={() => onEdit(ingredients)}
                     className="p-2 rounded-lg text-gray-400 hover:text-orange-600 hover:bg-orange-50 transition cursor-pointer"
@@ -58,17 +64,17 @@ export default function FormulacionesCards({
                     <Edit className="size-4" />
                   </button>
                   <button
-                    onClick={() => onDetail(ingredients)}
-                    className="p-2 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition cursor-pointer"
-                    title="Ver detalle"
+                    onClick={() => onDelete(ingredients)}
+                    className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition cursor-pointer"
+                    title="Eliminar formulación completa"
                   >
-                    <Eye className="size-4" />
+                    <Trash2 className="size-4" />
                   </button>
                 </div>
               </div>
             </div>
 
-            {}
+            {/* Barra de progreso porcentual */}
             <div className="px-6 py-4 bg-gray-50">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">Balance de la receta</span>
@@ -92,7 +98,7 @@ export default function FormulacionesCards({
               </div>
             </div>
 
-            {}
+            {/* Lista de ingredientes */}
             <div className="p-6">
               <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
                 {ingredients.map((ing, idx) => {
@@ -113,12 +119,6 @@ export default function FormulacionesCards({
                             <p className="text-xs text-gray-500 mt-0.5">{ingrediente?.unidad_medida || ""}</p>
                           </div>
                         </div>
-                        <button
-                          onClick={() => onDelete(ing)}
-                          className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition cursor-pointer"
-                        >
-                          <Trash2 className="size-3.5" />
-                        </button>
                       </div>
                       <div className="mt-3 flex items-center justify-between">
                         <div>
@@ -141,6 +141,8 @@ export default function FormulacionesCards({
     </div>
   );
 }
+
+// Skeleton
 function CardsSkeleton() {
   return (
     <div className="space-y-6">
@@ -161,6 +163,7 @@ function CardsSkeleton() {
   );
 }
 
+// Empty state
 function EmptyState() {
   return (
     <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-12 text-center">
