@@ -94,7 +94,7 @@ export default function FormulacionDetail({
             </div>
           </div>
 
-          {/* Footer */}
+          {}
           <div className="mt-6 flex justify-end">
             <button
               onClick={onClose}

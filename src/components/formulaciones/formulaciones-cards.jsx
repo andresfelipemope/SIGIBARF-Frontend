@@ -1,10 +1,71 @@
 // components/formulaciones/formulaciones-cards.jsx
 "use client";
 
-import { Edit, Trash2, FlaskConical, AlertTriangle } from "lucide-react";
+import { 
+  Edit, 
+  Trash2, 
+  FlaskConical, 
+  Droplets, 
+  Candy, 
+  Beef, 
+  Drumstick, 
+  PiggyBank, 
+  Salad, 
+  Heart, 
+  Bone, 
+  Wheat, 
+  Apple, 
+  Pill, 
+  Zap, 
+  Package,
+  ChefHat 
+} from "lucide-react";
 
 /**
- * Vista de cards para mostrar formulaciones agrupadas por producto
+ * Mapeo de colores HEX específicos para cada ingrediente
+ * Garantiza que cada uno tenga una identidad visual única
+ */
+function getIngredientStyle(nombre) {
+  const name = (nombre || "").toLowerCase();
+
+  if (name.includes("agua")) return { icon: Droplets, hex: "#8ECAE6", label: "Agua" };
+  if (name.includes("azucar") || name.includes("azúcar")) return { icon: Candy, hex: "#E9C46A", label: "Azúcar" };
+  
+  if (name === "carne magra de cerdo" || name.includes("carne magra de cerdo")) 
+    return { icon: PiggyBank, hex: "#E76F51", label: "Cerdo (Magra)" };
+  
+  if (name === "carne magra de cordero" || name.includes("carne magra de cordero")) 
+    return { icon: Salad, hex: "#B56576", label: "Cordero (Magra)" };
+  
+  if (name === "carne magra de pollo" || name.includes("carne magra de pollo")) 
+    return { icon: Drumstick, hex: "#F4A261", label: "Pollo (Magra)" }; // Ajustado para diferenciar
+  
+  if (name === "carne magra de res" || name.includes("carne magra de res")) 
+    return { icon: Beef, hex: "#D1495B", label: "Res (Magra)" };
+  
+  if (name.includes("cereal")) return { icon: Wheat, hex: "#90BE6D", label: "Cereales" };
+  
+  if (name.includes("fruta") || name.includes("vegetal")) 
+    return { icon: Apple, hex: "#43AA8B", label: "Frutas/Veg" };
+  
+  if (name.includes("hueso carnoso de pollo")) return { icon: Bone, hex: "#8ECAE6", label: "Hueso Pollo" };
+  
+  if (name.includes("órganos") || name.includes("vísceras")) {
+    if (name.includes("cerdo")) return { icon: Heart, hex: "#9D4EDD", label: "Vísceras Cerdo" };
+    if (name.includes("cordero")) return { icon: Heart, hex: "#7B2CBF", label: "Vísceras Cordero" };
+    if (name.includes("pollo")) return { icon: Heart, hex: "#C77DFF", label: "Vísceras Pollo" };
+    if (name.includes("res")) return { icon: Heart, hex: "#5A189A", label: "Vísceras Res" };
+  }
+  
+  if (name.includes("suplemento")) return { icon: Pill, hex: "#2A9D8F", label: "Suplementos" };
+  if (name.includes("taurina")) return { icon: Zap, hex: "#277DA1", label: "Taurina" };
+
+  // Default genérico
+  return { icon: Package, hex: "#9CA3AF", label: "Otros" };
+}
+
+/**
+ * Vista de cards con iconos y barras de colores sincronizados por ingrediente
  */
 export default function FormulacionesCards({
   formulaciones,
@@ -14,19 +75,12 @@ export default function FormulacionesCards({
   onEdit,
   onDelete,
 }) {
-  if (loading && formulaciones.length === 0) {
-    return <CardsSkeleton />;
-  }
+  if (loading && formulaciones.length === 0) return <CardsSkeleton />;
+  if (!loading && formulaciones.length === 0) return <EmptyState />;
 
-  if (!loading && formulaciones.length === 0) {
-    return <EmptyState />;
-  }
-
-  // Agrupar formulaciones por producto
+  // Agrupar por producto
   const formulacionesPorProducto = formulaciones.reduce((acc, f) => {
-    if (!acc[f.id_producto]) {
-      acc[f.id_producto] = [];
-    }
+    if (!acc[f.id_producto]) acc[f.id_producto] = [];
     acc[f.id_producto].push(f);
     return acc;
   }, {});
@@ -44,7 +98,7 @@ export default function FormulacionesCards({
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-4">
                   <div className="size-12 rounded-xl bg-orange-100 flex items-center justify-center">
-                    <FlaskConical className="size-6 text-orange-600" />
+                    <ChefHat className="size-6 text-orange-600" />
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-gray-900">{producto?.nombre || `Producto #${productoId}`}</h3>
@@ -54,7 +108,6 @@ export default function FormulacionesCards({
                   </div>
                 </div>
                 
-                {/* Botones de acción */}
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => onEdit(ingredients)}
@@ -74,7 +127,7 @@ export default function FormulacionesCards({
               </div>
             </div>
 
-            {/* Barra de progreso porcentual */}
+            {/* Barra de progreso sincronizada con colores únicos de ingredientes */}
             <div className="px-6 py-4 bg-gray-50">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">Balance de la receta</span>
@@ -82,52 +135,78 @@ export default function FormulacionesCards({
                   {totalPorcentaje.toFixed(1)}%
                 </span>
               </div>
+              {/* Barra segmentada con colores HEX exactos */}
               <div className="h-3 bg-gray-200 rounded-full overflow-hidden flex">
-                {ingredients.map((ing, idx) => {
+                {ingredients.map((ing) => {
+                  const ingredienteData = ingredientesMap[ing.id_ingrediente];
+                  const { hex } = getIngredientStyle(ingredienteData?.nombre);
                   const porcentaje = parseFloat(ing.porcentaje_ingrediente);
-                  const colores = ["bg-green-500", "bg-orange-500", "bg-blue-500", "bg-purple-500", "bg-pink-500", "bg-yellow-500"];
                   return (
                     <div
                       key={ing.id}
-                      className={`${colores[idx % colores.length]} transition-all`}
-                      style={{ width: `${porcentaje}%` }}
-                      title={`${ingredientesMap[ing.id_ingrediente]?.nombre}: ${porcentaje}%`}
+                      className="transition-all hover:opacity-80"
+                      style={{ width: `${porcentaje}%`, backgroundColor: hex }}
+                      title={`${ingredienteData?.nombre}: ${porcentaje}%`}
                     />
+                  );
+                })}
+              </div>
+              
+              {/* Leyenda visual debajo de la barra con colores exactos */}
+              <div className="flex flex-wrap gap-3 mt-3">
+                {ingredients.map((ing) => {
+                  const ingredienteData = ingredientesMap[ing.id_ingrediente];
+                  const { hex, label } = getIngredientStyle(ingredienteData?.nombre);
+                  return (
+                    <div key={ing.id} className="flex items-center gap-1.5">
+                      <div className="size-2.5 rounded-full" style={{ backgroundColor: hex }} />
+                      <span className="text-xs text-gray-600">{label}</span>
+                    </div>
                   );
                 })}
               </div>
             </div>
 
-            {/* Lista de ingredientes */}
+            {/* Lista de ingredientes con iconos y bordes de colores únicos */}
             <div className="p-6">
               <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-                {ingredients.map((ing, idx) => {
-                  const ingrediente = ingredientesMap[ing.id_ingrediente];
-                  const colores = ["border-green-200", "border-orange-200", "border-blue-200", "border-purple-200", "border-pink-200", "border-yellow-200"];
+                {ingredients.map((ing) => {
+                  const ingredienteData = ingredientesMap[ing.id_ingrediente];
+                  const { icon: Icon, hex, label } = getIngredientStyle(ingredienteData?.nombre);
                   
                   return (
-                    <div key={ing.id} className={`p-4 rounded-xl border-2 ${colores[idx % colores.length]} bg-white hover:shadow-md transition`}>
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className={`size-10 rounded-lg ${colores[idx % colores.length].replace('border', 'bg').replace('200', '100')} flex items-center justify-center`}>
-                            <span className="text-sm font-bold text-gray-700">
-                              {ingrediente?.nombre?.charAt(0)?.toUpperCase() || "I"}
-                            </span>
-                          </div>
-                          <div>
-                            <p className="font-semibold text-gray-900 text-sm">{ingrediente?.nombre || `Ingrediente #${ing.id_ingrediente}`}</p>
-                            <p className="text-xs text-gray-500 mt-0.5">{ingrediente?.unidad_medida || ""}</p>
-                          </div>
+                    <div key={ing.id} 
+                      className="p-4 rounded-xl border-2 bg-white hover:shadow-md transition group"
+                      style={{ borderColor: hex + "40" }} // Borde con opacidad 25% (hex + 40)
+                    >
+                      <div className="flex items-start gap-3">
+                        {/* Icono del ingrediente con fondo de color exacto (opacidad 15%) */}
+                        <div 
+                          className="size-10 rounded-lg flex items-center justify-center shrink-0"
+                          style={{ backgroundColor: hex + "25" }} 
+                        >
+                          <Icon className="size-5" style={{ color: hex }} />
                         </div>
-                      </div>
-                      <div className="mt-3 flex items-center justify-between">
-                        <div>
-                          <p className="text-xs text-gray-400 uppercase tracking-wider">Cantidad</p>
-                          <p className="text-sm font-bold text-gray-900">{parseFloat(ing.cantidad_ingrediente).toFixed(2)}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-xs text-gray-400 uppercase tracking-wider">Porcentaje</p>
-                          <p className="text-lg font-extrabold text-gray-900">{parseFloat(ing.porcentaje_ingrediente).toFixed(1)}%</p>
+                        
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-gray-900 text-sm truncate">
+                            {ingredienteData?.nombre || `Ingrediente #${ing.id_ingrediente}`}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-0.5">
+                            {ingredienteData?.unidad_medida || ""}
+                          </p>
+                          
+                          <div className="mt-2 flex items-center justify-between">
+                            <div>
+                              <p className="text-xs text-gray-400 uppercase tracking-wider">Cantidad</p>
+                              <p className="text-sm font-bold text-gray-900">{parseFloat(ing.cantidad_ingrediente).toFixed(2)}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-xs text-gray-400 uppercase tracking-wider">Porcentaje</p>
+                              {/* Porcentaje con el color HEX exacto */}
+                              <p className="text-lg font-extrabold" style={{ color: hex }}>{parseFloat(ing.porcentaje_ingrediente).toFixed(1)}%</p>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -168,7 +247,7 @@ function EmptyState() {
   return (
     <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-12 text-center">
       <div className="mx-auto size-16 rounded-full bg-gray-50 flex items-center justify-center mb-4">
-        <FlaskConical className="size-8 text-gray-400" />
+        <ChefHat className="size-8 text-gray-400" />
       </div>
       <h3 className="text-lg font-semibold text-gray-900">Sin formulaciones</h3>
       <p className="mt-1 text-sm text-gray-500">

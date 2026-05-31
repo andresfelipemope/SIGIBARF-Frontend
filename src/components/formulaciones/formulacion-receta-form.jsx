@@ -1,8 +1,7 @@
-// components/formulaciones/formulacion-receta-form.jsx
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { X, Plus, Trash2, AlertCircle, Loader2, FlaskConical } from "lucide-react";
+import { X, Plus, Trash2, AlertCircle, Loader2, FlaskConical, ChefHat } from "lucide-react";
 
 export default function FormulacionRecetaForm({
   open,
@@ -13,7 +12,7 @@ export default function FormulacionRecetaForm({
   onClose,
   onSave,
   onDelete,
-  onSuccess, // ⭐ NUEVO
+  onSuccess, 
 }) {
   const [step, setStep] = useState(1);
   const [productoSeleccionado, setProductoSeleccionado] = useState(null);
@@ -172,7 +171,7 @@ export default function FormulacionRecetaForm({
       
       <div className="flex min-h-full items-center justify-center p-3">
         <div className="relative w-full max-w-xl bg-white rounded-xl shadow-2xl overflow-hidden">
-          {/* Header */}
+          {}
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50">
             <div>
               <h2 className="text-base font-bold text-gray-900">
@@ -187,7 +186,7 @@ export default function FormulacionRecetaForm({
             </button>
           </div>
 
-          {/* Progress */}
+          {}
           <div className="px-4 py-2 bg-white border-b border-gray-100">
             <div className="flex items-center gap-2">
               {[1, 2, 3].map((s) => (
@@ -201,7 +200,7 @@ export default function FormulacionRecetaForm({
             </div>
           </div>
 
-          {/* Error */}
+          {}
           {error && (
             <div className="mx-4 mt-3 p-2 rounded-lg bg-red-50 border border-red-200 flex items-start gap-2">
               <AlertCircle className="size-4 text-red-600 shrink-0 mt-0.5" />
@@ -209,9 +208,9 @@ export default function FormulacionRecetaForm({
             </div>
           )}
 
-          {/* Content */}
+          {}
           <div className="px-4 py-3 max-h-[calc(100vh-180px)] overflow-y-auto">
-            {/* Step 1: Producto */}
+            {}
             {step === 1 && (
               <div className="space-y-2">
                 <label className="block text-xs font-semibold text-gray-700">Producto a formular <span className="text-red-500">*</span></label>
@@ -236,7 +235,7 @@ export default function FormulacionRecetaForm({
               </div>
             )}
 
-            {/* Step 2: Ingredientes */}
+            {}
             {step === 2 && (
               <div className="space-y-3">
                 <div className="p-3 rounded-lg bg-gray-50 border border-gray-200">
@@ -315,13 +314,13 @@ export default function FormulacionRecetaForm({
               </div>
             )}
 
-            {/* Step 3: Revisar */}
+            {}
             {step === 3 && (
               <div className="space-y-3">
                 <div className="p-3 rounded-lg bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200">
                   <div className="flex items-center gap-2.5">
                     <div className="size-9 rounded-lg bg-orange-500 flex items-center justify-center shrink-0">
-                      <FlaskConical className="size-4 text-white" />
+                      <ChefHat className="size-4 text-white" />
                     </div>
                     <div>
                       <p className="text-xs font-semibold text-orange-600 uppercase">Producto</p>
@@ -362,7 +361,7 @@ export default function FormulacionRecetaForm({
             )}
           </div>
 
-          {/* Footer */}
+          {}
           <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 bg-gray-50">
             <button onClick={() => step > 1 && setStep(step - 1)} disabled={step === 1 || loading}
               className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-100 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
@@ -377,7 +376,7 @@ export default function FormulacionRecetaForm({
               ) : (
                 <button onClick={handleSave} disabled={loading || ingredientesAgregados.length === 0}
                   className="inline-flex items-center gap-1.5 rounded-lg bg-green-500 px-4 py-1.5 text-xs font-bold text-white hover:bg-green-600 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
-                  {loading ? <><Loader2 className="size-3.5 animate-spin" /> Guardando...</> : <><FlaskConical className="size-3.5" /> {mode === "edit" ? "Actualizar" : "Crear"}</>}
+                  {loading ? <><Loader2 className="size-3.5 animate-spin" /> Guardando...</> : <><ChefHat className="size-3.5" /> {mode === "edit" ? "Actualizar" : "Crear"}</>}
                 </button>
               )}
             </div>

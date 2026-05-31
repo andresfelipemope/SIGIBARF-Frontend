@@ -1,11 +1,7 @@
-// components/formulaciones/formulacion-delete-dialog.jsx
 "use client";
 
 import { AlertTriangle, Loader2 } from "lucide-react";
 
-/**
- * Diálogo de confirmación para eliminar una o múltiples formulaciones
- */
 export default function FormulacionDeleteDialog({
   open,
   item,
@@ -16,14 +12,12 @@ export default function FormulacionDeleteDialog({
 }) {
   if (!open || !item) return null;
 
-  // Normalizar a array
   const items = Array.isArray(item) ? item : [item];
   const firstItem = items[0];
   const producto = productosMap[firstItem.id_producto];
   const esEliminacionMultiple = items.length > 1;
 
   const handleConfirm = async () => {
-    // Si es múltiple, eliminar todos; si no, solo uno
     if (esEliminacionMultiple) {
       const promises = items.map(f => onConfirm(f.id));
       await Promise.all(promises);
@@ -39,12 +33,12 @@ export default function FormulacionDeleteDialog({
       
       <div className="flex min-h-full items-center justify-center p-4">
         <div className="relative w-full max-w-md transform rounded-2xl bg-white p-6 shadow-2xl">
-          {/* Icono de advertencia */}
+          {}
           <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-red-100">
             <AlertTriangle className="size-6 text-red-600" />
           </div>
 
-          {/* Header */}
+          {}
           <div className="text-center mb-6">
             <h3 className="text-lg font-bold text-gray-900">
               {esEliminacionMultiple ? "¿Eliminar formulación completa?" : "¿Eliminar ingrediente?"}
@@ -56,7 +50,7 @@ export default function FormulacionDeleteDialog({
             </p>
           </div>
 
-          {/* Resumen */}
+          {}
           <div className="mb-6 rounded-xl bg-gray-50 p-4">
             <div className="space-y-2">
               <div className="flex justify-between items-center">
@@ -106,7 +100,7 @@ export default function FormulacionDeleteDialog({
             </div>
           </div>
 
-          {/* Actions */}
+          {}
           <div className="flex items-center justify-end gap-3">
             <button
               onClick={onClose}

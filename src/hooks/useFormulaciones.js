@@ -1,4 +1,3 @@
-// hooks/useFormulaciones.js
 "use client";
 
 import { useState, useCallback, useMemo } from "react";
@@ -87,7 +86,6 @@ export function useFormulaciones() {
     setSuccess(null);
   }, []);
 
-  // ⭐ NUEVO: Permite disparar mensajes de éxito explícitos
   const showSuccess = useCallback((message) => {
     setError(null);
     setSuccess(message);
@@ -107,6 +105,6 @@ export function useFormulaciones() {
     updateFormulacion,
     deleteFormulacion,
     clearMessages,
-    showSuccess, // ⭐ Exportado
+    showSuccess,
   };
 }

@@ -1,4 +1,3 @@
-// formulaciones/page.jsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -24,7 +23,7 @@ export default function FormulacionesPage() {
     updateFormulacion,
     deleteFormulacion,
     clearMessages,
-    showSuccess, // ⭐ NUEVO
+    showSuccess,
   } = useFormulaciones();
 
   const [isRecetaFormOpen, setIsRecetaFormOpen] = useState(false);
@@ -156,7 +155,7 @@ export default function FormulacionesPage() {
         onClose={() => { setIsRecetaFormOpen(false); setSelectedItem(null); }}
         onSave={handleSaveReceta}
         onDelete={deleteFormulacion}
-        onSuccess={showSuccess} // ⭐ PASADO AL COMPONENTE
+        onSuccess={showSuccess}
       />
 
       <FormulacionDeleteDialog 

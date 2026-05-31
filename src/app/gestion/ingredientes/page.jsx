@@ -20,7 +20,6 @@ const EMPTY_FORM = {
   unidad_medida: "kg",
 };
 
-// ── Modal ────────────────────────────────────────────────────────────
 function IngredienteModal({ open, onClose, onSaved, editData = null }) {
   const [formData, setFormData]       = useState(EMPTY_FORM);
   const [loading, setLoading]         = useState(false);
