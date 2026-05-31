@@ -4,14 +4,14 @@ import { useState, useEffect } from "react";
 import { 
   Boxes, 
   AlertTriangle, 
-  TrendingDown, 
-  Coins, 
   Search, 
   Filter,
   Plus,
   Loader2,
   X,
-  CheckCircle
+  CheckCircle,
+  Pencil,
+  Trash2
 } from "lucide-react";
 import { inventarioService } from "@/services/inventario";
 
@@ -24,6 +24,10 @@ export default function InventarioPage() {
 
   // Modal y Formulario
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
     nombre: "",
     precio: "",
@@ -65,6 +69,58 @@ export default function InventarioPage() {
     }
   };
 
+  const openNewModal = () => {
+    setEditingId(null);
+    setFormData({
+      nombre: "",
+      precio: "",
+      stock_actual: 0,
+      stock_minimo: 0,
+      inhabilitado: false
+    });
+    setFieldErrors({});
+    setFormError(null);
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (producto) => {
+    setEditingId(producto.id);
+    setFormData({
+      nombre: producto.nombre,
+      precio: producto.precio,
+      stock_actual: producto.stock_actual,
+      stock_minimo: producto.stock_minimo,
+      inhabilitado: producto.inhabilitado
+    });
+    setFieldErrors({});
+    setFormError(null);
+    setIsModalOpen(true);
+  };
+
+  const openDeleteModal = (producto) => {
+    setProductToDelete(producto);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!productToDelete) return;
+    try {
+      setDeleteLoading(true);
+      setError(null);
+      await inventarioService.deleteProducto(productToDelete.id);
+      setSuccessMessage("Producto eliminado correctamente");
+      setIsDeleteModalOpen(false);
+      setProductToDelete(null);
+      fetchProductos(); // Refrescar lista
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (err) {
+      setError(err.message || "Error al eliminar el producto");
+      setIsDeleteModalOpen(false);
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFormError(null);
@@ -83,17 +139,29 @@ export default function InventarioPage() {
     try {
       setFormLoading(true);
       // Asegurar tipos para el backend
-      const payload = {
-        ...formData,
-        precio: String(formData.precio), // El backend pide string decimal
-        stock_actual: parseInt(formData.stock_actual, 10) || 0,
-        stock_minimo: parseInt(formData.stock_minimo, 10) || 0,
-      };
-
-      await inventarioService.createProducto(payload);
+      if (editingId) {
+        // Modo Edición: no se envía stock_actual
+        const payload = {
+          nombre: formData.nombre,
+          precio: String(formData.precio),
+          stock_minimo: parseInt(formData.stock_minimo, 10) || 0,
+          inhabilitado: formData.inhabilitado
+        };
+        await inventarioService.updateProducto(editingId, payload);
+        setSuccessMessage("Producto actualizado correctamente");
+      } else {
+        // Modo Creación
+        const payload = {
+          ...formData,
+          precio: String(formData.precio), // El backend pide string decimal
+          stock_actual: parseInt(formData.stock_actual, 10) || 0,
+          stock_minimo: parseInt(formData.stock_minimo, 10) || 0,
+        };
+        await inventarioService.createProducto(payload);
+        setSuccessMessage("Producto registrado correctamente");
+      }
       
       // Éxito
-      setSuccessMessage("Producto registrado correctamente");
       setIsModalOpen(false);
       setFormData({
         nombre: "",
@@ -125,15 +193,12 @@ export default function InventarioPage() {
   
   const metrics = [
     { label: "Total Productos", value: loading ? "..." : totalItems.toString(), icon: Boxes, color: "text-green-700 bg-green-50 border-green-100" },
-    { label: "Alertas de Stock", value: loading ? "..." : `${itemsInAlert} Ítems`, icon: AlertTriangle, color: "text-rose-600 bg-rose-50 border-rose-100" },
-    { label: "Mermas (Este Mes)", value: "N/A", icon: TrendingDown, color: "text-orange-600 bg-orange-50 border-orange-100" },
-    { label: "Valor del Inventario", value: "N/A", icon: Coins, color: "text-emerald-700 bg-emerald-50 border-emerald-100" }
+    { label: "Alertas de Stock", value: loading ? "..." : `${itemsInAlert} Ítems`, icon: AlertTriangle, color: "text-rose-600 bg-rose-50 border-rose-100" }
   ];
 
   // Filtering Logic
   const filteredItems = productos.filter(item => {
-    const searchMatch = item.nombre.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                       item.id.toString().includes(searchTerm);
+    const searchMatch = item.nombre.toLowerCase().includes(searchTerm.toLowerCase());
     
     let statusMatch = true;
     if (statusFilter === "activos") statusMatch = !item.inhabilitado;
@@ -163,7 +228,7 @@ export default function InventarioPage() {
           </p>
         </div>
         <button 
-          onClick={() => setIsModalOpen(true)}
+          onClick={openNewModal}
           className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-orange-500/20 hover:bg-orange-600 transition-all duration-200"
         >
           <Plus className="size-4" />
@@ -172,7 +237,7 @@ export default function InventarioPage() {
       </div>
 
       {/* Metrics Row */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 sm:grid-cols-2">
         {metrics.map((m) => (
           <div key={m.label} className="rounded-2xl border border-gray-200 bg-white p-6 shadow-xs">
             <div className="flex items-center justify-between">
@@ -197,7 +262,7 @@ export default function InventarioPage() {
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
-              placeholder="Buscar producto por nombre o ID..."
+              placeholder="Buscar producto..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full rounded-xl border border-gray-200 bg-gray-50/50 py-2 pl-10 pr-4 text-sm text-black placeholder-gray-400 focus:border-green-600 focus:bg-white focus:outline-hidden transition-all duration-200"
@@ -235,12 +300,12 @@ export default function InventarioPage() {
           <table className="w-full border-collapse text-left">
             <thead>
               <tr className="border-b border-gray-100 text-xs font-bold uppercase tracking-wider text-gray-400">
-                <th className="py-4 px-3">ID</th>
                 <th className="py-4 px-3">Producto</th>
                 <th className="py-4 px-3 text-right">Precio</th>
                 <th className="py-4 px-3 text-right">Stock Actual</th>
                 <th className="py-4 px-3 text-right">Mínimo</th>
                 <th className="py-4 px-3 text-center">Estado</th>
+                <th className="py-4 px-3 text-center">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -254,9 +319,6 @@ export default function InventarioPage() {
               ) : filteredItems.length > 0 ? (
                 filteredItems.map((item) => (
                   <tr key={item.id} className={`transition-colors group ${item.inhabilitado ? 'bg-gray-50/50 opacity-70' : 'hover:bg-green-50/10'}`}>
-                    <td className="py-4 px-3 text-xs font-bold text-gray-500">
-                      #{item.id}
-                    </td>
                     <td className="py-4 px-3 text-sm font-semibold text-black">
                       {item.nombre}
                     </td>
@@ -288,6 +350,24 @@ export default function InventarioPage() {
                         </span>
                       )}
                     </td>
+                    <td className="py-4 px-3 text-center">
+                      <div className="flex items-center justify-center gap-1">
+                        <button
+                          onClick={() => openEditModal(item)}
+                          className="p-1.5 text-gray-400 hover:text-orange-500 hover:bg-orange-50 rounded-lg transition-colors"
+                          title="Editar Producto"
+                        >
+                          <Pencil className="size-4" />
+                        </button>
+                        <button
+                          onClick={() => openDeleteModal(item)}
+                          className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Eliminar Producto"
+                        >
+                          <Trash2 className="size-4" />
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))
               ) : (
@@ -307,7 +387,9 @@ export default function InventarioPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
-              <h2 className="text-xl font-extrabold text-black">Registrar Nuevo Producto</h2>
+              <h2 className="text-xl font-extrabold text-black">
+                {editingId ? "Editar Producto" : "Registrar Nuevo Producto"}
+              </h2>
               <button 
                 onClick={() => setIsModalOpen(false)}
                 className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -373,10 +455,11 @@ export default function InventarioPage() {
                       value={formData.stock_actual}
                       onChange={handleInputChange}
                       min="0"
-                      className={`w-full rounded-xl border ${fieldErrors.stock_actual ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-green-600'} bg-gray-50/50 px-4 py-2.5 text-sm text-black focus:bg-white focus:outline-hidden transition-all`}
-                      disabled={formLoading}
+                      className={`w-full rounded-xl border ${fieldErrors.stock_actual && !editingId ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-green-600'} bg-gray-50/50 px-4 py-2.5 text-sm text-black focus:bg-white focus:outline-hidden transition-all ${editingId ? 'opacity-60 cursor-not-allowed bg-gray-100' : ''}`}
+                      disabled={formLoading || !!editingId}
                     />
-                    {fieldErrors.stock_actual && <p className="text-red-500 text-xs mt-1 font-medium">{Array.isArray(fieldErrors.stock_actual) ? fieldErrors.stock_actual[0] : fieldErrors.stock_actual}</p>}
+                    {editingId && <p className="text-gray-500 text-[10px] mt-1 font-medium">No modificable (gestionado por Producción)</p>}
+                    {fieldErrors.stock_actual && !editingId && <p className="text-red-500 text-xs mt-1 font-medium">{Array.isArray(fieldErrors.stock_actual) ? fieldErrors.stock_actual[0] : fieldErrors.stock_actual}</p>}
                   </div>
 
                   <div>
@@ -433,11 +516,53 @@ export default function InventarioPage() {
                       Guardando...
                     </>
                   ) : (
-                    'Guardar Producto'
+                    editingId ? 'Guardar Cambios' : 'Guardar Producto'
                   )}
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Confirmar Eliminación */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden flex flex-col p-6 text-center">
+            <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-red-100 mb-4">
+              <AlertTriangle className="size-6 text-red-600" />
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Eliminar Producto</h3>
+            <p className="text-sm text-gray-500 mb-6">
+              ¿Está seguro de que desea eliminar <strong>{productToDelete?.nombre}</strong>? Esta acción no se puede deshacer.
+            </p>
+            
+            <div className="flex items-center justify-center gap-3">
+              <button
+                onClick={() => {
+                  setIsDeleteModalOpen(false);
+                  setProductToDelete(null);
+                }}
+                className="px-5 py-2.5 text-sm font-bold text-gray-600 hover:text-gray-900 transition-colors"
+                disabled={deleteLoading}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDeleteConfirm}
+                disabled={deleteLoading}
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-6 py-2.5 text-sm font-bold text-white shadow-md hover:bg-red-700 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+              >
+                {deleteLoading ? (
+                  <>
+                    <Loader2 className="size-4 animate-spin" />
+                    Eliminando...
+                  </>
+                ) : (
+                  'Eliminar'
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}
