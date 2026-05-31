@@ -1,149 +1,309 @@
+// formulaciones/page.jsx
 "use client";
 
+import { useState, useEffect } from "react";
+import { useFormulaciones } from "@/hooks/useFormulaciones";
+import FormulacionesTable from "@/components/formulaciones/formulaciones-table";
+import FormulacionForm from "@/components/formulaciones/formulacion-form";
+import FormulacionDetail from "@/components/formulaciones/formulacion-detail";
+import FormulacionDeleteDialog from "@/components/formulaciones/formulacion-delete-dialog";
+import FormulacionFilters from "@/components/formulaciones/formulacion-filters";
+
 import { 
+  Plus, 
   FlaskConical, 
-  Plus
+  Boxes, 
+  Beef, 
+  RefreshCw, 
+  CheckCircle, 
+  AlertTriangle 
 } from "lucide-react";
 
 export default function FormulacionesPage() {
-  const recipes = [
-    {
-      id: "REC-A10",
-      name: "Athletic Dog Adulto Premium",
-      type: "Perros Adultos",
-      efficiency: "96.4%",
-      batchSize: "200 Kg",
-      composition: [
-        { name: "Proteína de Carne (Res/Pollo)", percentage: 70, color: "bg-green-600" },
-        { name: "Hueso Blando Carnudo", percentage: 10, color: "bg-orange-500" },
-        { name: "Vísceras y Órganos", percentage: 10, color: "bg-green-700" },
-        { name: "Vegetales y Frutas", percentage: 8, color: "bg-orange-600" },
-        { name: "Suplementos y Aceites", percentage: 2, color: "bg-gray-400" }
-      ],
-      state: "Activo"
-    },
-    {
-      id: "REC-C05",
-      name: "Athletic Cat Purrfect Protein",
-      type: "Gatos Adultos",
-      efficiency: "98.1%",
-      batchSize: "150 Kg",
-      composition: [
-        { name: "Proteína Limpia (Pollo/Pavo)", percentage: 80, color: "bg-green-600" },
-        { name: "Vísceras Ricas en Taurina", percentage: 10, color: "bg-green-700" },
-        { name: "Hueso Blando Molido", percentage: 5, color: "bg-orange-500" },
-        { name: "Vegetales Selectos", percentage: 3, color: "bg-orange-600" },
-        { name: "Suplementos (Omega-3/Cálculo)", percentage: 2, color: "bg-gray-400" }
-      ],
-      state: "Activo"
-    },
-    {
-      id: "REC-P02",
-      name: "Athletic Puppy Grow & Strong",
-      type: "Cachorros",
-      efficiency: "95.0%",
-      batchSize: "200 Kg",
-      composition: [
-        { name: "Proteína de Ternera / Pollo", percentage: 65, color: "bg-green-600" },
-        { name: "Hueso Carnudo (Alto Calcio)", percentage: 15, color: "bg-orange-500" },
-        { name: "Vísceras y Órganos Blandos", percentage: 10, color: "bg-green-700" },
-        { name: "Puré de Calabaza y Zanahoria", percentage: 8, color: "bg-orange-600" },
-        { name: "Suplementos de Crecimiento", percentage: 2, color: "bg-gray-400" }
-      ],
-      state: "Bajo Revisión"
+  const {
+    formulaciones,
+    productos,
+    ingredientes,
+    productosMap,
+    ingredientesMap,
+    loading,
+    error,
+    success,
+    loadAllData,
+    createFormulacion,
+    updateFormulacion,
+    deleteFormulacion,
+    clearMessages,
+  } = useFormulaciones();
+
+  // Filtros
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedProductFilter, setSelectedProductFilter] = useState("todos");
+  const [selectedIngredientFilter, setSelectedIngredientFilter] = useState("todos");
+
+  // Modales
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+
+  // Toast
+  const [toastMsg, setToastMsg] = useState(null);
+
+  useEffect(() => {
+    loadAllData();
+  }, [loadAllData]);
+
+  // Manejar toasts
+  useEffect(() => {
+    if (success) {
+      setToastMsg({ type: "success", text: success });
+      const timer = setTimeout(() => {
+        setToastMsg(null);
+        clearMessages();
+      }, 4000);
+      return () => clearTimeout(timer);
     }
-  ];
+    if (error) {
+      setToastMsg({ type: "error", text: error });
+    }
+  }, [success, error, clearMessages]);
+
+  // Reset filtros
+  const handleResetFilters = () => {
+    setSearchTerm("");
+    setSelectedProductFilter("todos");
+    setSelectedIngredientFilter("todos");
+  };
+
+  // Handlers de modales
+  const handleOpenCreate = () => {
+    setSelectedItem(null);
+    setIsFormOpen(true);
+  };
+
+  const handleOpenEdit = (item) => {
+    setSelectedItem(item);
+    setIsFormOpen(true);
+  };
+
+  const handleOpenDetail = (item) => {
+    setSelectedItem(item);
+    setIsDetailOpen(true);
+  };
+
+  const handleOpenDelete = (item) => {
+    setSelectedItem(item);
+    setIsDeleteOpen(true);
+  };
+
+  // Guardar formulario
+  const handleSaveForm = async (formData) => {
+    if (selectedItem) {
+      const res = await updateFormulacion(selectedItem.id, formData);
+      if (res.success) {
+        setIsFormOpen(false);
+        setSelectedItem(null);
+      }
+      return res;
+    } else {
+      const res = await createFormulacion(formData);
+      if (res.success) {
+        setIsFormOpen(false);
+      }
+      return res;
+    }
+  };
+
+  // Confirmar eliminación
+  const handleDeleteConfirm = async (id) => {
+    const res = await deleteFormulacion(id);
+    if (res.success) {
+      setIsDeleteOpen(false);
+      setSelectedItem(null);
+    }
+    return res;
+  };
+
+  // Filtrado
+  const filteredFormulaciones = formulaciones.filter((f) => {
+    const prod = productosMap[f.id_producto];
+    const ing = ingredientesMap[f.id_ingrediente];
+
+    const matchSearch =
+      f.id.toString().includes(searchTerm) ||
+      prod?.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      ing?.nombre?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchProduct =
+      selectedProductFilter === "todos" ||
+      f.id_producto.toString() === selectedProductFilter;
+
+    const matchIngredient =
+      selectedIngredientFilter === "todos" ||
+      f.id_ingrediente.toString() === selectedIngredientFilter;
+
+    return matchSearch && matchProduct && matchIngredient;
+  });
+
+  // Métricas
+  const totalFormulaciones = formulaciones.length;
+  const uniqueProductsFormulated = new Set(formulaciones.map((f) => f.id_producto)).size;
+  const avgIngredients = uniqueProductsFormulated > 0 
+    ? (totalFormulaciones / uniqueProductsFormulated).toFixed(1) 
+    : "0";
 
   return (
-    <div className="space-y-8 animate-fade-in text-black">
+    <div className="space-y-8 animate-fade-in text-black relative">
+      {/* Toast */}
+      {toastMsg && (
+        <div 
+          className={`fixed top-24 right-8 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-lg border animate-slide-in-right ${
+            toastMsg.type === "success" 
+              ? "bg-emerald-50 border-emerald-500 text-emerald-800" 
+              : "bg-red-50 border-red-500 text-red-800"
+          }`}
+        >
+          {toastMsg.type === "success" ? (
+            <CheckCircle className="size-5 text-emerald-600 shrink-0" />
+          ) : (
+            <AlertTriangle className="size-5 text-red-600 shrink-0" />
+          )}
+          <span className="font-semibold text-sm">{toastMsg.text}</span>
+          <button 
+            onClick={() => {
+              setToastMsg(null);
+              clearMessages();
+            }}
+            className="ml-2 text-gray-400 hover:text-gray-700 font-bold"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-extrabold text-black tracking-tight">
-            Fórmulas y Recetarios
+            Fórmulas y Formulaciones
           </h1>
           <p className="text-sm text-gray-500 mt-1 font-medium">
-            Parámetros de composición porcentual, balanceo y control de macronutrientes para cada línea de producto BARF.
+            Define y gestiona los insumos e ingredientes exactos que componen cada producto final BARF de Athletic BARF.
           </p>
         </div>
-        <button className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-orange-500/20 hover:bg-orange-600 transition-all duration-200">
-          <Plus className="size-4" />
-          Nueva Formulación
-        </button>
+        <div className="flex items-center gap-2.5">
+          <button 
+            onClick={loadAllData}
+            disabled={loading}
+            className="flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-xs font-semibold text-gray-600 hover:bg-gray-50 transition disabled:opacity-50 cursor-pointer"
+          >
+            <RefreshCw className={`size-3.5 ${loading ? "animate-spin" : ""}`} /> 
+            Actualizar
+          </button>
+          <button 
+            onClick={handleOpenCreate}
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-orange-500/20 hover:bg-orange-600 transition-all duration-200 cursor-pointer"
+          >
+            <Plus className="size-4" />
+            Nueva Formulación
+          </button>
+        </div>
       </div>
 
-      {/* Recipes Listing */}
-      <div className="space-y-6">
-        {recipes.map((recipe) => (
-          <div key={recipe.id} className="rounded-2xl border border-gray-200 bg-white p-6 shadow-xs hover:border-green-600/30 transition-all duration-300">
-            {/* Header recipe details */}
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-gray-100 pb-4">
-              <div className="flex items-center gap-3">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-green-50 text-green-700 border border-green-100">
-                  <FlaskConical className="size-5" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-green-700 uppercase tracking-wider">{recipe.id}</span>
-                    <span className="h-1.5 w-1.5 rounded-full bg-gray-400" />
-                    <span className="text-xs font-semibold text-gray-500">{recipe.type}</span>
-                  </div>
-                  <h3 className="text-lg font-bold text-black mt-0.5">{recipe.name}</h3>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <div className="text-right">
-                  <span className="text-[10px] font-bold text-gray-400 uppercase block">Lote de Prueba</span>
-                  <span className="text-sm font-bold text-black">{recipe.batchSize}</span>
-                </div>
-                <div className="h-8 w-px bg-gray-200" />
-                <div className="text-right">
-                  <span className="text-[10px] font-bold text-gray-400 uppercase block">Rendimiento</span>
-                  <span className="text-sm font-bold text-emerald-600">{recipe.efficiency}</span>
-                </div>
-                <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[9px] font-bold border ${
-                  recipe.state === "Activo" 
-                    ? "bg-emerald-50 text-emerald-700 border-emerald-100" 
-                    : "bg-orange-50 text-orange-700 border-orange-100 animate-pulse"
-                }`}>
-                  {recipe.state}
-                </span>
+      {/* Métricas */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {[
+          { 
+            label: "Total Asociaciones", 
+            value: loading ? "..." : totalFormulaciones, 
+            icon: FlaskConical, 
+            color: "text-green-700 bg-green-50 border-green-100" 
+          },
+          { 
+            label: "Productos Formulados", 
+            value: loading ? "..." : `${uniqueProductsFormulated} ítems`, 
+            icon: Boxes, 
+            color: "text-orange-700 bg-orange-50 border-orange-100" 
+          },
+          { 
+            label: "Ingredientes prom. / Receta", 
+            value: loading ? "..." : `${avgIngredients} insumos`, 
+            icon: Beef, 
+            color: "text-gray-600 bg-gray-50 border-gray-200" 
+          },
+        ].map((metric) => (
+          <div key={metric.label} className="rounded-2xl border border-gray-200 bg-white p-5 shadow-xs">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-gray-400">{metric.label}</span>
+              <div className={`flex size-9 items-center justify-center rounded-xl border ${metric.color}`}>
+                <metric.icon className="size-4" />
               </div>
             </div>
-
-            {/* Visual composition progress bar segments */}
-            <div className="mt-6">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Balance Porcentual de la Receta</h4>
-              
-              {/* Stacked gauge bar */}
-              <div className="flex h-4 w-full overflow-hidden rounded-full bg-gray-50 border border-gray-100">
-                {recipe.composition.map((c, i) => (
-                  <div 
-                    key={i}
-                    className={`${c.color} h-full transition-all duration-300 hover:opacity-90 cursor-pointer`}
-                    style={{ width: `${c.percentage}%` }}
-                    title={`${c.name}: ${c.percentage}%`}
-                  />
-                ))}
-              </div>
-
-              {/* Legends list */}
-              <div className="mt-4 grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
-                {recipe.composition.map((c, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <span className={`size-3 shrink-0 rounded-md ${c.color}`} />
-                    <div className="flex flex-col min-w-0">
-                      <span className="text-[10px] font-semibold text-gray-500 truncate">{c.name}</span>
-                      <span className="text-xs font-bold text-black">{c.percentage}%</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <p className="text-2xl font-extrabold text-black mt-3">{metric.value}</p>
           </div>
         ))}
       </div>
+
+      {/* Filtros */}
+      <FormulacionFilters 
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        selectedProductFilter={selectedProductFilter}
+        setSelectedProductFilter={setSelectedProductFilter}
+        productos={productos}
+        selectedIngredientFilter={selectedIngredientFilter}
+        setSelectedIngredientFilter={setSelectedIngredientFilter}
+        ingredientes={ingredientes}
+        onReset={handleResetFilters}
+      />
+
+      {/* Tabla */}
+      <FormulacionesTable 
+        formulaciones={filteredFormulaciones}
+        productosMap={productosMap}
+        ingredientesMap={ingredientesMap}
+        loading={loading && formulaciones.length === 0}
+        onEdit={handleOpenEdit}
+        onDetail={handleOpenDetail}
+        onDelete={handleOpenDelete}
+      />
+
+      {/* Modales */}
+      <FormulacionForm 
+        open={isFormOpen}
+        productos={productos}
+        ingredientes={ingredientes}
+        editData={selectedItem}
+        onClose={() => {
+          setIsFormOpen(false);
+          setSelectedItem(null);
+        }}
+        onSave={handleSaveForm}
+      />
+
+      <FormulacionDetail 
+        open={isDetailOpen}
+        item={selectedItem}
+        productosMap={productosMap}
+        ingredientesMap={ingredientesMap}
+        onClose={() => {
+          setIsDetailOpen(false);
+          setSelectedItem(null);
+        }}
+      />
+
+      <FormulacionDeleteDialog 
+        open={isDeleteOpen}
+        item={selectedItem}
+        productosMap={productosMap}
+        ingredientesMap={ingredientesMap}
+        onClose={() => {
+          setIsDeleteOpen(false);
+          setSelectedItem(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+      />
     </div>
   );
 }
