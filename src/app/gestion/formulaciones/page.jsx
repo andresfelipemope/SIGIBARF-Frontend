@@ -3,21 +3,12 @@
 
 import { useState, useEffect } from "react";
 import { useFormulaciones } from "@/hooks/useFormulaciones";
-import FormulacionesTable from "@/components/formulaciones/formulaciones-table";
-import FormulacionForm from "@/components/formulaciones/formulacion-form";
+import FormulacionesCards from "@/components/formulaciones/formulaciones-cards";
+import FormulacionRecetaForm from "@/components/formulaciones/formulacion-receta-form";
 import FormulacionDetail from "@/components/formulaciones/formulacion-detail";
 import FormulacionDeleteDialog from "@/components/formulaciones/formulacion-delete-dialog";
-import FormulacionFilters from "@/components/formulaciones/formulacion-filters";
 
-import { 
-  Plus, 
-  FlaskConical, 
-  Boxes, 
-  Beef, 
-  RefreshCw, 
-  CheckCircle, 
-  AlertTriangle 
-} from "lucide-react";
+import { Plus, RefreshCw, CheckCircle, AlertTriangle } from "lucide-react";
 
 export default function FormulacionesPage() {
   const {
@@ -36,13 +27,8 @@ export default function FormulacionesPage() {
     clearMessages,
   } = useFormulaciones();
 
-  // Filtros
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedProductFilter, setSelectedProductFilter] = useState("todos");
-  const [selectedIngredientFilter, setSelectedIngredientFilter] = useState("todos");
-
   // Modales
-  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isRecetaFormOpen, setIsRecetaFormOpen] = useState(false);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -69,50 +55,24 @@ export default function FormulacionesPage() {
     }
   }, [success, error, clearMessages]);
 
-  // Reset filtros
-  const handleResetFilters = () => {
-    setSearchTerm("");
-    setSelectedProductFilter("todos");
-    setSelectedIngredientFilter("todos");
-  };
-
-  // Handlers de modales
+  // Handlers
   const handleOpenCreate = () => {
-    setSelectedItem(null);
-    setIsFormOpen(true);
+    setIsRecetaFormOpen(true);
   };
 
-  const handleOpenEdit = (item) => {
-    setSelectedItem(item);
-    setIsFormOpen(true);
-  };
-
-  const handleOpenDetail = (item) => {
-    setSelectedItem(item);
+  const handleOpenDetail = (formulaciones) => {
+    setSelectedItem(formulaciones);
     setIsDetailOpen(true);
   };
 
-  const handleOpenDelete = (item) => {
-    setSelectedItem(item);
+  const handleOpenDelete = (formulacion) => {
+    setSelectedItem(formulacion);
     setIsDeleteOpen(true);
   };
 
-  // Guardar formulario
-  const handleSaveForm = async (formData) => {
-    if (selectedItem) {
-      const res = await updateFormulacion(selectedItem.id, formData);
-      if (res.success) {
-        setIsFormOpen(false);
-        setSelectedItem(null);
-      }
-      return res;
-    } else {
-      const res = await createFormulacion(formData);
-      if (res.success) {
-        setIsFormOpen(false);
-      }
-      return res;
-    }
+  // Guardar múltiples formulaciones
+  const handleSaveReceta = async (formData) => {
+    return await createFormulacion(formData);
   };
 
   // Confirmar eliminación
@@ -124,34 +84,6 @@ export default function FormulacionesPage() {
     }
     return res;
   };
-
-  // Filtrado
-  const filteredFormulaciones = formulaciones.filter((f) => {
-    const prod = productosMap[f.id_producto];
-    const ing = ingredientesMap[f.id_ingrediente];
-
-    const matchSearch =
-      f.id.toString().includes(searchTerm) ||
-      prod?.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      ing?.nombre?.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchProduct =
-      selectedProductFilter === "todos" ||
-      f.id_producto.toString() === selectedProductFilter;
-
-    const matchIngredient =
-      selectedIngredientFilter === "todos" ||
-      f.id_ingrediente.toString() === selectedIngredientFilter;
-
-    return matchSearch && matchProduct && matchIngredient;
-  });
-
-  // Métricas
-  const totalFormulaciones = formulaciones.length;
-  const uniqueProductsFormulated = new Set(formulaciones.map((f) => f.id_producto)).size;
-  const avgIngredients = uniqueProductsFormulated > 0 
-    ? (totalFormulaciones / uniqueProductsFormulated).toFixed(1) 
-    : "0";
 
   return (
     <div className="space-y-8 animate-fade-in text-black relative">
@@ -186,10 +118,10 @@ export default function FormulacionesPage() {
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-extrabold text-black tracking-tight">
-            Fórmulas y Formulaciones
+            Fórmulas y Recetarios
           </h1>
           <p className="text-sm text-gray-500 mt-1 font-medium">
-            Define y gestiona los insumos e ingredientes exactos que componen cada producto final BARF de Athletic BARF.
+            Parámetros de composición porcentual, balanceo y control de macronutrientes para cada línea de producto BARF.
           </p>
         </div>
         <div className="flex items-center gap-2.5">
@@ -211,75 +143,28 @@ export default function FormulacionesPage() {
         </div>
       </div>
 
-      {/* Métricas */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {[
-          { 
-            label: "Total Asociaciones", 
-            value: loading ? "..." : totalFormulaciones, 
-            icon: FlaskConical, 
-            color: "text-green-700 bg-green-50 border-green-100" 
-          },
-          { 
-            label: "Productos Formulados", 
-            value: loading ? "..." : `${uniqueProductsFormulated} ítems`, 
-            icon: Boxes, 
-            color: "text-orange-700 bg-orange-50 border-orange-100" 
-          },
-          { 
-            label: "Ingredientes prom. / Receta", 
-            value: loading ? "..." : `${avgIngredients} insumos`, 
-            icon: Beef, 
-            color: "text-gray-600 bg-gray-50 border-gray-200" 
-          },
-        ].map((metric) => (
-          <div key={metric.label} className="rounded-2xl border border-gray-200 bg-white p-5 shadow-xs">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-gray-400">{metric.label}</span>
-              <div className={`flex size-9 items-center justify-center rounded-xl border ${metric.color}`}>
-                <metric.icon className="size-4" />
-              </div>
-            </div>
-            <p className="text-2xl font-extrabold text-black mt-3">{metric.value}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Filtros */}
-      <FormulacionFilters 
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        selectedProductFilter={selectedProductFilter}
-        setSelectedProductFilter={setSelectedProductFilter}
-        productos={productos}
-        selectedIngredientFilter={selectedIngredientFilter}
-        setSelectedIngredientFilter={setSelectedIngredientFilter}
-        ingredientes={ingredientes}
-        onReset={handleResetFilters}
-      />
-
-      {/* Tabla */}
-      <FormulacionesTable 
-        formulaciones={filteredFormulaciones}
+      {/* Cards de formulaciones */}
+      <FormulacionesCards 
+        formulaciones={formulaciones}
         productosMap={productosMap}
         ingredientesMap={ingredientesMap}
-        loading={loading && formulaciones.length === 0}
-        onEdit={handleOpenEdit}
+        loading={loading}
+        onEdit={(formulaciones) => {
+          // Implementar edición si es necesario
+          console.log("Editar:", formulaciones);
+        }}
         onDetail={handleOpenDetail}
         onDelete={handleOpenDelete}
       />
 
       {/* Modales */}
-      <FormulacionForm 
-        open={isFormOpen}
+      <FormulacionRecetaForm 
+        open={isRecetaFormOpen}
         productos={productos}
         ingredientes={ingredientes}
-        editData={selectedItem}
-        onClose={() => {
-          setIsFormOpen(false);
-          setSelectedItem(null);
-        }}
-        onSave={handleSaveForm}
+        formulacionesExistentes={formulaciones}
+        onClose={() => setIsRecetaFormOpen(false)}
+        onSave={handleSaveReceta}
       />
 
       <FormulacionDetail 

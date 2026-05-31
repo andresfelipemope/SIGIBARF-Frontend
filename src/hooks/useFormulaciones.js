@@ -26,10 +26,6 @@ export function useFormulaciones() {
     }, {});
   }, [ingredientes]);
 
-  const handleApiResponse = (response, operationName) => {
-    return response;
-  };
-
   const loadAllData = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -41,12 +37,12 @@ export function useFormulaciones() {
         FormulacionesService.getIngredientes(),
       ]);
       
-      setFormulaciones(handleApiResponse(formulacionesData, 'getFormulaciones'));
-      setProductos(handleApiResponse(productosData, 'getProductos'));
-      setIngredientes(handleApiResponse(ingredientesData, 'getIngredientes'));
+      setFormulaciones(formulacionesData || []);
+      setProductos(productosData || []);
+      setIngredientes(ingredientesData || []);
       
     } catch (err) {
-      console.error("❌ Error cargando formulaciones:", err);
+      console.error("❌ Error cargando datos de formulaciones:", err);
       const errorMsg = err?.detail || err?.message || err?.error || "Error al cargar los datos";
       setError(typeof errorMsg === 'object' ? JSON.stringify(errorMsg) : errorMsg);
     } finally {
@@ -54,64 +50,62 @@ export function useFormulaciones() {
     }
   }, []);
 
+  /** 
+   * @param {Object} formData 
+   * @returns {Promise<{ success: boolean, data?: Object, error?: string }>}
+   */
   const createFormulacion = useCallback(async (formData) => {
-    setLoading(true);
-    setError(null);
-    setSuccess(null);
     
     try {
       const nueva = await FormulacionesService.createFormulacion(formData);
-      const data = handleApiResponse(nueva, 'createFormulacion');
-      
-      setFormulaciones((prev) => [...prev, data]);
-      setSuccess("Formulación creada correctamente");
-      return { success: true, data };
+      setFormulaciones((prev) => [...prev, nueva]);
+      return { success: true, data: nueva };
       
     } catch (err) {
       console.error("❌ Error creando formulación:", err);
-      const errorMsg = err?.detail || err?.message || err?.error || "Error al crear la formulación";
-      const finalError = typeof errorMsg === 'object' 
-        ? Object.values(errorMsg)[0] || JSON.stringify(errorMsg) 
-        : errorMsg;
-      setError(finalError);
-      return { success: false, error: finalError };
-    } finally {
-      setLoading(false);
+      const errorMsg = err?.detail 
+        ? (typeof err.detail === 'object' ? Object.values(err.detail)[0] : err.detail)
+        : err?.message || "Error al crear la formulación";
+      return { success: false, error: errorMsg };
     }
   }, []);
 
+  /**
+   * @param {number|string} id 
+   * @param {Object} formData
+   * @returns {Promise<{ success: boolean, data?: Object, error?: string }>}
+   */
   const updateFormulacion = useCallback(async (id, formData) => {
     setLoading(true);
     setError(null);
-    setSuccess(null);
     
     try {
       const actualizada = await FormulacionesService.patchFormulacion(id, formData);
-      const data = handleApiResponse(actualizada, 'patchFormulacion');
-      
       setFormulaciones((prev) =>
-        prev.map((f) => (f.id === id ? data : f))
+        prev.map((f) => (f.id === id ? actualizada : f))
       );
       setSuccess("Formulación actualizada correctamente");
-      return { success: true, data };
+      return { success: true, data: actualizada };
       
     } catch (err) {
       console.error("❌ Error actualizando formulación:", err);
-      const errorMsg = err?.detail || err?.message || err?.error || "Error al actualizar";
-      const finalError = typeof errorMsg === 'object' 
-        ? Object.values(errorMsg)[0] || JSON.stringify(errorMsg) 
-        : errorMsg;
-      setError(finalError);
-      return { success: false, error: finalError };
+      const errorMsg = err?.detail 
+        ? (typeof err.detail === 'object' ? Object.values(err.detail)[0] : err.detail)
+        : err?.message || "Error al actualizar";
+      setError(errorMsg);
+      return { success: false, error: errorMsg };
     } finally {
       setLoading(false);
     }
   }, []);
 
+  /**
+   * @param {number|string} id - ID de la formulación
+   * @returns {Promise<{ success: boolean, error?: string }>}
+   */
   const deleteFormulacion = useCallback(async (id) => {
     setLoading(true);
     setError(null);
-    setSuccess(null);
     
     try {
       await FormulacionesService.deleteFormulacion(id);
@@ -121,12 +115,11 @@ export function useFormulaciones() {
       
     } catch (err) {
       console.error("❌ Error eliminando formulación:", err);
-      const errorMsg = err?.detail || err?.message || err?.error || "Error al eliminar";
-      const finalError = typeof errorMsg === 'object' 
-        ? Object.values(errorMsg)[0] || JSON.stringify(errorMsg) 
-        : errorMsg;
-      setError(finalError);
-      return { success: false, error: finalError };
+      const errorMsg = err?.detail 
+        ? (typeof err.detail === 'object' ? Object.values(err.detail)[0] : err.detail)
+        : err?.message || "Error al eliminar";
+      setError(errorMsg);
+      return { success: false, error: errorMsg };
     } finally {
       setLoading(false);
     }
@@ -137,10 +130,32 @@ export function useFormulaciones() {
     setSuccess(null);
   }, []);
 
+  /**
+   * @param {Array} lista 
+   * @returns {Object} 
+   */
+  const getFormulacionesPorProducto = useCallback((lista) => {
+    const source = lista || formulaciones;
+    return source.reduce((acc, f) => {
+      if (!acc[f.id_producto]) acc[f.id_producto] = [];
+      acc[f.id_producto].push(f);
+      return acc;
+    }, {});
+  }, [formulaciones]);
+
+  /**
+   * @param {Array} ingredientes - Array de formulaciones (producto-ingrediente)
+   * @returns {number} Suma de porcentajes
+   */
+  const calcularTotalPorcentaje = useCallback((ingredientes) => {
+    return ingredientes.reduce((sum, ing) => sum + parseFloat(ing.porcentaje_ingrediente || 0), 0);
+  }, []);
+
   return {
     formulaciones,
     productos,
     ingredientes,
+    
     productosMap,
     ingredientesMap,
     
@@ -149,9 +164,12 @@ export function useFormulaciones() {
     success,
     
     loadAllData,
-    createFormulacion,
-    updateFormulacion,
-    deleteFormulacion,
-    clearMessages,
+    createFormulacion,      
+    updateFormulacion,      
+    deleteFormulacion,      
+    clearMessages,          
+    
+    getFormulacionesPorProducto,  
+    calcularTotalPorcentaje,      
   };
 }
