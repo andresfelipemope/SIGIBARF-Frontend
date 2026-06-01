@@ -12,7 +12,7 @@ export function MovimientoForm({
 }) {
   const [formData, setFormData] = useState({
     id_producto: "",
-    tipo_movimiento: "ENTRADA",
+    tipo_movimiento: "SALIDA",
     cantidad: "",
     comentarios: "",
   });
@@ -68,7 +68,7 @@ export function MovimientoForm({
       // Limpiar formulario y cerrar
       setFormData({
         id_producto: "",
-        tipo_movimiento: "ENTRADA",
+        tipo_movimiento: "SALIDA",
         cantidad: "",
         comentarios: "",
       });
@@ -90,7 +90,7 @@ export function MovimientoForm({
         <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-gray-50/50">
           <div>
             <span className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-600">Gestión de Inventario</span>
-            <h2 className="text-lg font-extrabold text-black">Registrar Movimiento Manual</h2>
+            <h2 className="text-lg font-extrabold text-black">Registrar Operación de Inventario</h2>
           </div>
           <button 
             onClick={onClose}
@@ -106,17 +106,6 @@ export function MovimientoForm({
           
           <div className="p-6 overflow-y-auto space-y-5 flex-1">
             
-            {/* Mensaje de Advertencia del Backend */}
-            <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-4 text-amber-900 flex items-start gap-3.5 shadow-2xs">
-              <AlertTriangle className="size-5 text-amber-600 shrink-0 mt-0.5" />
-              <div className="space-y-1">
-                <h4 className="text-xs font-black uppercase tracking-wider text-amber-800">¡Advertencia Importante!</h4>
-                <p className="text-xs font-semibold leading-relaxed text-amber-700">
-                  Los movimientos manuales pueden no actualizar correctamente el stock absoluto en el backend. Use esta acción únicamente si requiere realizar un ajuste manual de auditoría o corrección.
-                </p>
-              </div>
-            </div>
-
             {/* Error General */}
             {formError && (
               <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-rose-800 flex items-start gap-3.5">
@@ -154,13 +143,13 @@ export function MovimientoForm({
               )}
             </div>
 
-            {/* Fila: Tipo Movimiento & Cantidad */}
+            {/* Fila: Tipo de Operación & Cantidad */}
             <div className="grid grid-cols-2 gap-4">
               
-              {/* Tipo de Movimiento */}
+              {/* Tipo de Operación */}
               <div>
                 <label className="block text-xs font-extrabold uppercase tracking-wider text-gray-700 mb-1.5">
-                  Tipo Movimiento <span className="text-red-500">*</span>
+                  Tipo de Operación <span className="text-red-500">*</span>
                 </label>
                 <select
                   name="tipo_movimiento"
@@ -172,14 +161,27 @@ export function MovimientoForm({
                   )}
                   disabled={creating}
                 >
-                  <option value="ENTRADA">Entrada (+)</option>
-                  <option value="SALIDA">Salida (-)</option>
-                  <option value="AJUSTE">Ajuste (Auditoría)</option>
+                  <option value="SALIDA">Venta Externa</option>
+                  <option value="AJUSTE">Auditoría</option>
                 </select>
                 {fieldErrors.tipo_movimiento && (
                   <p className="text-red-500 text-xs mt-1.5 font-bold">
                     {Array.isArray(fieldErrors.tipo_movimiento) ? fieldErrors.tipo_movimiento[0] : fieldErrors.tipo_movimiento}
                   </p>
+                )}
+                
+                {/* Ayuda Contextual */}
+                {formData.tipo_movimiento === "SALIDA" && (
+                  <div className="mt-2 rounded-lg border border-blue-100 bg-blue-50/50 p-2.5 text-[11px] font-semibold text-blue-700 flex items-start gap-2">
+                    <Info className="size-3.5 text-blue-600 shrink-0 mt-0.5" />
+                    <span>Esta operación descontará existencias del inventario.</span>
+                  </div>
+                )}
+                {formData.tipo_movimiento === "AJUSTE" && (
+                  <div className="mt-2 rounded-lg border border-blue-100 bg-blue-50/50 p-2.5 text-[11px] font-semibold text-blue-700 flex items-start gap-2">
+                    <Info className="size-3.5 text-blue-600 shrink-0 mt-0.5" />
+                    <span>Esta operación ajustará el stock al valor exacto indicado tras una validación física del inventario.</span>
+                  </div>
                 )}
               </div>
 
@@ -221,7 +223,7 @@ export function MovimientoForm({
                 value={formData.comentarios}
                 onChange={handleInputChange}
                 rows="3"
-                placeholder="Indique el motivo del ajuste manual de inventario (ej. auditoría mensual, producto vencido, donación...)"
+                placeholder="Indique el motivo de la operación (ej. venta a cliente externo, auditoría física mensual, merma...)"
                 className={cn(
                   "w-full rounded-xl border bg-gray-50/50 px-4 py-2.5 text-sm text-black focus:bg-white focus:outline-hidden transition-all duration-200 resize-none font-medium placeholder-gray-400",
                   fieldErrors.comentarios ? "border-red-500 focus:border-red-500" : "border-gray-200 focus:border-green-600"
@@ -257,7 +259,7 @@ export function MovimientoForm({
                   Registrando...
                 </>
               ) : (
-                "Registrar Movimiento"
+                "Registrar Operación"
               )}
             </button>
           </div>

@@ -47,10 +47,10 @@ export default function GestionDashboard() {
       href: "/gestion/alertas"
     },
     {
-      title: "Pedidos Pendientes",
-      value: "24 Pedidos",
+      title: "Movimientos de Inventario",
+      value: "24 Movimientos",
       change: "+8 hoy",
-      timeframe: "vía E-commerce",
+      timeframe: "últimos 30 días",
       isPositive: true,
       icon: ShoppingBag,
       color: "text-green-600 bg-green-50 border-green-100",

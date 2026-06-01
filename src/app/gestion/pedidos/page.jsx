@@ -64,7 +64,7 @@ export default function MovimientosProductosPage() {
         <div>
           <h1 className="text-3xl font-extrabold text-black tracking-tight flex items-center gap-2.5">
             <Boxes className="size-8 text-green-600 shrink-0" />
-            Movimientos de Productos
+            Movimientos de Inventario
           </h1>
           <p className="text-sm text-gray-500 mt-1 font-medium">
             Historial de auditoría, entradas, salidas y ajustes manuales del stock final de Athletic Barf.
@@ -85,13 +85,13 @@ export default function MovimientosProductosPage() {
             <RotateCcw className="size-4 shrink-0" />
           </button>
           
-          {/* Registrar Movimiento */}
+          {/* Registrar Operación */}
           <button 
             onClick={() => setIsCreateModalOpen(true)}
             className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-orange-500/20 hover:bg-orange-600 transition-all duration-200 cursor-pointer"
           >
             <Plus className="size-4 shrink-0" />
-            Registrar Movimiento
+            Registrar Operación
           </button>
         </div>
       </div>

@@ -75,9 +75,17 @@ export async function apiRequest(endpoint, { method = 'GET', body = null, header
     }
 
     if (!response.ok) {
-      const error = new Error(data?.detail || 'Ha ocurrido un error en la solicitud.');
+      console.log("URL:", url);
+      console.log("STATUS:", response.status);
+      console.log("RESPONSE:", data);
+
+      const error = new Error(
+        data?.detail || 'Ha ocurrido un error en la solicitud.'
+      );
+
       error.status = response.status;
-      error.data   = data;
+      error.data = data;
+
       throw error;
     }
 

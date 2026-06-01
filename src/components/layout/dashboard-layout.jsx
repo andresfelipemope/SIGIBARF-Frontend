@@ -21,7 +21,7 @@ export default function DashboardLayout({ children }) {
     formulaciones: "Formulaciones",
     produccion: "Producción",
     alertas: "Alertas",
-    pedidos: "Pedidos",
+    pedidos: "Movimientos de Inventario",
     deudas: "Gestión de Deudas",
   };
 
