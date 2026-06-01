@@ -90,7 +90,7 @@ export default function ProductCard({ product, onAddToCart }) {
 
         {/* Descripción corta */}
         <p className="text-gray-500 text-xs leading-relaxed line-clamp-2 flex-1">
-          {product.Descripción || "Sin descripción"}
+          {product.descripcion || "Sin descripción"}
         </p>
 
         {/* Precio y peso */}

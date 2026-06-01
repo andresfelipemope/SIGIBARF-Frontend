@@ -235,7 +235,7 @@ export default function ProductDetail({ product, onAddToCart }) {
                 Descripción
               </h2>
               <p className="text-gray-600 text-sm leading-relaxed">
-                {product.Descripción || "Sin descripción detallada disponible."}
+                {product.descripcion || "Sin descripción detallada disponible."}
               </p>
             </div>
 

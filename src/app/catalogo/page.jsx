@@ -43,8 +43,8 @@ export default function CatalogoPage() {
       const query = searchQuery.toLowerCase();
       result = result.filter(
         (p) =>
-          (p.nombre && p.nombre.toLowerCase().includes(query)) ||
-          (p.Descripción && p.Descripción.toLowerCase().includes(query))
+            (p.nombre && p.nombre.toLowerCase().includes(query)) ||
+              (p.descripcion && p.descripcion.toLowerCase().includes(query))
       );
     }
 

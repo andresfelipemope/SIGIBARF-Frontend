@@ -13,7 +13,7 @@ export async function generateMetadata({ params }) {
   }
   return {
     title: `${product.nombre} — Athletic Barf`,
-    description: product.Descripción || "Detalle del producto",
+    description: product.descripcion || "Detalle del producto",
   };
 }
 

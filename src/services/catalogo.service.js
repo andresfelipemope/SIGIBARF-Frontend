@@ -8,7 +8,7 @@ import { apiRequest } from '@/lib/api';
  * @property {number} stock_actual
  * @property {number} stock_minimo
  * @property {boolean} inhabilitado
- * @property {string} [Descripción]
+ * @property {string} [descripcion]
  * @property {number[]} [ingredientes]
  */
 

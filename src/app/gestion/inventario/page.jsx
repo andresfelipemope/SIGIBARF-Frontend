@@ -63,9 +63,19 @@ export default function InventarioPage() {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
-    // Limpiar error del campo al escribir
+    // Validaciones básicas en tiempo real (longitudes)
     if (fieldErrors[name]) {
       setFieldErrors(prev => ({ ...prev, [name]: null }));
+    }
+    if (name === 'nombre') {
+      if (value.length > 100) {
+        setFieldErrors(prev => ({ ...prev, nombre: 'El nombre no puede superar los 100 caracteres' }));
+      }
+    }
+    if (name === 'descripcion') {
+      if (value && value.length > 1000) {
+        setFieldErrors(prev => ({ ...prev, descripcion: 'La descripción no puede superar los 1000 caracteres' }));
+      }
     }
   };
 
@@ -76,7 +86,8 @@ export default function InventarioPage() {
       precio: "",
       stock_actual: 0,
       stock_minimo: 0,
-      inhabilitado: false
+      inhabilitado: false,
+      descripcion: ''
     });
     setFieldErrors({});
     setFormError(null);
@@ -90,7 +101,8 @@ export default function InventarioPage() {
       precio: producto.precio,
       stock_actual: producto.stock_actual,
       stock_minimo: producto.stock_minimo,
-      inhabilitado: producto.inhabilitado
+      inhabilitado: producto.inhabilitado,
+      descripcion: producto.descripcion || ''
     });
     setFieldErrors({});
     setFormError(null);
@@ -127,12 +139,44 @@ export default function InventarioPage() {
     setFieldErrors({});
     
     // Frontend validaciones simples
-    if (!formData.nombre.trim()) {
-      setFieldErrors(prev => ({ ...prev, nombre: "El nombre es obligatorio" }));
+    // Nombre: obligatorio y max 100 chars
+    const nombreVal = String(formData.nombre || '').trim();
+    if (!nombreVal) {
+      setFieldErrors(prev => ({ ...prev, nombre: 'El nombre es obligatorio' }));
       return;
     }
-    if (Number(formData.precio) <= 0 || isNaN(Number(formData.precio))) {
-      setFieldErrors(prev => ({ ...prev, precio: "El precio debe ser mayor a 0" }));
+    if (nombreVal.length > 100) {
+      setFieldErrors(prev => ({ ...prev, nombre: 'El nombre no puede superar los 100 caracteres' }));
+      return;
+    }
+
+    // Precio: string decimal, hasta 10 dígitos en la parte entera y 2 decimales, y > 0
+    const precioStr = String(formData.precio || '').trim();
+    const precioRegex = /^\d{1,10}(\.\d{1,2})?$/;
+    if (!precioRegex.test(precioStr) || Number(precioStr) <= 0) {
+      setFieldErrors(prev => ({ ...prev, precio: 'Precio inválido. Máx 10 dígitos y hasta 2 decimales, y debe ser mayor a 0' }));
+      return;
+    }
+
+    // Stock actual: solo en creación, entero >= 0
+    if (!editingId) {
+      const sa = parseInt(String(formData.stock_actual || '0'), 10);
+      if (isNaN(sa) || sa < 0) {
+        setFieldErrors(prev => ({ ...prev, stock_actual: 'Stock actual debe ser un número entero >= 0' }));
+        return;
+      }
+    }
+
+    // Stock mínimo: entero >= 0
+    const sm = parseInt(String(formData.stock_minimo || '0'), 10);
+    if (isNaN(sm) || sm < 0) {
+      setFieldErrors(prev => ({ ...prev, stock_minimo: 'Stock mínimo debe ser un número entero >= 0' }));
+      return;
+    }
+
+    // Descripción: opcional, max 1000 chars
+    if (formData.descripcion && String(formData.descripcion).length > 1000) {
+      setFieldErrors(prev => ({ ...prev, descripcion: 'La descripción no puede superar los 1000 caracteres' }));
       return;
     }
 
@@ -145,7 +189,8 @@ export default function InventarioPage() {
           nombre: formData.nombre,
           precio: String(formData.precio),
           stock_minimo: parseInt(formData.stock_minimo, 10) || 0,
-          inhabilitado: formData.inhabilitado
+          inhabilitado: formData.inhabilitado,
+          descripcion: formData.descripcion || null
         };
         await inventarioService.updateProducto(editingId, payload);
         setSuccessMessage("Producto actualizado correctamente");
@@ -156,6 +201,7 @@ export default function InventarioPage() {
           precio: String(formData.precio), // El backend pide string decimal
           stock_actual: parseInt(formData.stock_actual, 10) || 0,
           stock_minimo: parseInt(formData.stock_minimo, 10) || 0,
+          descripcion: formData.descripcion || null
         };
         await inventarioService.createProducto(payload);
         setSuccessMessage("Producto registrado correctamente");
@@ -168,7 +214,8 @@ export default function InventarioPage() {
         precio: "",
         stock_actual: 0,
         stock_minimo: 0,
-        inhabilitado: false
+        inhabilitado: false,
+        descripcion: ''
       });
       fetchProductos(); // Refrescar lista
 
@@ -442,6 +489,22 @@ export default function InventarioPage() {
                     />
                   </div>
                   {fieldErrors.precio && <p className="text-red-500 text-xs mt-1 font-medium">{Array.isArray(fieldErrors.precio) ? fieldErrors.precio[0] : fieldErrors.precio}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1.5">
+                    Descripción (opcional)
+                  </label>
+                  <textarea
+                    name="descripcion"
+                    value={formData.descripcion}
+                    onChange={handleInputChange}
+                    rows={3}
+                    className={`w-full rounded-xl border ${fieldErrors.descripcion ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-green-600'} bg-gray-50/50 px-4 py-2.5 text-sm text-black focus:bg-white focus:outline-hidden transition-all`}
+                    placeholder="Descripción para el catálogo (opcional)"
+                    disabled={formLoading}
+                  />
+                  {fieldErrors.descripcion && <p className="text-red-500 text-xs mt-1 font-medium">{Array.isArray(fieldErrors.descripcion) ? fieldErrors.descripcion[0] : fieldErrors.descripcion}</p>}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
