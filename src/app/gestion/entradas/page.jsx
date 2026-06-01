@@ -8,7 +8,6 @@ import {
 } from "lucide-react";
 import { inventarioService } from "@/services/inventario";
 
-// ── Helpers ──────────────────────────────────────────────────────────
 function formatDecimal(val) {
   return val !== null && val !== undefined ? parseFloat(val).toLocaleString("es-CO") : "—";
 }
@@ -23,11 +22,11 @@ function formatFecha(fechaStr) {
 
 const EMPTY_FORM = { id_ingrediente: "", cantidad: "", comentarios: "" };
 
-// ── Modal de Entrada ─────────────────────────────────────────────────
+// ── Modal ────────────────────────────────────────────────────────────
 function EntradaModal({ open, onClose, onSaved, ingredientes }) {
-  const [formData, setFormData]       = useState(EMPTY_FORM);
-  const [loading, setLoading]         = useState(false);
-  const [formError, setFormError]     = useState(null);
+  const [formData, setFormData] = useState(EMPTY_FORM);
+  const [loading, setLoading] = useState(false);
+  const [formError, setFormError] = useState(null);
   const [fieldErrors, setFieldErrors] = useState({});
 
   useEffect(() => {
@@ -53,33 +52,17 @@ function EntradaModal({ open, onClose, onSaved, ingredientes }) {
       errors.cantidad = "La cantidad debe ser mayor a 0";
     if (Object.keys(errors).length) { setFieldErrors(errors); return; }
 
-    const cantidad    = parseFloat(formData.cantidad);
-    const stockActual = parseFloat(selectedIng.stock_actual);
-    const nuevoStock  = (stockActual + cantidad).toFixed(2);
-
     try {
       setLoading(true);
-
-      // 1. Actualizar stock del ingrediente (confiable)
-      await inventarioService.updateIngrediente(selectedIng.id, {
-        stock_actual: nuevoStock,
+      // El backend ahora calcula stock_anterior/posterior y actualiza el stock
+      // del ingrediente automáticamente dentro de perform_create.
+      await inventarioService.createMovimientoIngrediente({
+        id_ingrediente: parseInt(formData.id_ingrediente, 10),
+        tipo_movimiento: "ENTRADA",
+        cantidad: parseFloat(formData.cantidad).toFixed(2),
+        comentarios: formData.comentarios.trim() || null,
       });
-
-      // 2. Intentar registrar el movimiento (puede fallar por bug del backend)
-      //    Cuando el backend corrija perform_create, esto funcionará automáticamente.
-      try {
-        await inventarioService.createMovimientoIngrediente({
-          id_ingrediente:  parseInt(formData.id_ingrediente, 10),
-          tipo_movimiento: "ENTRADA",
-          cantidad:        parseFloat(formData.cantidad).toFixed(2),
-          comentarios:     formData.comentarios.trim() || null,
-        });
-      } catch {
-        // Bug conocido del backend: stock_anterior/stock_posterior no se calculan
-        // en el ViewSet genérico. El stock ya fue actualizado correctamente arriba.
-      }
-
-      onSaved(selectedIng.nombre, cantidad, selectedIng.unidad_medida);
+      onSaved(selectedIng.nombre, parseFloat(formData.cantidad), selectedIng.unidad_medida);
     } catch (err) {
       if (err.data && typeof err.data === "object") {
         setFieldErrors(err.data);
@@ -107,7 +90,6 @@ function EntradaModal({ open, onClose, onSaved, ingredientes }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg flex flex-col max-h-[90vh] overflow-hidden">
-        {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-100">
           <div className="flex items-center gap-3">
             <div className="flex size-10 items-center justify-center rounded-xl bg-green-50 border border-green-100">
@@ -120,7 +102,6 @@ function EntradaModal({ open, onClose, onSaved, ingredientes }) {
           </button>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 overflow-y-auto flex-1 space-y-5">
           {formError && (
             <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-medium flex items-start gap-2">
@@ -136,10 +117,8 @@ function EntradaModal({ open, onClose, onSaved, ingredientes }) {
             </label>
             <div className="relative">
               <select
-                name="id_ingrediente"
-                value={formData.id_ingrediente}
-                onChange={handleChange}
-                disabled={loading}
+                name="id_ingrediente" value={formData.id_ingrediente}
+                onChange={handleChange} disabled={loading}
                 className={inputClass("id_ingrediente") + " appearance-none pr-10"}
               >
                 <option value="">— Seleccionar ingrediente —</option>
@@ -191,7 +170,6 @@ function EntradaModal({ open, onClose, onSaved, ingredientes }) {
               disabled={loading} className={inputClass("cantidad")}
             />
             {fieldErr("cantidad")}
-            {/* Preview del stock resultante */}
             {selectedIng && formData.cantidad && Number(formData.cantidad) > 0 && (
               <p className="text-xs text-gray-500 mt-1.5">
                 Stock resultante:{" "}
@@ -216,7 +194,6 @@ function EntradaModal({ open, onClose, onSaved, ingredientes }) {
             />
           </div>
 
-          {/* Footer */}
           <div className="flex items-center justify-end gap-3 pt-2">
             <button type="button" onClick={onClose} disabled={loading}
               className="px-5 py-2.5 text-sm font-bold text-gray-600 hover:text-gray-900 transition-colors">
@@ -237,15 +214,14 @@ function EntradaModal({ open, onClose, onSaved, ingredientes }) {
 
 // ── Página Principal ─────────────────────────────────────────────────
 export default function EntradasIngredientesPage() {
-  const [ingredientes, setIngredientes]   = useState([]);
-  const [movimientos, setMovimientos]     = useState([]);
-  const [loading, setLoading]             = useState(true);
-  const [error, setError]                 = useState(null);
-  const [searchTerm, setSearchTerm]       = useState("");
-  const [modalOpen, setModalOpen]         = useState(false);
-  const [successMsg, setSuccessMsg]       = useState(null);
+  const [ingredientes, setIngredientes] = useState([]);
+  const [movimientos, setMovimientos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [successMsg, setSuccessMsg] = useState(null);
 
-  // Mapa id → ingrediente para cruzar datos del historial
   const ingMap = Object.fromEntries(ingredientes.map(i => [i.id, i]));
 
   const fetchData = useCallback(async () => {
@@ -254,10 +230,9 @@ export default function EntradasIngredientesPage() {
     try {
       const [ings, movs] = await Promise.all([
         inventarioService.getIngredientes(),
-        inventarioService.getMovimientosIngrediente().catch(() => []), // no bloquear si falla
+        inventarioService.getMovimientosIngrediente().catch(() => []),
       ]);
       setIngredientes(Array.isArray(ings) ? ings : []);
-      // Solo entradas, más recientes primero
       const entradas = (Array.isArray(movs) ? movs : [])
         .filter(m => m.tipo_movimiento === "ENTRADA")
         .sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
@@ -278,23 +253,19 @@ export default function EntradasIngredientesPage() {
 
   const handleSaved = (nombre, cantidad, unidad) => {
     setModalOpen(false);
-    fetchData();
+    fetchData(); // recarga ingredientes (stock actualizado) + historial
     showSuccess(`Entrada registrada: +${cantidad} ${unidad} de ${nombre}`);
   };
 
-  // Filtro del historial por nombre de ingrediente
   const filteredMovs = movimientos.filter(m => {
     const ing = ingMap[m.id_ingrediente];
-    return ing?.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) || !searchTerm;
+    return !searchTerm || ing?.nombre?.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
-  // Métricas rápidas
-  const totalEntradas  = movimientos.length;
-  const ingConAlertas  = ingredientes.filter(i => Number(i.stock_actual) < Number(i.stock_minimo)).length;
+  const ingConAlertas = ingredientes.filter(i => Number(i.stock_actual) < Number(i.stock_minimo)).length;
 
   return (
     <div className="space-y-8 text-black relative">
-      {/* Toast */}
       {successMsg && (
         <div className="absolute top-0 right-0 z-50 flex items-center gap-2 bg-emerald-100 border border-emerald-500 text-emerald-800 px-4 py-3 rounded-xl shadow-lg">
           <CheckCircle className="size-5" />
@@ -305,9 +276,7 @@ export default function EntradasIngredientesPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-extrabold text-black tracking-tight">
-            Entradas de Ingredientes
-          </h1>
+          <h1 className="text-3xl font-extrabold text-black tracking-tight">Entradas de Ingredientes</h1>
           <p className="text-sm text-gray-500 mt-1 font-medium">
             Registra compras y recepciones de ingredientes para actualizar el stock disponible.
           </p>
@@ -327,25 +296,11 @@ export default function EntradasIngredientesPage() {
       {/* Métricas */}
       <div className="grid gap-4 sm:grid-cols-3">
         {[
+          { label: "Ingredientes Disponibles", value: loading ? "..." : ingredientes.length, icon: Scale, color: "text-blue-700 bg-blue-50 border-blue-100" },
+          { label: "Entradas en Historial", value: loading ? "..." : movimientos.length, icon: ClipboardList, color: "text-green-700 bg-green-50 border-green-100" },
           {
-            label: "Ingredientes Disponibles",
-            value: loading ? "..." : ingredientes.length,
-            icon: Scale,
-            color: "text-blue-700 bg-blue-50 border-blue-100",
-          },
-          {
-            label: "Entradas en Historial",
-            value: loading ? "..." : totalEntradas,
-            icon: ClipboardList,
-            color: "text-green-700 bg-green-50 border-green-100",
-          },
-          {
-            label: "Ingredientes con Stock Bajo",
-            value: loading ? "..." : ingConAlertas,
-            icon: AlertTriangle,
-            color: ingConAlertas > 0
-              ? "text-red-700 bg-red-50 border-red-100"
-              : "text-gray-500 bg-gray-50 border-gray-200",
+            label: "Ingredientes con Stock Bajo", value: loading ? "..." : ingConAlertas, icon: AlertTriangle,
+            color: ingConAlertas > 0 ? "text-red-700 bg-red-50 border-red-100" : "text-gray-500 bg-gray-50 border-gray-200"
           },
         ].map(m => (
           <div key={m.label} className="rounded-2xl border border-gray-200 bg-white p-5 shadow-xs">
@@ -375,10 +330,8 @@ export default function EntradasIngredientesPage() {
           </div>
           <div className="relative max-w-xs w-full">
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
-            <input type="text"
-              placeholder="Buscar por ingrediente..."
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
+            <input type="text" placeholder="Buscar por ingrediente..."
+              value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
               className="w-full rounded-xl border border-gray-200 bg-gray-50/50 py-2 pl-10 pr-4 text-sm text-black placeholder-gray-400 focus:border-orange-500 focus:bg-white focus:outline-none transition-all"
             />
           </div>
