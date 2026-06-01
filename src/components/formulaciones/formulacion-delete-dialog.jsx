@@ -1,6 +1,7 @@
 "use client";
 
 import { AlertTriangle, Loader2 } from "lucide-react";
+import { useState } from "react";
 
 export default function FormulacionDeleteDialog({
   open,
@@ -9,22 +10,37 @@ export default function FormulacionDeleteDialog({
   ingredientesMap,
   onClose,
   onConfirm,
+  onSuccess,
 }) {
   if (!open || !item) return null;
-
+  const [loading, setLoading] = useState(false);
   const items = Array.isArray(item) ? item : [item];
   const firstItem = items[0];
   const producto = productosMap[firstItem.id_producto];
   const esEliminacionMultiple = items.length > 1;
 
-  const handleConfirm = async () => {
-    if (esEliminacionMultiple) {
-      const promises = items.map(f => onConfirm(f.id));
-      await Promise.all(promises);
-    } else {
-      await onConfirm(firstItem.id);
+    const handleConfirm = async () => {
+    setLoading(true);
+    try {
+      if (esEliminacionMultiple) {
+        const promises = items.map(f => onConfirm(f.id));
+        const results = await Promise.all(promises);
+        
+        if (results.every(r => r?.success)) {
+          onSuccess?.("Formulación eliminada correctamente");
+        }
+      } else {
+        const res = await onConfirm(firstItem.id);
+        if (res?.success) {
+          onSuccess?.("Formulación eliminada correctamente");
+        }
+      }
+      onClose();
+    } catch (err) {
+      console.error("Error eliminando:", err);
+    } finally {
+      setLoading(false);
     }
-    onClose();
   };
 
   return (
@@ -101,19 +117,30 @@ export default function FormulacionDeleteDialog({
           </div>
 
           {}
-          <div className="flex items-center justify-end gap-3">
+                    <div className="flex items-center justify-end gap-3">
             <button
               onClick={onClose}
-              className="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition cursor-pointer"
+              disabled={loading}
+              className="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition cursor-pointer disabled:opacity-50"
             >
               Cancelar
             </button>
             <button
               onClick={handleConfirm}
-              className="inline-flex items-center gap-2 rounded-xl bg-red-500 px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-red-500/20 hover:bg-red-600 transition-all cursor-pointer"
+              disabled={loading}
+              className="inline-flex items-center gap-2 rounded-xl bg-red-500 px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-red-500/20 hover:bg-red-600 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <AlertTriangle className="size-4" />
-              Sí, eliminar{esEliminacionMultiple ? " todo" : ""}
+              {loading ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" />
+                  Eliminando...
+                </>
+              ) : (
+                <>
+                  <AlertTriangle className="size-4" />
+                  Sí, eliminar{esEliminacionMultiple ? " todo" : ""}
+                </>
+              )}
             </button>
           </div>
         </div>

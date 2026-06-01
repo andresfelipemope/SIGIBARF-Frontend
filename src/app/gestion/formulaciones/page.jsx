@@ -165,6 +165,7 @@ export default function FormulacionesPage() {
         ingredientesMap={ingredientesMap}
         onClose={() => { setIsDeleteOpen(false); setSelectedItem(null); }}
         onConfirm={handleDeleteConfirm}
+        onSuccess={showSuccess} 
       />
     </div>
   );
