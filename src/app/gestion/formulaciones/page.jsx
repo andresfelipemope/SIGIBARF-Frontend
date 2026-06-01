@@ -1,11 +1,9 @@
-// formulaciones/page.jsx
 "use client";
 
 import { useState, useEffect } from "react";
 import { useFormulaciones } from "@/hooks/useFormulaciones";
 import FormulacionesCards from "@/components/formulaciones/formulaciones-cards";
 import FormulacionRecetaForm from "@/components/formulaciones/formulacion-receta-form";
-import FormulacionDetail from "@/components/formulaciones/formulacion-detail";
 import FormulacionDeleteDialog from "@/components/formulaciones/formulacion-delete-dialog";
 
 import { Plus, RefreshCw, CheckCircle, AlertTriangle } from "lucide-react";
@@ -25,22 +23,20 @@ export default function FormulacionesPage() {
     updateFormulacion,
     deleteFormulacion,
     clearMessages,
+    showSuccess,
   } = useFormulaciones();
 
-  // Modales
   const [isRecetaFormOpen, setIsRecetaFormOpen] = useState(false);
-  const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [formMode, setFormMode] = useState("create");
 
-  // Toast
   const [toastMsg, setToastMsg] = useState(null);
 
   useEffect(() => {
     loadAllData();
   }, [loadAllData]);
 
-  // Manejar toasts
   useEffect(() => {
     if (success) {
       setToastMsg({ type: "success", text: success });
@@ -55,27 +51,30 @@ export default function FormulacionesPage() {
     }
   }, [success, error, clearMessages]);
 
-  // Handlers
   const handleOpenCreate = () => {
+    setFormMode("create");
+    setSelectedItem(null);
     setIsRecetaFormOpen(true);
   };
 
-  const handleOpenDetail = (formulaciones) => {
-    setSelectedItem(formulaciones);
-    setIsDetailOpen(true);
+  const handleOpenEdit = (formulaciones) => {
+    setFormMode("edit");
+    setSelectedItem(Array.isArray(formulaciones) ? formulaciones : [formulaciones]);
+    setIsRecetaFormOpen(true);
   };
 
-  const handleOpenDelete = (formulacion) => {
-    setSelectedItem(formulacion);
+  const handleOpenDelete = (formulaciones) => {
+    setSelectedItem(Array.isArray(formulaciones) ? formulaciones : [formulaciones]);
     setIsDeleteOpen(true);
   };
 
-  // Guardar múltiples formulaciones
-  const handleSaveReceta = async (formData) => {
+  const handleSaveReceta = async (id, formData) => {
+    if (id !== undefined && id !== null) {
+      return await updateFormulacion(id, formData);
+    }
     return await createFormulacion(formData);
   };
 
-  // Confirmar eliminación
   const handleDeleteConfirm = async (id) => {
     const res = await deleteFormulacion(id);
     if (res.success) {
@@ -87,7 +86,6 @@ export default function FormulacionesPage() {
 
   return (
     <div className="space-y-8 animate-fade-in text-black relative">
-      {/* Toast */}
       {toastMsg && (
         <div 
           className={`fixed top-24 right-8 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-lg border animate-slide-in-right ${
@@ -103,10 +101,7 @@ export default function FormulacionesPage() {
           )}
           <span className="font-semibold text-sm">{toastMsg.text}</span>
           <button 
-            onClick={() => {
-              setToastMsg(null);
-              clearMessages();
-            }}
+            onClick={() => { setToastMsg(null); clearMessages(); }}
             className="ml-2 text-gray-400 hover:text-gray-700 font-bold"
           >
             ×
@@ -114,7 +109,6 @@ export default function FormulacionesPage() {
         </div>
       )}
 
-      {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-extrabold text-black tracking-tight">
@@ -143,39 +137,25 @@ export default function FormulacionesPage() {
         </div>
       </div>
 
-      {/* Cards de formulaciones */}
       <FormulacionesCards 
         formulaciones={formulaciones}
         productosMap={productosMap}
         ingredientesMap={ingredientesMap}
         loading={loading}
-        onEdit={(formulaciones) => {
-          // Implementar edición si es necesario
-          console.log("Editar:", formulaciones);
-        }}
-        onDetail={handleOpenDetail}
+        onEdit={handleOpenEdit}
         onDelete={handleOpenDelete}
       />
 
-      {/* Modales */}
       <FormulacionRecetaForm 
         open={isRecetaFormOpen}
+        mode={formMode}
+        existingFormulaciones={selectedItem}
         productos={productos}
         ingredientes={ingredientes}
-        formulacionesExistentes={formulaciones}
-        onClose={() => setIsRecetaFormOpen(false)}
+        onClose={() => { setIsRecetaFormOpen(false); setSelectedItem(null); }}
         onSave={handleSaveReceta}
-      />
-
-      <FormulacionDetail 
-        open={isDetailOpen}
-        item={selectedItem}
-        productosMap={productosMap}
-        ingredientesMap={ingredientesMap}
-        onClose={() => {
-          setIsDetailOpen(false);
-          setSelectedItem(null);
-        }}
+        onDelete={deleteFormulacion}
+        onSuccess={showSuccess}
       />
 
       <FormulacionDeleteDialog 
@@ -183,11 +163,9 @@ export default function FormulacionesPage() {
         item={selectedItem}
         productosMap={productosMap}
         ingredientesMap={ingredientesMap}
-        onClose={() => {
-          setIsDeleteOpen(false);
-          setSelectedItem(null);
-        }}
+        onClose={() => { setIsDeleteOpen(false); setSelectedItem(null); }}
         onConfirm={handleDeleteConfirm}
+        onSuccess={showSuccess} 
       />
     </div>
   );

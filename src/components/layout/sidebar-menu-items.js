@@ -7,7 +7,8 @@ import {
   Factory, 
   AlertCircle, 
   ShoppingBag, 
-  Coins 
+  Coins,
+  History
 } from "lucide-react";
 
 export const sidebarMenuItems = [
@@ -48,9 +49,14 @@ export const sidebarMenuItems = [
     badge: "3", // Example badge count (could be loaded from an API/state later)
   },
   {
-    title: "Pedidos",
+    title: "Movimientos de Inventario",
     url: "/gestion/pedidos",
     icon: ShoppingBag,
+  },
+  {
+    title: "Historial de Inventario",
+    url: "/gestion/historial",
+    icon: History,
   },
   {
     title: "Gestión de Deudas",

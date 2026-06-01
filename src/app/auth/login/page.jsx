@@ -86,6 +86,8 @@ export default function LoginPage() {
     setError("");
     try {
       const data = await authService.googleLogin(response.credential);
+
+      console.log("Respuesta backend:", data);
       
       // Guardar tokens y perfil en localStorage
       localStorage.setItem("access", data.tokens.access);
@@ -114,6 +116,8 @@ export default function LoginPage() {
 
     try {
       const data = await authService.login(correo, password);
+
+      console.log(data);
 
       // Manejo de Remember Me
       if (rememberMe) {
