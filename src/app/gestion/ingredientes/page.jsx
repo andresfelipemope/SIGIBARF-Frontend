@@ -350,8 +350,7 @@ export default function IngredientesPage() {
         <div className="mt-5 overflow-x-auto">
           <table className="w-full border-collapse text-left">
             <thead>
-              <tr className="border-b border-gray-100 text-xs font-bold uppercase tracking-wider text-gray-400">
-                <th className="py-4 px-3">ID</th>
+            <tr className="border-b border-gray-100 text-xs font-bold uppercase tracking-wider text-gray-400">
                 <th className="py-4 px-3">Nombre</th>
                 <th className="py-4 px-3">Proveedor</th>
                 <th className="py-4 px-3 text-right">Stock Actual</th>
@@ -364,7 +363,7 @@ export default function IngredientesPage() {
             <tbody className="divide-y divide-gray-100">
               {loading ? (
                 <tr>
-                  <td colSpan="8" className="py-12 text-center">
+                  <td colSpan="7" className="py-12 text-center">
                     <Loader2 className="size-8 animate-spin text-orange-500 mx-auto" />
                     <p className="text-sm text-gray-500 mt-2 font-medium">Cargando ingredientes...</p>
                   </td>
@@ -375,7 +374,6 @@ export default function IngredientesPage() {
                   const pct  = Math.min(100, Math.round((Number(ing.stock_actual) / Math.max(Number(ing.stock_minimo), 0.01)) * 100));
                   return (
                     <tr key={ing.id} className="hover:bg-orange-50/10 transition-colors group">
-                      <td className="py-4 px-3 text-xs font-bold text-gray-400">#{ing.id}</td>
                       <td className="py-4 px-3 text-sm font-semibold text-black">{ing.nombre}</td>
                       <td className="py-4 px-3 text-sm text-gray-500">{ing.proveedor}</td>
                       <td className="py-4 px-3 text-right">
@@ -425,7 +423,7 @@ export default function IngredientesPage() {
                 })
               ) : (
                 <tr>
-                  <td colSpan="8" className="py-10 text-center text-sm font-medium text-gray-400">
+                  <td colSpan="7" className="py-10 text-center text-sm font-medium text-gray-400">
                     {ingredientes.length === 0
                       ? "No hay ingredientes registrados aún."
                       : "No hay resultados para los filtros aplicados."}

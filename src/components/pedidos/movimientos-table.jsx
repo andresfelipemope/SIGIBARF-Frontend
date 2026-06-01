@@ -71,7 +71,6 @@ export function MovimientosTable({
         <table className="w-full border-collapse text-left">
           <thead>
             <tr className="border-b border-gray-100 text-xs font-bold uppercase tracking-wider text-gray-400 bg-gray-50/30">
-              <th className="py-4 px-4 font-extrabold w-16">ID</th>
               <th className="py-4 px-4 font-extrabold">Producto</th>
               <th className="py-4 px-4 font-extrabold text-center w-28">Tipo</th>
               <th className="py-4 px-4 font-extrabold text-right w-24">Cantidad</th>
@@ -91,9 +90,7 @@ export function MovimientosTable({
                   className="hover:bg-green-50/10 transition-colors group cursor-pointer"
                   onClick={() => onViewDetails(mov)}
                 >
-                  <td className="py-4 px-4 text-xs font-extrabold text-gray-500">
-                    #{mov.id}
-                  </td>
+
                   <td className="py-4 px-4">
                     <div className="flex flex-col gap-0.5">
                       <span className="text-sm font-semibold text-black leading-tight">
