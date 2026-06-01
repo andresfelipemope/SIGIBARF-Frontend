@@ -58,7 +58,7 @@ export default function MovimientosProductosPage() {
 
   return (
     <div className="space-y-8 animate-fade-in text-black relative">
-      
+
       {/* Header del Módulo */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
@@ -70,7 +70,7 @@ export default function MovimientosProductosPage() {
             Historial de auditoría, entradas, salidas y ajustes manuales del stock final de Athletic Barf.
           </p>
         </div>
-        
+
         <div className="flex items-center gap-2">
           {/* Botón de Refrescar manual */}
           <button
@@ -84,9 +84,9 @@ export default function MovimientosProductosPage() {
           >
             <RotateCcw className="size-4 shrink-0" />
           </button>
-          
+
           {/* Registrar Operación */}
-          <button 
+          <button
             onClick={() => setIsCreateModalOpen(true)}
             className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-orange-500/20 hover:bg-orange-600 transition-all duration-200 cursor-pointer"
           >
@@ -119,6 +119,7 @@ export default function MovimientosProductosPage() {
       ) : (
         <MovimientosTable
           movimientos={filteredMovimientos}
+          productos={productos}
           onViewDetails={setSelectedMovimiento}
           error={error}
           onRetry={() => {
@@ -144,7 +145,7 @@ export default function MovimientosProductosPage() {
           onClose={() => setSelectedMovimiento(null)}
         />
       )}
-      
+
     </div>
   );
 }
