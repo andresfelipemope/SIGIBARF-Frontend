@@ -2,9 +2,18 @@
 
 import { useState, useEffect, useCallback } from "react";
 import {
-  Package, Search, Filter, Plus, Loader2,
-  X, CheckCircle, AlertTriangle, RefreshCw,
-  Pencil, Trash2, Scale
+  Package,
+  Search,
+  Filter,
+  Plus,
+  Loader2,
+  X,
+  CheckCircle,
+  AlertTriangle,
+  RefreshCw,
+  Pencil,
+  Trash2,
+  Scale,
 } from "lucide-react";
 import { inventarioService } from "@/services/inventario";
 
@@ -21,20 +30,24 @@ const EMPTY_FORM = {
 };
 
 function IngredienteModal({ open, onClose, onSaved, editData = null }) {
-  const [formData, setFormData]       = useState(EMPTY_FORM);
-  const [loading, setLoading]         = useState(false);
-  const [formError, setFormError]     = useState(null);
+  const [formData, setFormData] = useState(EMPTY_FORM);
+  const [loading, setLoading] = useState(false);
+  const [formError, setFormError] = useState(null);
   const [fieldErrors, setFieldErrors] = useState({});
 
   useEffect(() => {
     if (open) {
-      setFormData(editData ? {
-        nombre:       editData.nombre       ?? "",
-        proveedor:    editData.proveedor    ?? "",
-        stock_actual: editData.stock_actual ?? "",
-        stock_minimo: editData.stock_minimo ?? "",
-        unidad_medida: editData.unidad_medida ?? "kg",
-      } : EMPTY_FORM);
+      setFormData(
+        editData
+          ? {
+              nombre: editData.nombre ?? "",
+              proveedor: editData.proveedor ?? "",
+              stock_actual: editData.stock_actual ?? "",
+              stock_minimo: editData.stock_minimo ?? "",
+              unidad_medida: editData.unidad_medida ?? "kg",
+            }
+          : EMPTY_FORM,
+      );
       setFormError(null);
       setFieldErrors({});
     }
@@ -42,8 +55,9 @@ function IngredienteModal({ open, onClose, onSaved, editData = null }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    if (fieldErrors[name]) setFieldErrors(prev => ({ ...prev, [name]: null }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (fieldErrors[name])
+      setFieldErrors((prev) => ({ ...prev, [name]: null }));
   };
 
   const handleSubmit = async (e) => {
@@ -53,8 +67,9 @@ function IngredienteModal({ open, onClose, onSaved, editData = null }) {
 
     // Validaciones frontend
     const errors = {};
-    if (!formData.nombre.trim())    errors.nombre    = "El nombre es obligatorio";
-    if (!formData.proveedor.trim()) errors.proveedor = "El proveedor es obligatorio";
+    if (!formData.nombre.trim()) errors.nombre = "El nombre es obligatorio";
+    if (!formData.proveedor.trim())
+      errors.proveedor = "El proveedor es obligatorio";
     if (!formData.stock_actual || Number(formData.stock_actual) <= 0)
       errors.stock_actual = "Debe ser mayor a 0";
     if (!formData.stock_minimo || Number(formData.stock_minimo) <= 0)
@@ -67,10 +82,10 @@ function IngredienteModal({ open, onClose, onSaved, editData = null }) {
 
     // El backend espera decimal string con 2 decimales
     const payload = {
-      nombre:        formData.nombre.trim(),
-      proveedor:     formData.proveedor.trim(),
-      stock_actual:  parseFloat(formData.stock_actual).toFixed(2),
-      stock_minimo:  parseFloat(formData.stock_minimo).toFixed(2),
+      nombre: formData.nombre.trim(),
+      proveedor: formData.proveedor.trim(),
+      stock_actual: parseFloat(formData.stock_actual).toFixed(2),
+      stock_minimo: parseFloat(formData.stock_minimo).toFixed(2),
       unidad_medida: formData.unidad_medida,
     };
 
@@ -103,7 +118,9 @@ function IngredienteModal({ open, onClose, onSaved, editData = null }) {
   const fieldErr = (name) =>
     fieldErrors[name] ? (
       <p className="text-red-500 text-xs mt-1 font-medium">
-        {Array.isArray(fieldErrors[name]) ? fieldErrors[name][0] : fieldErrors[name]}
+        {Array.isArray(fieldErrors[name])
+          ? fieldErrors[name][0]
+          : fieldErrors[name]}
       </p>
     ) : null;
 
@@ -115,14 +132,20 @@ function IngredienteModal({ open, onClose, onSaved, editData = null }) {
           <h2 className="text-xl font-extrabold text-black">
             {editData ? "Editar Ingrediente" : "Registrar Ingrediente"}
           </h2>
-          <button onClick={onClose} disabled={loading}
-            className="text-gray-400 hover:text-gray-600 transition-colors">
+          <button
+            onClick={onClose}
+            disabled={loading}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
             <X className="size-5" />
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto flex-1 space-y-5">
+        <form
+          onSubmit={handleSubmit}
+          className="p-6 overflow-y-auto flex-1 space-y-5"
+        >
           {formError && (
             <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-medium flex items-start gap-2">
               <AlertTriangle className="size-4 shrink-0 mt-0.5" />
@@ -135,9 +158,14 @@ function IngredienteModal({ open, onClose, onSaved, editData = null }) {
             <label className="block text-sm font-bold text-gray-700 mb-1.5">
               Nombre <span className="text-red-500">*</span>
             </label>
-            <input name="nombre" value={formData.nombre} onChange={handleChange}
-              placeholder="Ej. Hígado de Pollo" disabled={loading}
-              className={inputClass("nombre")} />
+            <input
+              name="nombre"
+              value={formData.nombre}
+              onChange={handleChange}
+              placeholder="Ej. Hígado de Pollo"
+              disabled={loading}
+              className={inputClass("nombre")}
+            />
             {fieldErr("nombre")}
           </div>
 
@@ -146,9 +174,14 @@ function IngredienteModal({ open, onClose, onSaved, editData = null }) {
             <label className="block text-sm font-bold text-gray-700 mb-1.5">
               Proveedor <span className="text-red-500">*</span>
             </label>
-            <input name="proveedor" value={formData.proveedor} onChange={handleChange}
-              placeholder="Ej. Frigorífico Central" disabled={loading}
-              className={inputClass("proveedor")} />
+            <input
+              name="proveedor"
+              value={formData.proveedor}
+              onChange={handleChange}
+              placeholder="Ej. Frigorífico Central"
+              disabled={loading}
+              className={inputClass("proveedor")}
+            />
             {fieldErr("proveedor")}
           </div>
 
@@ -158,43 +191,78 @@ function IngredienteModal({ open, onClose, onSaved, editData = null }) {
               <label className="block text-sm font-bold text-gray-700 mb-1.5">
                 Stock Actual <span className="text-red-500">*</span>
               </label>
-              <input type="number" step="0.01" min="0.01"
-                name="stock_actual" value={formData.stock_actual}
-                onChange={handleChange} placeholder="0.00" disabled={loading}
-                className={inputClass("stock_actual")} />
+              <input
+                type="number"
+                step="0.01"
+                min="0.01"
+                name="stock_actual"
+                value={formData.stock_actual}
+                onChange={handleChange}
+                placeholder="0.00"
+                disabled={loading}
+                className={inputClass("stock_actual")}
+              />
               {fieldErr("stock_actual")}
             </div>
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-1.5">
                 Stock Mínimo <span className="text-red-500">*</span>
               </label>
-              <input type="number" step="0.01" min="0.01"
-                name="stock_minimo" value={formData.stock_minimo}
-                onChange={handleChange} placeholder="0.00" disabled={loading}
-                className={inputClass("stock_minimo")} />
+              <input
+                type="number"
+                step="0.01"
+                min="0.01"
+                name="stock_minimo"
+                value={formData.stock_minimo}
+                onChange={handleChange}
+                placeholder="0.00"
+                disabled={loading}
+                className={inputClass("stock_minimo")}
+              />
               {fieldErr("stock_minimo")}
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1.5">Unidad</label>
-              <select name="unidad_medida" value={formData.unidad_medida}
-                onChange={handleChange} disabled={loading}
-                className={inputClass("unidad_medida")}>
-                {UNIDADES.map(u => <option key={u} value={u}>{u}</option>)}
+              <label className="block text-sm font-bold text-gray-700 mb-1.5">
+                Unidad
+              </label>
+              <select
+                name="unidad_medida"
+                value={formData.unidad_medida}
+                onChange={handleChange}
+                disabled={loading}
+                className={inputClass("unidad_medida")}
+              >
+                {UNIDADES.map((u) => (
+                  <option key={u} value={u}>
+                    {u}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
 
           {/* Footer */}
           <div className="flex items-center justify-end gap-3 pt-2">
-            <button type="button" onClick={onClose} disabled={loading}
-              className="px-5 py-2.5 text-sm font-bold text-gray-600 hover:text-gray-900 transition-colors">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={loading}
+              className="px-5 py-2.5 text-sm font-bold text-gray-600 hover:text-gray-900 transition-colors"
+            >
               Cancelar
             </button>
-            <button type="submit" disabled={loading}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-6 py-2.5 text-sm font-bold text-white shadow-md hover:bg-orange-600 transition-all disabled:opacity-70 disabled:cursor-not-allowed">
-              {loading
-                ? <><Loader2 className="size-4 animate-spin" /> Guardando...</>
-                : "Guardar Ingrediente"}
+            <button
+              type="submit"
+              disabled={loading}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-6 py-2.5 text-sm font-bold text-white shadow-md hover:bg-orange-600 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" /> Guardando...
+                </>
+              ) : (
+                "Guardar Ingrediente"
+              )}
             </button>
           </div>
         </form>
@@ -206,13 +274,13 @@ function IngredienteModal({ open, onClose, onSaved, editData = null }) {
 // ── Página Principal ─────────────────────────────────────────────────
 export default function IngredientesPage() {
   const [ingredientes, setIngredientes] = useState([]);
-  const [loading, setLoading]           = useState(true);
-  const [error, setError]               = useState(null);
-  const [searchTerm, setSearchTerm]     = useState("");
-  const [unitFilter, setUnitFilter]     = useState("todas");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [unitFilter, setUnitFilter] = useState("todas");
 
   const [modalOpen, setModalOpen] = useState(false);
-  const [editData, setEditData]   = useState(null);
+  const [editData, setEditData] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
 
   const fetchIngredientes = useCallback(async () => {
@@ -228,7 +296,9 @@ export default function IngredientesPage() {
     }
   }, []);
 
-  useEffect(() => { fetchIngredientes(); }, [fetchIngredientes]);
+  useEffect(() => {
+    fetchIngredientes();
+  }, [fetchIngredientes]);
 
   const showSuccess = (msg) => {
     setSuccessMsg(msg);
@@ -239,13 +309,21 @@ export default function IngredientesPage() {
     setModalOpen(false);
     setEditData(null);
     fetchIngredientes();
-    showSuccess(editData ? "Ingrediente actualizado correctamente" : "Ingrediente registrado correctamente");
+    showSuccess(
+      editData
+        ? "Ingrediente actualizado correctamente"
+        : "Ingrediente registrado correctamente",
+    );
   };
 
-  const handleEdit = (ing) => { setEditData(ing); setModalOpen(true); };
+  const handleEdit = (ing) => {
+    setEditData(ing);
+    setModalOpen(true);
+  };
 
   const handleDelete = async (id, nombre) => {
-    if (!confirm(`¿Eliminar "${nombre}"? Esta acción no se puede deshacer.`)) return;
+    if (!confirm(`¿Eliminar "${nombre}"? Esta acción no se puede deshacer.`))
+      return;
     try {
       await inventarioService.deleteIngrediente(id);
       fetchIngredientes();
@@ -256,18 +334,25 @@ export default function IngredientesPage() {
   };
 
   // Unidades únicas para filtro
-  const unidades = ["todas", ...new Set(ingredientes.map(i => i.unidad_medida).filter(Boolean))];
+  const unidades = [
+    "todas",
+    ...new Set(ingredientes.map((i) => i.unidad_medida).filter(Boolean)),
+  ];
 
-  const filtered = ingredientes.filter(i => {
+  const filtered = ingredientes.filter((i) => {
     const q = searchTerm.toLowerCase();
-    const matchSearch = i.nombre?.toLowerCase().includes(q) || i.proveedor?.toLowerCase().includes(q);
-    const matchUnit   = unitFilter === "todas" || i.unidad_medida === unitFilter;
+    const matchSearch =
+      i.nombre?.toLowerCase().includes(q) ||
+      i.proveedor?.toLowerCase().includes(q);
+    const matchUnit = unitFilter === "todas" || i.unidad_medida === unitFilter;
     return matchSearch && matchUnit;
   });
 
   // Métricas
   const totalItems = ingredientes.length;
-  const lowStock   = ingredientes.filter(i => Number(i.stock_actual) < Number(i.stock_minimo)).length;
+  const lowStock = ingredientes.filter(
+    (i) => Number(i.stock_actual) < Number(i.stock_minimo),
+  ).length;
 
   return (
     <div className="space-y-8 animate-fade-in text-black relative">
@@ -286,16 +371,24 @@ export default function IngredientesPage() {
             Catálogo de Ingredientes
           </h1>
           <p className="text-sm text-gray-500 mt-1 font-medium">
-            Insumos registrados con stock y proveedor para formulaciones y producción.
+            Insumos registrados con stock y proveedor para formulaciones y
+            producción.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={fetchIngredientes}
-            className="flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-xs font-semibold text-gray-600 hover:bg-gray-50 transition">
+          <button
+            onClick={fetchIngredientes}
+            className="flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-xs font-semibold text-gray-600 hover:bg-gray-50 transition"
+          >
             <RefreshCw className="size-3.5" /> Actualizar
           </button>
-          <button onClick={() => { setEditData(null); setModalOpen(true); }}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-orange-500/20 hover:bg-orange-600 transition-all">
+          <button
+            onClick={() => {
+              setEditData(null);
+              setModalOpen(true);
+            }}
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-orange-500/20 hover:bg-orange-600 transition-all"
+          >
             <Plus className="size-4" /> Añadir Ingrediente
           </button>
         </div>
@@ -304,14 +397,40 @@ export default function IngredientesPage() {
       {/* Métricas */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {[
-          { label: "Total Ingredientes", value: loading ? "..." : totalItems, icon: Package, color: "text-green-700 bg-green-50 border-green-100" },
-          { label: "Stock Bajo", value: loading ? "..." : `${lowStock} ítems`, icon: AlertTriangle, color: "text-rose-600 bg-rose-50 border-rose-100" },
-          { label: "Unidades Manejadas", value: loading ? "..." : [...new Set(ingredientes.map(i => i.unidad_medida))].join(" · ") || "—", icon: Scale, color: "text-gray-600 bg-gray-50 border-gray-200" },
-        ].map(m => (
-          <div key={m.label} className="rounded-2xl border border-gray-200 bg-white p-5 shadow-xs">
+          {
+            label: "Total Ingredientes",
+            value: loading ? "..." : totalItems,
+            icon: Package,
+            color: "text-green-700 bg-green-50 border-green-100",
+          },
+          {
+            label: "Stock Bajo",
+            value: loading ? "..." : `${lowStock} ítems`,
+            icon: AlertTriangle,
+            color: "text-rose-600 bg-rose-50 border-rose-100",
+          },
+          {
+            label: "Unidades Manejadas",
+            value: loading
+              ? "..."
+              : [...new Set(ingredientes.map((i) => i.unidad_medida))].join(
+                  " · ",
+                ) || "—",
+            icon: Scale,
+            color: "text-gray-600 bg-gray-50 border-gray-200",
+          },
+        ].map((m) => (
+          <div
+            key={m.label}
+            className="rounded-2xl border border-gray-200 bg-white p-5 shadow-xs"
+          >
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-gray-400">{m.label}</span>
-              <div className={`flex size-9 items-center justify-center rounded-xl border ${m.color}`}>
+              <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
+                {m.label}
+              </span>
+              <div
+                className={`flex size-9 items-center justify-center rounded-xl border ${m.color}`}
+              >
                 <m.icon className="size-4" />
               </div>
             </div>
@@ -325,16 +444,25 @@ export default function IngredientesPage() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
-            <input type="text" placeholder="Buscar por nombre o proveedor..."
-              value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
-              className="w-full rounded-xl border border-gray-200 bg-gray-50/50 py-2 pl-10 pr-4 text-sm text-black placeholder-gray-400 focus:border-orange-500 focus:bg-white focus:outline-none transition-all" />
+            <input
+              type="text"
+              placeholder="Buscar por nombre o proveedor..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full rounded-xl border border-gray-200 bg-gray-50/50 py-2 pl-10 pr-4 text-sm text-black placeholder-gray-400 focus:border-orange-500 focus:bg-white focus:outline-none transition-all"
+            />
           </div>
           <div className="flex items-center gap-2">
             <Filter className="size-4 text-gray-500 shrink-0" />
-            <select value={unitFilter} onChange={e => setUnitFilter(e.target.value)}
-              className="rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2 text-xs font-bold text-gray-700 focus:outline-none">
-              {unidades.map(u => (
-                <option key={u} value={u}>{u === "todas" ? "Todas las unidades" : u}</option>
+            <select
+              value={unitFilter}
+              onChange={(e) => setUnitFilter(e.target.value)}
+              className="rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2 text-xs font-bold text-gray-700 focus:outline-none"
+            >
+              {unidades.map((u) => (
+                <option key={u} value={u}>
+                  {u === "todas" ? "Todas las unidades" : u}
+                </option>
               ))}
             </select>
           </div>
@@ -350,7 +478,7 @@ export default function IngredientesPage() {
         <div className="mt-5 overflow-x-auto">
           <table className="w-full border-collapse text-left">
             <thead>
-            <tr className="border-b border-gray-100 text-xs font-bold uppercase tracking-wider text-gray-400">
+              <tr className="border-b border-gray-100 text-xs font-bold uppercase tracking-wider text-gray-400">
                 <th className="py-4 px-3">Nombre</th>
                 <th className="py-4 px-3">Proveedor</th>
                 <th className="py-4 px-3 text-right">Stock Actual</th>
@@ -365,19 +493,38 @@ export default function IngredientesPage() {
                 <tr>
                   <td colSpan="7" className="py-12 text-center">
                     <Loader2 className="size-8 animate-spin text-orange-500 mx-auto" />
-                    <p className="text-sm text-gray-500 mt-2 font-medium">Cargando ingredientes...</p>
+                    <p className="text-sm text-gray-500 mt-2 font-medium">
+                      Cargando ingredientes...
+                    </p>
                   </td>
                 </tr>
               ) : filtered.length > 0 ? (
-                filtered.map(ing => {
-                  const lowS = Number(ing.stock_actual) < Number(ing.stock_minimo);
-                  const pct  = Math.min(100, Math.round((Number(ing.stock_actual) / Math.max(Number(ing.stock_minimo), 0.01)) * 100));
+                filtered.map((ing) => {
+                  const lowS =
+                    Number(ing.stock_actual) < Number(ing.stock_minimo);
+                  const pct = Math.min(
+                    100,
+                    Math.round(
+                      (Number(ing.stock_actual) /
+                        Math.max(Number(ing.stock_minimo), 0.01)) *
+                        100,
+                    ),
+                  );
                   return (
-                    <tr key={ing.id} className="hover:bg-orange-50/10 transition-colors group">
-                      <td className="py-4 px-3 text-sm font-semibold text-black">{ing.nombre}</td>
-                      <td className="py-4 px-3 text-sm text-gray-500">{ing.proveedor}</td>
+                    <tr
+                      key={ing.id}
+                      className="hover:bg-orange-50/10 transition-colors group"
+                    >
+                      <td className="py-4 px-3 text-sm font-semibold text-black">
+                        {ing.nombre}
+                      </td>
+                      <td className="py-4 px-3 text-sm text-gray-500">
+                        {ing.proveedor}
+                      </td>
                       <td className="py-4 px-3 text-right">
-                        <p className={`text-sm font-bold ${lowS ? "text-red-600" : "text-black"}`}>
+                        <p
+                          className={`text-sm font-bold ${lowS ? "text-red-600" : "text-black"}`}
+                        >
                           {parseFloat(ing.stock_actual).toLocaleString()}
                         </p>
                         <div className="w-20 ml-auto mt-1 rounded-full bg-gray-100 h-1">
@@ -408,12 +555,18 @@ export default function IngredientesPage() {
                       </td>
                       <td className="py-4 px-3 text-center">
                         <div className="flex items-center justify-center gap-1.5">
-                          <button onClick={() => handleEdit(ing)} title="Editar"
-                            className="inline-flex size-8 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-400 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-100 transition-colors">
+                          <button
+                            onClick={() => handleEdit(ing)}
+                            title="Editar"
+                            className="inline-flex size-8 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-400 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-100 transition-colors"
+                          >
                             <Pencil className="size-3.5" />
                           </button>
-                          <button onClick={() => handleDelete(ing.id, ing.nombre)} title="Eliminar"
-                            className="inline-flex size-8 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-400 hover:bg-red-50 hover:text-red-600 hover:border-red-100 transition-colors">
+                          <button
+                            onClick={() => handleDelete(ing.id, ing.nombre)}
+                            title="Eliminar"
+                            className="inline-flex size-8 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-400 hover:bg-red-50 hover:text-red-600 hover:border-red-100 transition-colors"
+                          >
                             <Trash2 className="size-3.5" />
                           </button>
                         </div>
@@ -423,7 +576,10 @@ export default function IngredientesPage() {
                 })
               ) : (
                 <tr>
-                  <td colSpan="7" className="py-10 text-center text-sm font-medium text-gray-400">
+                  <td
+                    colSpan="7"
+                    className="py-10 text-center text-sm font-medium text-gray-400"
+                  >
                     {ingredientes.length === 0
                       ? "No hay ingredientes registrados aún."
                       : "No hay resultados para los filtros aplicados."}
@@ -438,7 +594,10 @@ export default function IngredientesPage() {
       {/* Modal */}
       <IngredienteModal
         open={modalOpen}
-        onClose={() => { setModalOpen(false); setEditData(null); }}
+        onClose={() => {
+          setModalOpen(false);
+          setEditData(null);
+        }}
         onSaved={handleSaved}
         editData={editData}
       />

@@ -21,7 +21,6 @@ export default function ProductGrid({
   cartMap = {},
   updatingItems = {},
 }) {
-
   // Estado de carga — skeleton cards
   if (isLoading) {
     return (

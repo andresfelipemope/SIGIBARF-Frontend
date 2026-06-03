@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { movimientosProductoService } from '@/services/movimientosProducto';
+import { useState, useEffect, useCallback } from "react";
+import { movimientosProductoService } from "@/services/movimientosProducto";
 
 export function useProductos() {
   const [productos, setProductos] = useState([]);
@@ -14,8 +14,10 @@ export function useProductos() {
       // Filtrar u ordenar si es necesario, o simplemente retornar el listado
       setProductos(data || []);
     } catch (err) {
-      console.error('Error fetching products:', err);
-      setErrorProductos(err.message || 'Error al obtener la lista de productos');
+      console.error("Error fetching products:", err);
+      setErrorProductos(
+        err.message || "Error al obtener la lista de productos",
+      );
     } finally {
       setLoadingProductos(false);
     }

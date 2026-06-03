@@ -42,7 +42,7 @@ export function PedidoManualFormDialog({
 
   const updateItem = (index, field, value) => {
     setItems((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
+      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)),
     );
   };
 
@@ -115,9 +115,15 @@ export function PedidoManualFormDialog({
             <span className="text-[10px] font-extrabold uppercase tracking-widest text-orange-500">
               Canales externos · WhatsApp · Redes · Teléfono
             </span>
-            <h2 className="text-lg font-extrabold text-black">Registrar pedido manual</h2>
+            <h2 className="text-lg font-extrabold text-black">
+              Registrar pedido manual
+            </h2>
           </div>
-          <button onClick={handleClose} disabled={creating} className="p-1.5 hover:bg-gray-100 rounded-lg cursor-pointer">
+          <button
+            onClick={handleClose}
+            disabled={creating}
+            className="p-1.5 hover:bg-gray-100 rounded-lg cursor-pointer"
+          >
             <X className="size-5 text-gray-400" />
           </button>
         </div>
@@ -141,7 +147,10 @@ export function PedidoManualFormDialog({
             </button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col flex-1 overflow-hidden"
+          >
             <div className="p-6 overflow-y-auto space-y-5 flex-1">
               {formError && (
                 <p className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs font-semibold text-rose-800">
@@ -149,7 +158,11 @@ export function PedidoManualFormDialog({
                 </p>
               )}
 
-              <ClienteSelector value={usuarioId} onChange={setUsuarioId} disabled={creating} />
+              <ClienteSelector
+                value={usuarioId}
+                onChange={setUsuarioId}
+                disabled={creating}
+              />
 
               <div>
                 <label className="block text-xs font-extrabold uppercase tracking-wider text-gray-700 mb-2">
@@ -170,7 +183,9 @@ export function PedidoManualFormDialog({
               {tipoPago === "credito" && (
                 <div className="grid grid-cols-2 gap-3 rounded-xl border border-orange-100 bg-orange-50/30 p-4">
                   <div>
-                    <label className="text-[10px] font-bold uppercase text-gray-500">Cuotas</label>
+                    <label className="text-[10px] font-bold uppercase text-gray-500">
+                      Cuotas
+                    </label>
                     <input
                       type="number"
                       min="1"
@@ -181,7 +196,9 @@ export function PedidoManualFormDialog({
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] font-bold uppercase text-gray-500">Frecuencia (días)</label>
+                    <label className="text-[10px] font-bold uppercase text-gray-500">
+                      Frecuencia (días)
+                    </label>
                     <input
                       type="number"
                       min="1"
@@ -192,7 +209,9 @@ export function PedidoManualFormDialog({
                     />
                   </div>
                   <div className="col-span-2">
-                    <label className="text-[10px] font-bold uppercase text-gray-500">Observaciones</label>
+                    <label className="text-[10px] font-bold uppercase text-gray-500">
+                      Observaciones
+                    </label>
                     <textarea
                       value={observaciones}
                       onChange={(e) => setObservaciones(e.target.value)}
@@ -222,7 +241,9 @@ export function PedidoManualFormDialog({
                     <div key={index} className="flex gap-2 items-start">
                       <select
                         value={item.producto_id}
-                        onChange={(e) => updateItem(index, "producto_id", e.target.value)}
+                        onChange={(e) =>
+                          updateItem(index, "producto_id", e.target.value)
+                        }
                         className="flex-1 rounded-xl border border-gray-200 px-3 py-2 text-sm cursor-pointer"
                         disabled={creating}
                       >
@@ -237,7 +258,9 @@ export function PedidoManualFormDialog({
                         type="number"
                         min="1"
                         value={item.cantidad}
-                        onChange={(e) => updateItem(index, "cantidad", e.target.value)}
+                        onChange={(e) =>
+                          updateItem(index, "cantidad", e.target.value)
+                        }
                         className="w-20 rounded-xl border border-gray-200 px-3 py-2 text-sm"
                         disabled={creating}
                       />
@@ -246,7 +269,7 @@ export function PedidoManualFormDialog({
                         onClick={() => removeItem(index)}
                         className={cn(
                           "p-2 text-gray-400 hover:text-rose-600",
-                          items.length <= 1 && "opacity-30 pointer-events-none"
+                          items.length <= 1 && "opacity-30 pointer-events-none",
                         )}
                       >
                         <Trash2 className="size-4" />

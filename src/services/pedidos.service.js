@@ -1,10 +1,11 @@
-import { apiRequest } from '@/lib/api';
+import { apiRequest } from "@/lib/api";
 
 /**
  * Helper to retrieve Authorization headers using the locally stored JWT access token.
  */
 function authHeaders() {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('access') : null;
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("access") : null;
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
@@ -17,8 +18,8 @@ export const pedidosService = {
    * GET /api/ventas/mis-pedidos/
    */
   async getMisPedidos() {
-    return apiRequest('/api/ventas/mis-pedidos/', {
-      method: 'GET',
+    return apiRequest("/api/ventas/mis-pedidos/", {
+      method: "GET",
       headers: authHeaders(),
     });
   },
@@ -30,7 +31,7 @@ export const pedidosService = {
    */
   async getPedidoDetalle(id) {
     return apiRequest(`/api/ventas/pedidos/${id}/`, {
-      method: 'GET',
+      method: "GET",
       headers: authHeaders(),
     });
   },
@@ -42,7 +43,7 @@ export const pedidosService = {
    */
   async pagarPedido(id) {
     return apiRequest(`/api/ventas/pedidos/${id}/pagar/`, {
-      method: 'POST',
+      method: "POST",
       headers: authHeaders(),
     });
   },

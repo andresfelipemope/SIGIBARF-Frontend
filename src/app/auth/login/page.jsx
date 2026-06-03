@@ -7,13 +7,25 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { Mail, Lock, Eye, EyeOff, Loader2, AlertCircle } from "lucide-react";
 
-import { Card, CardHeader, CardContent, CardDescription, CardTitle, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardDescription,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Field, FieldLabel, FieldGroup, FieldError } from "@/components/ui/field";
+import {
+  Field,
+  FieldLabel,
+  FieldGroup,
+  FieldError,
+} from "@/components/ui/field";
 
 import { authService } from "@/lib/api";
 
@@ -88,13 +100,15 @@ export default function LoginPage() {
       const data = await authService.googleLogin(response.credential);
 
       console.log("Respuesta backend:", data);
-      
+
       // Guardar tokens y perfil en localStorage
       localStorage.setItem("access", data.tokens.access);
       localStorage.setItem("refresh", data.tokens.refresh);
       localStorage.setItem("user", JSON.stringify(data.user));
 
-      toast.success(`¡Bienvenido, ${data.user.nombre}! Sesión iniciada con Google.`);
+      toast.success(
+        `¡Bienvenido, ${data.user.nombre}! Sesión iniciada con Google.`,
+      );
       router.push("/home");
     } catch (err) {
       setError(err.message || "Error al iniciar sesión con Google.");
@@ -132,11 +146,13 @@ export default function LoginPage() {
       localStorage.setItem("user", JSON.stringify(data.user));
 
       toast.success(`¡Hola de nuevo, ${data.user.nombre}!`);
-      
+
       // Redirigir a Home
       router.push("/home");
     } catch (err) {
-      setError(err.message || "Credenciales incorrectas o problema de servidor.");
+      setError(
+        err.message || "Credenciales incorrectas o problema de servidor.",
+      );
       toast.error("Inicio de sesión fallido");
     } finally {
       setIsLoading(false);
@@ -167,10 +183,17 @@ export default function LoginPage() {
 
         <CardContent className="space-y-5">
           {error && (
-            <Alert variant="destructive" className="border-red-200 bg-red-50/50 text-red-900 py-3 rounded-lg">
+            <Alert
+              variant="destructive"
+              className="border-red-200 bg-red-50/50 text-red-900 py-3 rounded-lg"
+            >
               <AlertCircle className="w-4 h-4 text-red-600" />
-              <AlertTitle className="text-xs font-semibold">Error al iniciar sesión</AlertTitle>
-              <AlertDescription className="text-[11px] mt-0.5">{error}</AlertDescription>
+              <AlertTitle className="text-xs font-semibold">
+                Error al iniciar sesión
+              </AlertTitle>
+              <AlertDescription className="text-[11px] mt-0.5">
+                {error}
+              </AlertDescription>
             </Alert>
           )}
 
@@ -178,7 +201,10 @@ export default function LoginPage() {
             <FieldGroup className="gap-4">
               {/* Campo Correo */}
               <Field>
-                <FieldLabel htmlFor="correo" className="text-xs font-semibold text-zinc-700">
+                <FieldLabel
+                  htmlFor="correo"
+                  className="text-xs font-semibold text-zinc-700"
+                >
                   Correo Electrónico
                 </FieldLabel>
                 <div className="relative flex items-center">
@@ -199,7 +225,10 @@ export default function LoginPage() {
 
               {/* Campo Contraseña */}
               <Field>
-                <FieldLabel htmlFor="password" className="text-xs font-semibold text-zinc-700">
+                <FieldLabel
+                  htmlFor="password"
+                  className="text-xs font-semibold text-zinc-700"
+                >
                   Contraseña
                 </FieldLabel>
                 <div className="relative flex items-center">
@@ -221,7 +250,11 @@ export default function LoginPage() {
                     disabled={isLoading}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 transition-colors focus:outline-none"
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
                   </button>
                 </div>
               </Field>
@@ -276,7 +309,10 @@ export default function LoginPage() {
 
           {/* Botón de Google */}
           <div className="w-full flex justify-center">
-            <div id="google-signin-btn" className="w-full min-h-[44px] flex items-center justify-center [&_iframe]:!rounded-lg" />
+            <div
+              id="google-signin-btn"
+              className="w-full min-h-[44px] flex items-center justify-center [&_iframe]:!rounded-lg"
+            />
           </div>
         </CardContent>
 

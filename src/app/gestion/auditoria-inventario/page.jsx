@@ -32,10 +32,7 @@ export default function AuditoriaInventarioPage() {
     stats,
   } = useMovimientosProducto();
 
-  const {
-    productos,
-    refetchProductos,
-  } = useProductos();
+  const { productos, refetchProductos } = useProductos();
 
   const [selectedMovimiento, setSelectedMovimiento] = useState(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -57,7 +54,8 @@ export default function AuditoriaInventarioPage() {
             Auditoría de Inventario
           </h1>
           <p className="text-sm text-gray-500 mt-1 font-medium">
-            Historial de auditoría, entradas, salidas y ajustes manuales del stock final de Athletic Barf.
+            Historial de auditoría, entradas, salidas y ajustes manuales del
+            stock final de Athletic Barf.
           </p>
         </div>
 

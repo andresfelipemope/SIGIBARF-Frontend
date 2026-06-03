@@ -54,7 +54,7 @@ export default function CatalogoPage() {
       result = result.filter(
         (p) =>
           (p.nombre && p.nombre.toLowerCase().includes(query)) ||
-          (p.descripcion && p.descripcion.toLowerCase().includes(query))
+          (p.descripcion && p.descripcion.toLowerCase().includes(query)),
       );
     }
 
@@ -69,7 +69,6 @@ export default function CatalogoPage() {
       {/* ═══ HERO ═══ */}
       <section className="relative bg-gradient-to-br from-green-200 via-white to-orange-200 border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-12 text-center">
-
           {/* Pill badge */}
           <div className="inline-flex items-center gap-2 bg-orange-100 text-orange-700 text-xs font-semibold px-4 py-1.5 rounded-full mb-5">
             <Leaf size={13} />
@@ -77,8 +76,7 @@ export default function CatalogoPage() {
           </div>
 
           <h1 className="text-4xl sm:text-5xl font-bold text-gray-800 leading-tight">
-            Nuestros{" "} 
-            <span className="text-green-600">Productos</span>
+            Nuestros <span className="text-green-600">Productos</span>
           </h1>
 
           <p className="mt-4 text-gray-500 max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
@@ -101,7 +99,6 @@ export default function CatalogoPage() {
 
       {/* ═══ RESULTADOS ═══ */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-16">
-
         {errorCart && !loadingCart && (
           <div className="mb-6 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
             {errorCart}

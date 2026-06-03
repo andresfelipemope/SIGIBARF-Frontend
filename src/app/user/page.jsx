@@ -3,27 +3,59 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { 
-  User, Mail, Phone, MapPin, Shield, Calendar, Edit2, KeyRound, 
-  Loader2, AlertCircle, CheckCircle, Eye, EyeOff, Lock, Heart, Award
+import {
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Shield,
+  Calendar,
+  Edit2,
+  KeyRound,
+  Loader2,
+  AlertCircle,
+  CheckCircle,
+  Eye,
+  EyeOff,
+  Lock,
+  Heart,
+  Award,
 } from "lucide-react";
 
-import { Card, CardHeader, CardContent, CardDescription, CardTitle, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardDescription,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Field, FieldLabel, FieldGroup, FieldError } from "@/components/ui/field";
+import {
+  Field,
+  FieldLabel,
+  FieldGroup,
+  FieldError,
+} from "@/components/ui/field";
 import { Skeleton } from "@/components/ui/skeleton";
-import { 
-  Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter, DialogClose 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
 } from "@/components/ui/dialog";
 
 import { authService } from "@/lib/api";
 
 export default function UserProfilePage() {
   const router = useRouter();
-  
+
   // Perfil del Usuario
   const [profile, setProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -65,7 +97,7 @@ export default function UserProfilePage() {
       try {
         const data = await authService.getProfile();
         setProfile(data);
-        
+
         // Inicializar campos de edición
         setEditNombre(data.nombre || "");
         setEditApellido(data.apellido || "");
@@ -78,7 +110,9 @@ export default function UserProfilePage() {
           localStorage.removeItem("access");
           localStorage.removeItem("refresh");
           localStorage.removeItem("user");
-          toast.error("Tu sesión ha expirado. Por favor, inicia sesión nuevamente.");
+          toast.error(
+            "Tu sesión ha expirado. Por favor, inicia sesión nuevamente.",
+          );
           router.push("/auth/login");
         } else {
           toast.error("No se pudo cargar la información del perfil.");
@@ -182,16 +216,22 @@ export default function UserProfilePage() {
     }
 
     try {
-      await authService.changePassword(currentPassword, newPassword, newPasswordConfirm);
+      await authService.changePassword(
+        currentPassword,
+        newPassword,
+        newPasswordConfirm,
+      );
       toast.success("¡Tu contraseña ha sido cambiada con éxito!");
-      
+
       // Limpiar campos
       setCurrentPassword("");
       setNewPassword("");
       setNewPasswordConfirm("");
       setIsPasswordOpen(false);
     } catch (err) {
-      setPasswordError(err.message || "Error al actualizar la contraseña. Revisa tus datos.");
+      setPasswordError(
+        err.message || "Error al actualizar la contraseña. Revisa tus datos.",
+      );
       toast.error("No se pudo cambiar la contraseña");
     } finally {
       setIsChanging(false);
@@ -254,7 +294,6 @@ export default function UserProfilePage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 md:py-12 space-y-8 bg-[#fafaf9] min-h-screen z-10 relative">
-      
       {/* Header Principal */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-200/60 pb-6">
         <div>
@@ -262,16 +301,19 @@ export default function UserProfilePage() {
             Mi Cuenta
           </h1>
           <p className="text-sm text-zinc-500 mt-1">
-            Gestiona tu información personal, datos de contacto y seguridad de acceso.
+            Gestiona tu información personal, datos de contacto y seguridad de
+            acceso.
           </p>
         </div>
-        
+
         {/* Badge de completitud */}
-        <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold self-start md:self-auto border ${
-          profile.is_perfil_completo 
-            ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-700" 
-            : "bg-orange-500/10 border-orange-500/20 text-orange-700"
-        }`}>
+        <div
+          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold self-start md:self-auto border ${
+            profile.is_perfil_completo
+              ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-700"
+              : "bg-orange-500/10 border-orange-500/20 text-orange-700"
+          }`}
+        >
           {profile.is_perfil_completo ? (
             <>
               <CheckCircle className="size-3.5" />
@@ -291,9 +333,13 @@ export default function UserProfilePage() {
         <Alert className="border-orange-500/20 bg-orange-50/50 text-orange-900 rounded-2xl flex gap-3 p-4 items-start shadow-xs">
           <AlertCircle className="w-5 h-5 text-orange-500 shrink-0 mt-0.5" />
           <div>
-            <AlertTitle className="text-sm font-bold tracking-tight">¡Completa tu información de perfil!</AlertTitle>
+            <AlertTitle className="text-sm font-bold tracking-tight">
+              ¡Completa tu información de perfil!
+            </AlertTitle>
             <AlertDescription className="text-xs text-orange-800/90 mt-1 leading-relaxed">
-              Actualmente no has agregado tu número de **teléfono** o **dirección**. Completa estos datos para agilizar el proceso de compra y garantizar envíos de Barf precisos y seguros a tu hogar.
+              Actualmente no has agregado tu número de **teléfono** o
+              **dirección**. Completa estos datos para agilizar el proceso de
+              compra y garantizar envíos de Barf precisos y seguros a tu hogar.
             </AlertDescription>
           </div>
         </Alert>
@@ -301,18 +347,21 @@ export default function UserProfilePage() {
 
       {/* Grid del Perfil */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        
         {/* Columna Izquierda: Tarjeta de Avatar y Rol */}
         <div className="space-y-6 lg:col-span-1">
           <Card className="border-zinc-200/60 bg-white overflow-hidden rounded-2xl shadow-xs">
             {/* Portada Decorativa con gradiente sutil de marca */}
             <div className="h-24 w-full bg-linear-to-r from-green-700 via-emerald-600 to-orange-500 relative" />
-            
+
             <CardContent className="pt-0 flex flex-col items-center text-center px-6 pb-6 relative z-10 -mt-12">
               <div className="size-24 rounded-full border-4 border-white bg-emerald-600 text-white flex items-center justify-center text-3xl font-extrabold shadow-md mb-4 uppercase">
-                {profile.nombre ? profile.nombre[0] : <User className="size-10" />}
+                {profile.nombre ? (
+                  profile.nombre[0]
+                ) : (
+                  <User className="size-10" />
+                )}
               </div>
-              
+
               <h2 className="text-xl font-bold text-zinc-950">
                 {profile.nombre} {profile.apellido}
               </h2>
@@ -326,7 +375,7 @@ export default function UserProfilePage() {
                 Rol: {profile.rol}
               </div>
             </CardContent>
-            
+
             {/* Footer de Tarjeta decorado con fecha */}
             <div className="border-t border-zinc-100 bg-zinc-50/50 p-4 px-6 flex items-center gap-2 text-xs text-zinc-500 font-medium justify-center">
               <Calendar className="size-4 text-emerald-600 shrink-0" />
@@ -335,7 +384,7 @@ export default function UserProfilePage() {
                 {new Date(profile.created_at).toLocaleDateString("es-ES", {
                   day: "numeric",
                   month: "long",
-                  year: "numeric"
+                  year: "numeric",
                 })}
               </span>
             </div>
@@ -350,23 +399,30 @@ export default function UserProfilePage() {
                 Información de contacto
               </CardTitle>
               <CardDescription className="text-zinc-500 text-xs">
-                Datos necesarios para la facturación, llamadas y entrega de paquetes de Athletic Barf.
+                Datos necesarios para la facturación, llamadas y entrega de
+                paquetes de Athletic Barf.
               </CardDescription>
             </CardHeader>
 
             <CardContent className="pt-6 space-y-5">
-              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
                 {/* Teléfono */}
                 <div className="flex items-start gap-3.5 p-4 rounded-xl border border-zinc-100 bg-zinc-50/20">
                   <div className="p-2 rounded-lg bg-emerald-50 text-emerald-700 shrink-0">
                     <Phone className="size-5" />
                   </div>
                   <div className="space-y-1">
-                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Teléfono de contacto</span>
+                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">
+                      Teléfono de contacto
+                    </span>
                     <span className="text-sm font-semibold text-zinc-800">
-                      {profile.telefono ? profile.telefono : <span className="text-orange-500 font-medium text-xs">No registrado</span>}
+                      {profile.telefono ? (
+                        profile.telefono
+                      ) : (
+                        <span className="text-orange-500 font-medium text-xs">
+                          No registrado
+                        </span>
+                      )}
                     </span>
                   </div>
                 </div>
@@ -377,18 +433,24 @@ export default function UserProfilePage() {
                     <MapPin className="size-5" />
                   </div>
                   <div className="space-y-1">
-                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Dirección de entrega</span>
+                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">
+                      Dirección de entrega
+                    </span>
                     <span className="text-sm font-semibold text-zinc-800 leading-snug break-words">
-                      {profile.direccion ? profile.direccion : <span className="text-orange-500 font-medium text-xs">No registrada</span>}
+                      {profile.direccion ? (
+                        profile.direccion
+                      ) : (
+                        <span className="text-orange-500 font-medium text-xs">
+                          No registrada
+                        </span>
+                      )}
                     </span>
                   </div>
                 </div>
-
               </div>
 
               {/* Divisor */}
               <div className="border-t border-zinc-100 pt-5 flex flex-col sm:flex-row gap-4 justify-between items-center">
-                
                 {/* Botón Editar Perfil */}
                 <Button
                   onClick={() => setIsEditOpen(true)}
@@ -406,12 +468,10 @@ export default function UserProfilePage() {
                   <KeyRound className="size-4 text-orange-400" />
                   Cambiar Contraseña
                 </Button>
-
               </div>
             </CardContent>
           </Card>
         </div>
-
       </div>
 
       {/* DIÁLOGO: EDITAR DATOS */}
@@ -423,23 +483,33 @@ export default function UserProfilePage() {
               Editar perfil
             </DialogTitle>
             <DialogDescription className="text-zinc-500 text-xs mt-1">
-              Actualiza tu información personal y datos de contacto en Athletic Barf.
+              Actualiza tu información personal y datos de contacto en Athletic
+              Barf.
             </DialogDescription>
           </DialogHeader>
 
           {editError && (
-            <Alert variant="destructive" className="border-red-200 bg-red-50/50 text-red-950 py-3 rounded-lg mb-4">
+            <Alert
+              variant="destructive"
+              className="border-red-200 bg-red-50/50 text-red-950 py-3 rounded-lg mb-4"
+            >
               <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
-              <AlertDescription className="text-xs">{editError}</AlertDescription>
+              <AlertDescription className="text-xs">
+                {editError}
+              </AlertDescription>
             </Alert>
           )}
 
           <form onSubmit={handleUpdateProfile} className="space-y-4">
             <FieldGroup className="gap-4">
-              
               <div className="grid grid-cols-2 gap-4">
                 <Field>
-                  <FieldLabel htmlFor="editNombre" className="text-xs font-semibold text-zinc-700">Nombre</FieldLabel>
+                  <FieldLabel
+                    htmlFor="editNombre"
+                    className="text-xs font-semibold text-zinc-700"
+                  >
+                    Nombre
+                  </FieldLabel>
                   <Input
                     id="editNombre"
                     type="text"
@@ -451,7 +521,12 @@ export default function UserProfilePage() {
                   />
                 </Field>
                 <Field>
-                  <FieldLabel htmlFor="editApellido" className="text-xs font-semibold text-zinc-700">Apellido</FieldLabel>
+                  <FieldLabel
+                    htmlFor="editApellido"
+                    className="text-xs font-semibold text-zinc-700"
+                  >
+                    Apellido
+                  </FieldLabel>
                   <Input
                     id="editApellido"
                     type="text"
@@ -465,7 +540,12 @@ export default function UserProfilePage() {
               </div>
 
               <Field>
-                <FieldLabel htmlFor="editTelefono" className="text-xs font-semibold text-zinc-700">Teléfono</FieldLabel>
+                <FieldLabel
+                  htmlFor="editTelefono"
+                  className="text-xs font-semibold text-zinc-700"
+                >
+                  Teléfono
+                </FieldLabel>
                 <div className="relative">
                   <Phone className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400" />
                   <Input
@@ -481,7 +561,12 @@ export default function UserProfilePage() {
               </Field>
 
               <Field>
-                <FieldLabel htmlFor="editDireccion" className="text-xs font-semibold text-zinc-700">Dirección</FieldLabel>
+                <FieldLabel
+                  htmlFor="editDireccion"
+                  className="text-xs font-semibold text-zinc-700"
+                >
+                  Dirección
+                </FieldLabel>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400" />
                   <Input
@@ -495,17 +580,29 @@ export default function UserProfilePage() {
                   />
                 </div>
               </Field>
-
             </FieldGroup>
 
             <DialogFooter className="mt-6 border-t border-zinc-100 pt-4 gap-2">
               <DialogClose asChild>
-                <Button type="button" variant="outline" disabled={isUpdating} className="h-10 rounded-xl cursor-pointer">
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={isUpdating}
+                  className="h-10 rounded-xl cursor-pointer"
+                >
                   Cancelar
                 </Button>
               </DialogClose>
-              <Button type="submit" disabled={isUpdating} className="h-10 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold shadow-xs flex items-center gap-1.5 cursor-pointer">
-                {isUpdating ? <Loader2 className="size-4 animate-spin" /> : "Guardar Cambios"}
+              <Button
+                type="submit"
+                disabled={isUpdating}
+                className="h-10 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold shadow-xs flex items-center gap-1.5 cursor-pointer"
+              >
+                {isUpdating ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  "Guardar Cambios"
+                )}
               </Button>
             </DialogFooter>
           </form>
@@ -526,18 +623,27 @@ export default function UserProfilePage() {
           </DialogHeader>
 
           {passwordError && (
-            <Alert variant="destructive" className="border-red-200 bg-red-50/50 text-red-950 py-3 rounded-lg mb-4">
+            <Alert
+              variant="destructive"
+              className="border-red-200 bg-red-50/50 text-red-950 py-3 rounded-lg mb-4"
+            >
               <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
-              <AlertDescription className="text-xs">{passwordError}</AlertDescription>
+              <AlertDescription className="text-xs">
+                {passwordError}
+              </AlertDescription>
             </Alert>
           )}
 
           <form onSubmit={handleChangePassword} className="space-y-4">
             <FieldGroup className="gap-4">
-              
               {/* Contraseña Actual */}
               <Field>
-                <FieldLabel htmlFor="currentPassword" className="text-xs font-semibold text-zinc-700">Contraseña Actual</FieldLabel>
+                <FieldLabel
+                  htmlFor="currentPassword"
+                  className="text-xs font-semibold text-zinc-700"
+                >
+                  Contraseña Actual
+                </FieldLabel>
                 <div className="relative flex items-center">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400" />
                   <Input
@@ -554,14 +660,23 @@ export default function UserProfilePage() {
                     onClick={() => setShowCurrent(!showCurrent)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700"
                   >
-                    {showCurrent ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                    {showCurrent ? (
+                      <EyeOff className="size-4" />
+                    ) : (
+                      <Eye className="size-4" />
+                    )}
                   </button>
                 </div>
               </Field>
 
               {/* Nueva Contraseña */}
               <Field>
-                <FieldLabel htmlFor="newPassword" className="text-xs font-semibold text-zinc-700">Nueva Contraseña</FieldLabel>
+                <FieldLabel
+                  htmlFor="newPassword"
+                  className="text-xs font-semibold text-zinc-700"
+                >
+                  Nueva Contraseña
+                </FieldLabel>
                 <div className="relative flex items-center">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400" />
                   <Input
@@ -579,19 +694,34 @@ export default function UserProfilePage() {
                     onClick={() => setShowNew(!showNew)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700"
                   >
-                    {showNew ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                    {showNew ? (
+                      <EyeOff className="size-4" />
+                    ) : (
+                      <Eye className="size-4" />
+                    )}
                   </button>
                 </div>
-                
+
                 {/* Fortaleza de contraseña */}
                 {newPassword && (
                   <div className="mt-2 space-y-1">
                     <div className="flex h-1.5 w-full gap-1 rounded-full bg-zinc-100 overflow-hidden">
-                      <div className={`h-full transition-all duration-300 ${getScoreColorClass()}`} style={{ width: `${(passwordScore / 4) * 100}%` }} />
+                      <div
+                        className={`h-full transition-all duration-300 ${getScoreColorClass()}`}
+                        style={{ width: `${(passwordScore / 4) * 100}%` }}
+                      />
                     </div>
-                    <span className={`text-[10px] font-semibold ${
-                      passwordScore <= 1 ? "text-red-500" : passwordScore === 2 ? "text-orange-500" : passwordScore === 3 ? "text-yellow-600" : "text-emerald-600"
-                    }`}>
+                    <span
+                      className={`text-[10px] font-semibold ${
+                        passwordScore <= 1
+                          ? "text-red-500"
+                          : passwordScore === 2
+                            ? "text-orange-500"
+                            : passwordScore === 3
+                              ? "text-yellow-600"
+                              : "text-emerald-600"
+                      }`}
+                    >
                       {passwordFeedback}
                     </span>
                   </div>
@@ -600,7 +730,12 @@ export default function UserProfilePage() {
 
               {/* Confirmar Nueva Contraseña */}
               <Field>
-                <FieldLabel htmlFor="newPasswordConfirm" className="text-xs font-semibold text-zinc-700">Confirmar Nueva Contraseña</FieldLabel>
+                <FieldLabel
+                  htmlFor="newPasswordConfirm"
+                  className="text-xs font-semibold text-zinc-700"
+                >
+                  Confirmar Nueva Contraseña
+                </FieldLabel>
                 <div className="relative flex items-center">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400" />
                   <Input
@@ -617,27 +752,42 @@ export default function UserProfilePage() {
                     onClick={() => setShowConfirm(!showConfirm)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700"
                   >
-                    {showConfirm ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                    {showConfirm ? (
+                      <EyeOff className="size-4" />
+                    ) : (
+                      <Eye className="size-4" />
+                    )}
                   </button>
                 </div>
               </Field>
-
             </FieldGroup>
 
             <DialogFooter className="mt-6 border-t border-zinc-100 pt-4 gap-2">
               <DialogClose asChild>
-                <Button type="button" variant="outline" disabled={isChanging} className="h-10 rounded-xl cursor-pointer">
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={isChanging}
+                  className="h-10 rounded-xl cursor-pointer"
+                >
                   Cancelar
                 </Button>
               </DialogClose>
-              <Button type="submit" disabled={isChanging} className="h-10 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold shadow-xs flex items-center gap-1.5 cursor-pointer">
-                {isChanging ? <Loader2 className="size-4 animate-spin" /> : "Cambiar Contraseña"}
+              <Button
+                type="submit"
+                disabled={isChanging}
+                className="h-10 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold shadow-xs flex items-center gap-1.5 cursor-pointer"
+              >
+                {isChanging ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  "Cambiar Contraseña"
+                )}
               </Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
-
     </div>
   );
 }

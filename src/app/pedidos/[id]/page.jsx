@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { 
+import {
   ArrowLeft,
   AlertCircle,
   Calendar,
@@ -11,11 +11,18 @@ import {
   CheckCircle2,
   Package,
   Clock,
-  ExternalLink
+  ExternalLink,
 } from "lucide-react";
 import { Toaster, toast } from "sonner";
 
-import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -65,18 +72,25 @@ export default function PedidoDetallePage() {
       console.log("Pagar pedido response:", response);
 
       if (!response) {
-        throw new Error("Respuesta inválida del servidor al solicitar reintento de pago.");
+        throw new Error(
+          "Respuesta inválida del servidor al solicitar reintento de pago.",
+        );
       }
 
       // 2. Validar datos de Wompi recibidos
       const wompiData = response.wompi;
       if (!wompiData) {
-        throw new Error("El servidor no retornó la información de pago de Wompi.");
+        throw new Error(
+          "El servidor no retornó la información de pago de Wompi.",
+        );
       }
 
-      const { public_key, currency, amount_in_cents, reference, integrity } = wompiData;
+      const { public_key, currency, amount_in_cents, reference, integrity } =
+        wompiData;
       if (!public_key || !amount_in_cents || !reference) {
-        throw new Error("Faltan campos obligatorios para iniciar la pasarela de pagos.");
+        throw new Error(
+          "Faltan campos obligatorios para iniciar la pasarela de pagos.",
+        );
       }
 
       // 3. Abrir el Widget de Wompi utilizando el helper compartido
@@ -87,7 +101,7 @@ export default function PedidoDetallePage() {
           currency: currency || "COP",
           amountInCents: amount_in_cents,
           reference: reference,
-          integrity: integrity
+          integrity: integrity,
         });
         console.log("Reintento pago Wompi transacción:", transaction);
       } catch (widgetErr) {
@@ -115,7 +129,6 @@ export default function PedidoDetallePage() {
 
       // Refrescar el detalle del pedido para actualizar el estado de pago
       await fetchPedidoDetalle();
-
     } catch (err) {
       console.error("Error reattempting payment:", err);
       toast.error(err.message || "Error al iniciar el proceso de pago.");
@@ -127,7 +140,12 @@ export default function PedidoDetallePage() {
   // Determinar color de badge según estado
   const getStatusBadgeClass = (status) => {
     const s = (status || "").toLowerCase();
-    if (s === "approved" || s === "aprobado" || s === "pagado" || s === "exitoso") {
+    if (
+      s === "approved" ||
+      s === "aprobado" ||
+      s === "pagado" ||
+      s === "exitoso"
+    ) {
       return "bg-green-50 text-green-700 border-green-200";
     }
     if (s === "pending" || s === "pendiente" || s === "espera") {
@@ -138,9 +156,17 @@ export default function PedidoDetallePage() {
 
   const getStatusText = (status) => {
     const s = (status || "").toLowerCase();
-    if (s === "approved" || s === "aprobado" || s === "pagado" || s === "exitoso") return "Aprobado";
-    if (s === "pending" || s === "pendiente" || s === "espera") return "Pendiente";
-    if (s === "declined" || s === "declinado" || s === "rechazado") return "Declinado";
+    if (
+      s === "approved" ||
+      s === "aprobado" ||
+      s === "pagado" ||
+      s === "exitoso"
+    )
+      return "Aprobado";
+    if (s === "pending" || s === "pendiente" || s === "espera")
+      return "Pendiente";
+    if (s === "declined" || s === "declinado" || s === "rechazado")
+      return "Declinado";
     if (s === "error") return "Error";
     return status || "Desconocido";
   };
@@ -163,14 +189,19 @@ export default function PedidoDetallePage() {
   if (error && !pedido) {
     return (
       <div className="max-w-md mx-auto px-4 sm:px-6 py-16 w-full flex-1 flex flex-col items-center justify-center text-center">
-        <Alert variant="destructive" className="rounded-2xl border-red-200 bg-red-50 p-6 flex flex-col items-center gap-4">
+        <Alert
+          variant="destructive"
+          className="rounded-2xl border-red-200 bg-red-50 p-6 flex flex-col items-center gap-4"
+        >
           <AlertCircle className="h-10 w-10 text-red-600 animate-bounce" />
-          <AlertTitle className="text-lg font-bold text-red-900">Error de carga</AlertTitle>
+          <AlertTitle className="text-lg font-bold text-red-900">
+            Error de carga
+          </AlertTitle>
           <AlertDescription className="text-sm text-red-800 leading-relaxed">
             {error}
           </AlertDescription>
-          <Button 
-            onClick={fetchPedidoDetalle} 
+          <Button
+            onClick={fetchPedidoDetalle}
             className="mt-2 bg-red-600 hover:bg-red-700 text-white rounded-xl px-6 py-2 cursor-pointer"
           >
             Reintentar
@@ -181,21 +212,19 @@ export default function PedidoDetallePage() {
   }
 
   const numeroPedido = pedido.numero_pedido || pedido.id;
-  const fecha =
-    pedido.fecha_creacion ||
-    pedido.created_at ||
-    pedido.fecha;
+  const fecha = pedido.fecha_creacion || pedido.created_at || pedido.fecha;
   const status = pedido.estado_pago || pedido.estado;
   const total = parseFloat(pedido.precio_total || pedido.total || "0");
   const productos = pedido.productos || pedido.items || [];
-  const isPendiente = (status || "").toLowerCase() === "pendiente" || (status || "").toLowerCase() === "pending";
+  const isPendiente =
+    (status || "").toLowerCase() === "pendiente" ||
+    (status || "").toLowerCase() === "pending";
 
   return (
     <>
       <Toaster position="top-right" richColors closeButton expand={false} />
-      
+
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-12 w-full flex-1 flex flex-col justify-start">
-        
         {/* Botón Volver */}
         <Button
           onClick={() => router.push("/pedidos")}
@@ -217,13 +246,14 @@ export default function PedidoDetallePage() {
               Realizado el {formatDate(fecha)}
             </p>
           </div>
-          <span className={`inline-flex items-center rounded-full border px-4 py-1.5 text-sm font-semibold self-start sm:self-center ${getStatusBadgeClass(status)}`}>
+          <span
+            className={`inline-flex items-center rounded-full border px-4 py-1.5 text-sm font-semibold self-start sm:self-center ${getStatusBadgeClass(status)}`}
+          >
             {getStatusText(status)}
           </span>
         </div>
 
         <div className="space-y-6">
-          
           {/* Card Resumen Pago */}
           <Card className="border-zinc-100 shadow-xs">
             <CardHeader className="p-6 pb-4">
@@ -235,16 +265,26 @@ export default function PedidoDetallePage() {
             <CardContent className="p-6 pt-0 space-y-4">
               <div className="flex justify-between items-center text-sm">
                 <span className="text-zinc-500 font-medium">Subtotal</span>
-                <span className="text-zinc-800 font-semibold">{formatPrice(total)}</span>
+                <span className="text-zinc-800 font-semibold">
+                  {formatPrice(total)}
+                </span>
               </div>
               <div className="flex justify-between items-center text-sm">
-                <span className="text-zinc-500 font-medium">Envío / Entrega</span>
-                <span className="text-zinc-500 font-medium text-xs">Por cuenta del cliente</span>
+                <span className="text-zinc-500 font-medium">
+                  Envío / Entrega
+                </span>
+                <span className="text-zinc-500 font-medium text-xs">
+                  Por cuenta del cliente
+                </span>
               </div>
               <Separator className="bg-zinc-100" />
               <div className="flex justify-between items-center">
-                <span className="text-base font-bold text-zinc-850 font-heading">Total del pedido</span>
-                <span className="text-2xl font-extrabold text-emerald-600">{formatPrice(total)}</span>
+                <span className="text-base font-bold text-zinc-850 font-heading">
+                  Total del pedido
+                </span>
+                <span className="text-2xl font-extrabold text-emerald-600">
+                  {formatPrice(total)}
+                </span>
               </div>
 
               {/* Caja de alerta sobre entrega */}
@@ -253,7 +293,8 @@ export default function PedidoDetallePage() {
                   Nota sobre la recogida
                 </p>
                 <p className="text-xs text-red-600 leading-relaxed">
-                  Recuerda que debes retirar tu pedido en sucursal o coordinar con un transportador externo de confianza.
+                  Recuerda que debes retirar tu pedido en sucursal o coordinar
+                  con un transportador externo de confianza.
                 </p>
               </div>
             </CardContent>
@@ -296,26 +337,29 @@ export default function PedidoDetallePage() {
             </CardHeader>
             <CardContent className="p-6 pt-0 divide-y divide-zinc-100">
               {productos.map((item, idx) => {
-                const nombre = item.producto_nombre || item.nombre || "Producto";
+                const nombre =
+                  item.producto_nombre || item.nombre || "Producto";
 
                 const precio = parseFloat(
                   item.precio_unitario ||
-                  item.producto_precio ||
-                  item.precio ||
-                  "0"
+                    item.producto_precio ||
+                    item.precio ||
+                    "0",
                 );
 
                 const cantidad = item.cantidad || item.cantidad_productos || 1;
 
-                const subtotal = parseFloat(
-                  item.subtotal ||
-                  (precio * cantidad)
-                );
+                const subtotal = parseFloat(item.subtotal || precio * cantidad);
 
                 return (
-                  <div key={item.id || idx} className="py-4 first:pt-0 last:pb-0 flex items-center justify-between gap-4">
+                  <div
+                    key={item.id || idx}
+                    className="py-4 first:pt-0 last:pb-0 flex items-center justify-between gap-4"
+                  >
                     <div className="space-y-1">
-                      <h3 className="font-bold text-zinc-800 text-sm sm:text-base">{nombre}</h3>
+                      <h3 className="font-bold text-zinc-800 text-sm sm:text-base">
+                        {nombre}
+                      </h3>
                       <p className="text-xs text-zinc-500 font-medium">
                         {cantidad} x {formatPrice(precio)}
                       </p>
@@ -328,7 +372,6 @@ export default function PedidoDetallePage() {
               })}
             </CardContent>
           </Card>
-
         </div>
       </div>
     </>

@@ -15,7 +15,7 @@ export default function ProduccionDashboard() {
   const [ingredientes, setIngredientes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState(null);
 
@@ -26,24 +26,26 @@ export default function ProduccionDashboard() {
       let prodRes = [];
       let prodListRes = [];
       let ingListRes = [];
-      
+
       try {
         prodListRes = await inventarioService.getProductos();
       } catch (e) {
         console.error("Error cargando productos:", e);
       }
-      
+
       try {
         ingListRes = await inventarioService.getIngredientes();
       } catch (e) {
         console.error("Error cargando ingredientes:", e);
       }
-      
+
       try {
         prodRes = await produccionesService.getProducciones();
       } catch (e) {
         console.error("Error cargando producciones:", e);
-        setError("El backend devolvió un error 500 al consultar las producciones. El historial no se pudo cargar.");
+        setError(
+          "El backend devolvió un error 500 al consultar las producciones. El historial no se pudo cargar.",
+        );
       }
 
       setProducciones(prodRes || []);
@@ -72,7 +74,9 @@ export default function ProduccionDashboard() {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-green-600">
         <Loader2 className="size-10 animate-spin mb-4" />
-        <p className="text-sm font-bold text-gray-500">Cargando módulo de producción...</p>
+        <p className="text-sm font-bold text-gray-500">
+          Cargando módulo de producción...
+        </p>
       </div>
     );
   }
@@ -93,10 +97,11 @@ export default function ProduccionDashboard() {
             Control de Producción
           </h1>
           <p className="text-sm text-gray-500 mt-1 font-medium">
-            Seguimiento de producciones, manufactura de lotes y control de inventario.
+            Seguimiento de producciones, manufactura de lotes y control de
+            inventario.
           </p>
         </div>
-        <button 
+        <button
           onClick={() => setIsFormOpen(true)}
           className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-orange-500/20 hover:bg-orange-600 transition-all duration-200"
         >
@@ -112,30 +117,27 @@ export default function ProduccionDashboard() {
         </div>
       )}
 
-      <ProduccionStats 
-        producciones={producciones} 
-        productos={productos} 
-        ingredientes={ingredientes} 
+      <ProduccionStats
+        producciones={producciones}
+        productos={productos}
+        ingredientes={ingredientes}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         <div className="lg:col-span-3">
-          <ProduccionTable 
-            producciones={producciones} 
+          <ProduccionTable
+            producciones={producciones}
             productos={productos}
             loading={loading}
           />
         </div>
         <div className="lg:col-span-1">
-          <ProduccionAlerts 
-            ingredientes={ingredientes} 
-            productos={productos}
-          />
+          <ProduccionAlerts ingredientes={ingredientes} productos={productos} />
         </div>
       </div>
 
       {isFormOpen && (
-        <ProduccionForm 
+        <ProduccionForm
           productos={productos}
           onClose={() => setIsFormOpen(false)}
           onSuccess={handleSuccess}

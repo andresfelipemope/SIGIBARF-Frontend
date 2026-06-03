@@ -1,10 +1,5 @@
 import * as React from "react";
-import { 
-  Activity, 
-  ArrowUpRight, 
-  ArrowDownRight, 
-  Sliders 
-} from "lucide-react";
+import { Activity, ArrowUpRight, ArrowDownRight, Sliders } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function StatsCards({ stats, loading }) {
@@ -48,11 +43,16 @@ export function StatsCards({ stats, loading }) {
               <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
                 {m.label}
               </span>
-              <div className={cn("flex size-10 items-center justify-center rounded-xl border", m.color)}>
+              <div
+                className={cn(
+                  "flex size-10 items-center justify-center rounded-xl border",
+                  m.color,
+                )}
+              >
                 <Icon className="size-5 shrink-0" />
               </div>
             </div>
-            
+
             <div className="mt-4">
               {loading ? (
                 <div className="h-8 w-16 animate-pulse rounded-md bg-gray-200" />

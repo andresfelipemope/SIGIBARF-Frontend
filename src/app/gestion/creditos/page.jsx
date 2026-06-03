@@ -7,7 +7,8 @@ import { CreditosTable } from "@/components/creditos/creditos-table";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function CreditosPage() {
-  const { creditos, count, loading, error, search, setSearch, refetch } = useCreditos();
+  const { creditos, count, loading, error, search, setSearch, refetch } =
+    useCreditos();
 
   return (
     <>
@@ -21,7 +22,8 @@ export default function CreditosPage() {
               Gestión de Créditos
             </h1>
             <p className="text-sm text-gray-500 mt-1 font-medium">
-              Créditos otorgados a clientes por pedidos. Seguimiento de cuotas y pagos.
+              Créditos otorgados a clientes por pedidos. Seguimiento de cuotas y
+              pagos.
             </p>
           </div>
           <button
@@ -34,7 +36,9 @@ export default function CreditosPage() {
         </div>
 
         <div className="rounded-2xl border border-gray-200 bg-white px-6 py-4 shadow-xs">
-          <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Total</span>
+          <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
+            Total
+          </span>
           <p className="text-2xl font-extrabold text-green-700 mt-1">{count}</p>
         </div>
 
@@ -54,7 +58,10 @@ export default function CreditosPage() {
         {loading ? (
           <div className="space-y-3">
             {[1, 2, 3, 4].map((i) => (
-              <Skeleton key={i} className="h-14 w-full rounded-xl bg-gray-100" />
+              <Skeleton
+                key={i}
+                className="h-14 w-full rounded-xl bg-gray-100"
+              />
             ))}
           </div>
         ) : (

@@ -16,16 +16,18 @@ export default function FormulacionDetail({
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
-      <div 
+      <div
         className="fixed inset-0 bg-black/40 backdrop-blur-sm"
         onClick={onClose}
       />
-      
+
       <div className="flex min-h-full items-center justify-center p-4">
         <div className="relative w-full max-w-md transform rounded-2xl bg-white p-6 shadow-2xl">
           {}
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-gray-900">Detalle de Formulación</h2>
+            <h2 className="text-xl font-bold text-gray-900">
+              Detalle de Formulación
+            </h2>
             <button
               onClick={onClose}
               className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition cursor-pointer"
@@ -44,11 +46,15 @@ export default function FormulacionDetail({
                 </span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">Producto</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                  Producto
+                </p>
                 <p className="font-semibold text-gray-900 mt-1">
                   {producto?.nombre || `Producto #${item.id_producto}`}
                 </p>
-                <p className="text-xs text-gray-500 mt-0.5">ID: {item.id_producto}</p>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  ID: {item.id_producto}
+                </p>
               </div>
             </div>
 
@@ -60,7 +66,9 @@ export default function FormulacionDetail({
                 </span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">Ingrediente</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                  Ingrediente
+                </p>
                 <p className="font-semibold text-gray-900 mt-1">
                   {ingrediente?.nombre || `Ingrediente #${item.id_ingrediente}`}
                 </p>
@@ -73,13 +81,17 @@ export default function FormulacionDetail({
             {}
             <div className="grid grid-cols-2 gap-4">
               <div className="p-4 rounded-xl border border-gray-200">
-                <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">Cantidad</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                  Cantidad
+                </p>
                 <p className="text-2xl font-extrabold text-gray-900 mt-1">
                   {parseFloat(item.cantidad_ingrediente).toFixed(2)}
                 </p>
               </div>
               <div className="p-4 rounded-xl border border-gray-200">
-                <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">Porcentaje</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                  Porcentaje
+                </p>
                 <p className="text-2xl font-extrabold text-orange-600 mt-1">
                   {parseFloat(item.porcentaje_ingrediente).toFixed(2)}%
                 </p>
@@ -89,7 +101,8 @@ export default function FormulacionDetail({
             {}
             <div className="pt-4 border-t border-gray-100">
               <p className="text-xs text-gray-400">
-                ID de relación: <span className="font-mono text-gray-600">{item.id}</span>
+                ID de relación:{" "}
+                <span className="font-mono text-gray-600">{item.id}</span>
               </p>
             </div>
           </div>

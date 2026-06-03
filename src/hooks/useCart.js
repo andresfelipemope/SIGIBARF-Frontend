@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
-import { cartService } from '@/services/cart.service';
-import { requireCartAuth } from '@/lib/cart-auth';
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { cartService } from "@/services/cart.service";
+import { requireCartAuth } from "@/lib/cart-auth";
 
 export function useCart() {
   const router = useRouter();
@@ -32,8 +32,8 @@ export function useCart() {
       const map = await cartService.syncCart();
       setCartMap(map);
     } catch (error) {
-      console.error('Cart sync failed:', error);
-      setErrorCart(error.message || 'No fue posible cargar el carrito.');
+      console.error("Cart sync failed:", error);
+      setErrorCart(error.message || "No fue posible cargar el carrito.");
     } finally {
       setLoadingCart(false);
     }
@@ -58,28 +58,28 @@ export function useCart() {
       try {
         if (quantity === 0) {
           await cartService.removeCartItem(productId);
-          toast.success('Producto eliminado del carrito');
+          toast.success("Producto eliminado del carrito");
         } else {
           await cartService.updateCartItem(productId, quantity);
-          toast.success('Cantidad actualizada');
+          toast.success("Cantidad actualizada");
         }
 
         const synced = await cartService.syncCart();
         setCartMap(synced);
         return true;
       } catch (error) {
-        console.error('Cart quantity update failed:', error);
+        console.error("Cart quantity update failed:", error);
         if (error.status === 401) {
           requireCartAuth(router, toast);
           return false;
         }
-        toast.error('No fue posible actualizar el carrito');
+        toast.error("No fue posible actualizar el carrito");
         return false;
       } finally {
         setItemPending(productId, false);
       }
     },
-    [cartMap, router, updatingItems, setItemPending]
+    [cartMap, router, updatingItems, setItemPending],
   );
 
   const addToCart = useCallback(
@@ -94,28 +94,28 @@ export function useCart() {
       try {
         if (cartMap[productId]) {
           await cartService.updateCartItem(productId, quantity);
-          toast.success('Cantidad actualizada');
+          toast.success("Cantidad actualizada");
         } else {
           await cartService.addToCart(productId, quantity);
-          toast.success('Producto agregado al carrito');
+          toast.success("Producto agregado al carrito");
         }
 
         const synced = await cartService.syncCart();
         setCartMap(synced);
         return true;
       } catch (error) {
-        console.error('Cart add failed:', error);
+        console.error("Cart add failed:", error);
         if (error.status === 401) {
           requireCartAuth(router, toast);
           return false;
         }
-        toast.error('No fue posible actualizar el carrito');
+        toast.error("No fue posible actualizar el carrito");
         return false;
       } finally {
         setItemPending(productId, false);
       }
     },
-    [cartMap, router, updatingItems, setItemPending]
+    [cartMap, router, updatingItems, setItemPending],
   );
 
   return {

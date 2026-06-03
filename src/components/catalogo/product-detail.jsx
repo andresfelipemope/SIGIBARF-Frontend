@@ -1,5 +1,5 @@
 "use client";
- 
+
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
@@ -15,9 +15,9 @@ import {
 import { formatPrice } from "@/lib/format-price";
 import QuantitySelector from "@/components/catalogo/quantity-selector";
 import { useCart } from "@/hooks/useCart";
- 
+
 /* ─────────────────────────── constantes ─────────────────────────── */
- 
+
 const CATEGORY_COLORS = {
   "Dieta Tradicional": {
     badge: "bg-amber-100 text-amber-700 border border-amber-200",
@@ -40,27 +40,33 @@ const CATEGORY_COLORS = {
     ring: "ring-orange-200",
   },
 };
- 
+
 const CATEGORY_FALLBACK = {
   badge: "bg-green-100 text-green-700 border border-green-200",
   accent: "text-green-600",
   ring: "ring-green-200",
 };
- 
+
 /* ─────────────────────────── sub-componentes ─────────────────────── */
- 
+
 function Breadcrumb({ productName }) {
   return (
     <nav className="flex items-center gap-1.5 text-xs text-gray-400 mb-6">
-      <Link href="/home" className="hover:text-green-600 transition-colors">Inicio</Link>
+      <Link href="/home" className="hover:text-green-600 transition-colors">
+        Inicio
+      </Link>
       <ChevronRight size={12} />
-      <Link href="/catalogo" className="hover:text-green-600 transition-colors">Catálogo</Link>
+      <Link href="/catalogo" className="hover:text-green-600 transition-colors">
+        Catálogo
+      </Link>
       <ChevronRight size={12} />
-      <span className="text-gray-600 font-medium truncate max-w-[200px]">{productName}</span>
+      <span className="text-gray-600 font-medium truncate max-w-[200px]">
+        {productName}
+      </span>
     </nav>
   );
 }
- 
+
 function ImagePlaceholder({ category }) {
   return (
     <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 gap-4">
@@ -71,19 +77,23 @@ function ImagePlaceholder({ category }) {
     </div>
   );
 }
- 
+
 function DetailRow({ icon: Icon, label, value }) {
   return (
     <div className="flex items-center gap-3 py-3.5 border-b border-gray-100 last:border-0">
       <div className="w-8 h-8 flex items-center justify-center rounded-xl bg-green-50 text-green-600 shrink-0">
         <Icon size={14} />
       </div>
-      <span className="text-sm text-gray-500 flex-1 leading-tight">{label}</span>
-      <span className="text-sm font-semibold text-gray-800 text-right">{value}</span>
+      <span className="text-sm text-gray-500 flex-1 leading-tight">
+        {label}
+      </span>
+      <span className="text-sm font-semibold text-gray-800 text-right">
+        {value}
+      </span>
     </div>
   );
 }
- 
+
 function TrustBadge({ text }) {
   return (
     <div className="flex items-center gap-2 text-xs text-gray-500">
@@ -92,9 +102,9 @@ function TrustBadge({ text }) {
     </div>
   );
 }
- 
+
 /* ─────────────────────────── componente principal ─────────────────── */
- 
+
 /**
  * ProductDetail — Vista detallada de un producto.
  *
@@ -103,21 +113,23 @@ function TrustBadge({ text }) {
 export default function ProductDetail({ product }) {
   const { cartMap, updatingItems, addToCart, updateQuantity } = useCart();
   const cartQuantity = cartMap[product.id];
-  const [quantity, setQuantity] = useState(product.stock_actual > 0 ? (cartQuantity || 1) : 0);
+  const [quantity, setQuantity] = useState(
+    product.stock_actual > 0 ? cartQuantity || 1 : 0,
+  );
   const [imgError, setImgError] = useState(false);
   const [cartState, setCartState] = useState("idle");
- 
+
   const isUpdating = Boolean(updatingItems[product.id]);
   const inStock = product.stock_actual > 0;
   const lowStock = inStock && product.stock_actual <= 10;
   const colors = CATEGORY_COLORS[product.categoria] || CATEGORY_FALLBACK;
- 
+
   // ── LOG TEMPORAL DE DEPURACIÓN ──────────────────────────────────────────────
   // Permite identificar el nombre exacto del campo de imagen enviado por el backend.
   // Eliminar una vez confirmado el campo correcto.
   console.log("PRODUCTO RECIBIDO:", product);
   // ───────────────────────────────────────────────────────────────────────────
- 
+
   useEffect(() => {
     if (typeof cartQuantity === "number") {
       setQuantity(Math.max(0, cartQuantity));
@@ -125,11 +137,11 @@ export default function ProductDetail({ product }) {
       setQuantity(inStock ? 1 : 0);
     }
   }, [cartQuantity, inStock, quantity]);
- 
+
   const handleDecrease = async () => {
     const next = quantity - 1;
     if (next < 0) return;
- 
+
     if (typeof cartQuantity === "number" && cartQuantity > 0) {
       const success = await updateQuantity({ product, quantity: next });
       if (success && next === 0) {
@@ -137,23 +149,23 @@ export default function ProductDetail({ product }) {
       }
       return;
     }
- 
+
     if (next >= 1) {
       setQuantity(next);
     }
   };
- 
+
   const handleIncrease = async () => {
     const next = Math.min(quantity + 1, product.stock_actual || 1);
- 
+
     if (typeof cartQuantity === "number" && cartQuantity > 0) {
       await updateQuantity({ product, quantity: next });
       return;
     }
- 
+
     setQuantity(next);
   };
- 
+
   const handleAddToCart = async () => {
     if (!inStock) return;
     const success = await addToCart({ product, quantity });
@@ -162,11 +174,10 @@ export default function ProductDetail({ product }) {
       setTimeout(() => setCartState("idle"), 2500);
     }
   };
- 
+
   return (
     <div className="min-h-screen bg-gray-50/60">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
- 
         {/* ── Breadcrumb + Volver ── */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
           <Breadcrumb productName={product.nombre} />
@@ -181,18 +192,16 @@ export default function ProductDetail({ product }) {
             Volver al catálogo
           </Link>
         </div>
- 
+
         {/* ── Layout principal ── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 xl:gap-12">
- 
           {/* ══ COLUMNA IZQUIERDA — Imagen ══ */}
           <div className="flex flex-col gap-4">
- 
             {/* Imagen principal */}
             <div className="relative rounded-3xl overflow-hidden border border-gray-200 bg-white shadow-sm aspect-square">
               {!imgError ? (
                 <img
-                  src={product.imagen}               
+                  src={product.imagen}
                   alt={product.nombre}
                   onError={() => setImgError(true)}
                   className="w-full h-full object-cover"
@@ -200,10 +209,12 @@ export default function ProductDetail({ product }) {
               ) : (
                 <ImagePlaceholder category={product.categoria || "Producto"} />
               )}
- 
+
               {/* Badges flotantes sobre la imagen */}
               <div className="absolute top-4 left-4 flex flex-col gap-2">
-                <span className={`text-xs font-semibold px-3 py-1 rounded-full ${colors.badge}`}>
+                <span
+                  className={`text-xs font-semibold px-3 py-1 rounded-full ${colors.badge}`}
+                >
                   {product.categoria || "General"}
                 </span>
                 {lowStock && (
@@ -213,7 +224,7 @@ export default function ProductDetail({ product }) {
                 )}
               </div>
             </div>
- 
+
             {/* Tarjeta de confianza / garantías */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 grid grid-cols-2 gap-3">
               <TrustBadge text="100% Natural" />
@@ -222,17 +233,16 @@ export default function ProductDetail({ product }) {
               <TrustBadge text="Cadena de frío" />
             </div>
           </div>
- 
+
           {/* ══ COLUMNA DERECHA — Info + acciones ══ */}
           <div className="flex flex-col gap-6">
- 
             {/* Nombre */}
             <div className="flex flex-col gap-3">
               <h1 className="text-3xl xl:text-4xl font-bold text-gray-800 leading-tight">
                 {product.nombre}
               </h1>
             </div>
- 
+
             {/* Precio + peso */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center justify-between">
               <div>
@@ -243,31 +253,40 @@ export default function ProductDetail({ product }) {
                   {formatPrice(parseFloat(product.precio || 0))}
                 </p>
                 <p className="text-sm text-gray-400 mt-1">
-                  Presentación: <span className="font-semibold text-gray-600">{product.presentacion || "1 unidad"}</span>
+                  Presentación:{" "}
+                  <span className="font-semibold text-gray-600">
+                    {product.presentacion || "1 unidad"}
+                  </span>
                 </p>
               </div>
- 
+
               {/* Indicador de stock */}
               <div className="text-right">
                 {inStock ? (
                   <div className="flex flex-col items-end gap-1">
                     <div className="flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                      <span className="text-sm font-semibold text-green-600">Disponible</span>
+                      <span className="text-sm font-semibold text-green-600">
+                        Disponible
+                      </span>
                     </div>
-                    <span className="text-xs text-gray-400">{product.stock_actual} en stock</span>
+                    <span className="text-xs text-gray-400">
+                      {product.stock_actual} en stock
+                    </span>
                   </div>
                 ) : (
                   <div className="flex flex-col items-end gap-1">
                     <div className="flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-red-400" />
-                      <span className="text-sm font-semibold text-red-500">Sin stock</span>
+                      <span className="text-sm font-semibold text-red-500">
+                        Sin stock
+                      </span>
                     </div>
                   </div>
                 )}
               </div>
             </div>
- 
+
             {/* Descripción */}
             <div>
               <h2 className="text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
@@ -278,7 +297,7 @@ export default function ProductDetail({ product }) {
                 {product.descripcion || "Sin descripción detallada disponible."}
               </p>
             </div>
- 
+
             {/* Composición del producto */}
             {product.composicion && product.composicion.length > 0 && (
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
@@ -290,31 +309,40 @@ export default function ProductDetail({ product }) {
                 <div className="px-5 py-4">
                   <ul className="space-y-2">
                     {product.composicion.map((item, index) => (
-                      <li key={index} className="flex items-center justify-between text-sm text-gray-600 border-b border-dashed border-gray-200 pb-2 last:border-0 last:pb-0">
+                      <li
+                        key={index}
+                        className="flex items-center justify-between text-sm text-gray-600 border-b border-dashed border-gray-200 pb-2 last:border-0 last:pb-0"
+                      >
                         <span>{item.ingrediente_nombre}</span>
-                        <span className="font-semibold text-gray-800">{parseFloat(item.porcentaje_ingrediente)}%</span>
+                        <span className="font-semibold text-gray-800">
+                          {parseFloat(item.porcentaje_ingrediente)}%
+                        </span>
                       </li>
                     ))}
                   </ul>
                 </div>
               </div>
             )}
- 
+
             {/* Selector cantidad + botón carrito */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-gray-700">Cantidad</span>
+                <span className="text-sm font-semibold text-gray-700">
+                  Cantidad
+                </span>
                 <QuantitySelector
                   value={quantity}
                   onChange={setQuantity}
                   onDecrease={handleDecrease}
                   onIncrease={handleIncrease}
-                  min={typeof cartQuantity === "number" && cartQuantity > 0 ? 0 : 1}
+                  min={
+                    typeof cartQuantity === "number" && cartQuantity > 0 ? 0 : 1
+                  }
                   max={product.stock_actual || 1}
                   disabled={isUpdating}
                 />
               </div>
- 
+
               {/* Subtotal dinámico */}
               <div className="flex items-center justify-between text-sm border-t border-gray-100 pt-3">
                 <span className="text-gray-500">Subtotal estimado</span>
@@ -322,7 +350,7 @@ export default function ProductDetail({ product }) {
                   {formatPrice(parseFloat(product.precio || 0) * quantity)}
                 </span>
               </div>
- 
+
               {/* Botón principal */}
               <button
                 type="button"
@@ -332,9 +360,10 @@ export default function ProductDetail({ product }) {
                   w-full flex items-center justify-center gap-3 py-4 rounded-2xl
                   text-white font-bold text-base tracking-wide
                   transition-all duration-300 select-none
-                  ${cartState === "added"
-                    ? "bg-green-500 scale-[0.99]"
-                    : "bg-green-600 hover:bg-green-700 active:scale-[0.98]"
+                  ${
+                    cartState === "added"
+                      ? "bg-green-500 scale-[0.99]"
+                      : "bg-green-600 hover:bg-green-700 active:scale-[0.98]"
                   }
                   disabled:opacity-50 disabled:cursor-not-allowed
                 `}
@@ -351,7 +380,7 @@ export default function ProductDetail({ product }) {
                   </>
                 )}
               </button>
- 
+
               {!inStock && (
                 <p className="text-center text-xs text-red-400 -mt-1 flex items-center justify-center gap-1">
                   <AlertCircle size={12} />
@@ -359,7 +388,6 @@ export default function ProductDetail({ product }) {
                 </p>
               )}
             </div>
- 
           </div>
         </div>
       </div>

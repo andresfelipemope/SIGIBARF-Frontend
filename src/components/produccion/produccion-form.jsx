@@ -8,17 +8,19 @@ export default function ProduccionForm({ productos, onClose, onSuccess }) {
   const [formData, setFormData] = useState({
     id_producto: "",
     cantidad_producida: "",
-    fecha_vencimiento: ""
+    fecha_vencimiento: "",
   });
-  
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   // Solo mostrar productos activos en el form
-  const productosActivos = productos.filter(p => !p.inhabilitado);
+  const productosActivos = productos.filter((p) => !p.inhabilitado);
 
   // Selected product to show current stock info
-  const selectedProduct = productosActivos.find(p => p.id.toString() === formData.id_producto);
+  const selectedProduct = productosActivos.find(
+    (p) => p.id.toString() === formData.id_producto,
+  );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -46,13 +48,16 @@ export default function ProduccionForm({ productos, onClose, onSuccess }) {
       await produccionesService.createProduccion({
         id_producto: parseInt(formData.id_producto, 10),
         cantidad_producida: cantidad,
-        fecha_vencimiento: formData.fecha_vencimiento
+        fecha_vencimiento: formData.fecha_vencimiento,
       });
-      
+
       onSuccess("Producción registrada con éxito. Inventario actualizado.");
     } catch (err) {
       // Mostrar exactamente el error que viene del backend en `detail` o `message`
-      setError(err.message || "Error al registrar la producción. Verifica el stock de ingredientes.");
+      setError(
+        err.message ||
+          "Error al registrar la producción. Verifica el stock de ingredientes.",
+      );
     } finally {
       setLoading(false);
     }
@@ -67,11 +72,15 @@ export default function ProduccionForm({ productos, onClose, onSuccess }) {
               <Factory className="size-5" />
             </div>
             <div>
-              <h2 className="text-xl font-extrabold text-black">Registrar Producción</h2>
-              <p className="text-xs text-gray-500 font-medium">Convierte ingredientes en producto final</p>
+              <h2 className="text-xl font-extrabold text-black">
+                Registrar Producción
+              </h2>
+              <p className="text-xs text-gray-500 font-medium">
+                Convierte ingredientes en producto final
+              </p>
             </div>
           </div>
-          <button 
+          <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
             disabled={loading}
@@ -79,7 +88,7 @@ export default function ProduccionForm({ productos, onClose, onSuccess }) {
             <X className="size-5" />
           </button>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="p-6 overflow-y-auto flex-1">
           {error && (
             <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-medium flex items-start gap-2 animate-slide-in-right">
@@ -96,12 +105,17 @@ export default function ProduccionForm({ productos, onClose, onSuccess }) {
               <select
                 name="id_producto"
                 value={formData.id_producto}
-                onChange={(e) => setFormData(prev => ({ ...prev, id_producto: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    id_producto: e.target.value,
+                  }))
+                }
                 className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm font-semibold text-black focus:border-orange-500 focus:bg-white focus:outline-hidden transition-all"
                 disabled={loading}
               >
                 <option value="">Selecciona un producto...</option>
-                {productosActivos.map(p => (
+                {productosActivos.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.nombre}
                   </option>
@@ -113,10 +127,16 @@ export default function ProduccionForm({ productos, onClose, onSuccess }) {
               <div className="p-4 rounded-xl bg-blue-50 border border-blue-100 flex items-start gap-3">
                 <Info className="size-5 text-blue-600 shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-sm font-bold text-blue-900">Stock Actual del Producto</h4>
+                  <h4 className="text-sm font-bold text-blue-900">
+                    Stock Actual del Producto
+                  </h4>
                   <p className="text-xs text-blue-800 mt-1">
-                    Actualmente tienes <strong className="font-extrabold">{selectedProduct.stock_actual} unidades</strong> en inventario. 
-                    El registro de esta producción incrementará este valor.
+                    Actualmente tienes{" "}
+                    <strong className="font-extrabold">
+                      {selectedProduct.stock_actual} unidades
+                    </strong>{" "}
+                    en inventario. El registro de esta producción incrementará
+                    este valor.
                   </p>
                 </div>
               </div>
@@ -131,7 +151,12 @@ export default function ProduccionForm({ productos, onClose, onSuccess }) {
                   type="number"
                   name="cantidad_producida"
                   value={formData.cantidad_producida}
-                  onChange={(e) => setFormData(prev => ({ ...prev, cantidad_producida: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      cantidad_producida: e.target.value,
+                    }))
+                  }
                   min="1"
                   step="1"
                   className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-black font-semibold focus:border-orange-500 focus:bg-white focus:outline-hidden transition-all"
@@ -143,7 +168,8 @@ export default function ProduccionForm({ productos, onClose, onSuccess }) {
                 </span>
               </div>
               <p className="text-xs text-gray-500 font-medium mt-2">
-                Se descontarán automáticamente los ingredientes de tu inventario según la fórmula registrada.
+                Se descontarán automáticamente los ingredientes de tu inventario
+                según la fórmula registrada.
               </p>
             </div>
 
@@ -155,7 +181,12 @@ export default function ProduccionForm({ productos, onClose, onSuccess }) {
                 type="date"
                 name="fecha_vencimiento"
                 value={formData.fecha_vencimiento}
-                onChange={(e) => setFormData(prev => ({ ...prev, fecha_vencimiento: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    fecha_vencimiento: e.target.value,
+                  }))
+                }
                 className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-black font-semibold focus:border-orange-500 focus:bg-white focus:outline-hidden transition-all"
                 disabled={loading}
               />
@@ -182,7 +213,7 @@ export default function ProduccionForm({ productos, onClose, onSuccess }) {
                   Procesando...
                 </>
               ) : (
-                'Confirmar Producción'
+                "Confirmar Producción"
               )}
             </button>
           </div>

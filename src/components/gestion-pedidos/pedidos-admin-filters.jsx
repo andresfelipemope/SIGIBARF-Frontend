@@ -7,9 +7,7 @@ export function PedidosAdminFilters({
   onRefresh,
 }) {
   const hasActive =
-    filters.search ||
-    filters.estado !== "todos" ||
-    filters.soloCredito;
+    filters.search || filters.estado !== "todos" || filters.soloCredito;
 
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-xs space-y-4">

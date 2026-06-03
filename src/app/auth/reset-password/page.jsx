@@ -4,14 +4,35 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Lock, Eye, EyeOff, Loader2, AlertCircle, CheckCircle2, ArrowLeft, ShieldAlert } from "lucide-react";
+import {
+  Lock,
+  Eye,
+  EyeOff,
+  Loader2,
+  AlertCircle,
+  CheckCircle2,
+  ArrowLeft,
+  ShieldAlert,
+} from "lucide-react";
 
-import { Card, CardHeader, CardContent, CardDescription, CardTitle, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardDescription,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Field, FieldLabel, FieldGroup, FieldError } from "@/components/ui/field";
+import {
+  Field,
+  FieldLabel,
+  FieldGroup,
+  FieldError,
+} from "@/components/ui/field";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import { authService } from "@/lib/api";
@@ -46,7 +67,9 @@ function ResetPasswordForm() {
   useEffect(() => {
     async function checkToken() {
       if (!uid || !token) {
-        setErrorGlobal("Los parámetros del enlace son inválidos o están ausentes.");
+        setErrorGlobal(
+          "Los parámetros del enlace son inválidos o están ausentes.",
+        );
         setIsTokenValid(false);
         setIsValidating(false);
         return;
@@ -57,7 +80,9 @@ function ResetPasswordForm() {
         setIsTokenValid(true);
       } catch (err) {
         setIsTokenValid(false);
-        setErrorGlobal(err.message || "El token de recuperación es inválido o ha expirado.");
+        setErrorGlobal(
+          err.message || "El token de recuperación es inválido o ha expirado.",
+        );
       } finally {
         setIsValidating(false);
       }
@@ -108,7 +133,8 @@ function ResetPasswordForm() {
     // Validaciones del cliente
     const validationErrors = {};
     if (newPassword.length < 8) {
-      validationErrors.new_password = "La contraseña debe tener al menos 8 caracteres.";
+      validationErrors.new_password =
+        "La contraseña debe tener al menos 8 caracteres.";
     }
     if (newPassword !== newPasswordConfirm) {
       validationErrors.new_password_confirm = "Las contraseñas no coinciden.";
@@ -122,23 +148,30 @@ function ResetPasswordForm() {
     setIsSubmitting(true);
 
     try {
-      await authService.confirmPasswordReset(uid, token, newPassword, newPasswordConfirm);
+      await authService.confirmPasswordReset(
+        uid,
+        token,
+        newPassword,
+        newPasswordConfirm,
+      );
       setIsSuccess(true);
       toast.success("Contraseña restablecida correctamente.");
     } catch (err) {
       if (err.data && typeof err.data === "object") {
         const fieldErrors = {};
         let globalMsg = "Por favor, corrige los errores señalados.";
-        
+
         // Mapear los errores que devuelve Django a los campos
         if (err.data.new_password) {
-          fieldErrors.new_password = Array.isArray(err.data.new_password) 
-            ? err.data.new_password.join(" ") 
+          fieldErrors.new_password = Array.isArray(err.data.new_password)
+            ? err.data.new_password.join(" ")
             : err.data.new_password;
         }
         if (err.data.new_password_confirm) {
-          fieldErrors.new_password_confirm = Array.isArray(err.data.new_password_confirm) 
-            ? err.data.new_password_confirm.join(" ") 
+          fieldErrors.new_password_confirm = Array.isArray(
+            err.data.new_password_confirm,
+          )
+            ? err.data.new_password_confirm.join(" ")
             : err.data.new_password_confirm;
         }
         if (err.data.detail) {
@@ -148,7 +181,9 @@ function ResetPasswordForm() {
         setErrorsByField(fieldErrors);
         setErrorGlobal(globalMsg);
       } else {
-        setErrorGlobal(err.message || "Ocurrió un error al intentar cambiar la contraseña.");
+        setErrorGlobal(
+          err.message || "Ocurrió un error al intentar cambiar la contraseña.",
+        );
       }
       toast.error("Error al restablecer contraseña");
     } finally {
@@ -206,7 +241,8 @@ function ResetPasswordForm() {
             Contraseña restablecida
           </CardTitle>
           <CardDescription className="text-zinc-500 text-sm px-4">
-            Tu contraseña ha sido actualizada con éxito. Ya puedes iniciar sesión con tus nuevas credenciales.
+            Tu contraseña ha sido actualizada con éxito. Ya puedes iniciar
+            sesión con tus nuevas credenciales.
           </CardDescription>
         </CardHeader>
 
@@ -233,7 +269,9 @@ function ResetPasswordForm() {
             Enlace inválido o expirado
           </CardTitle>
           <CardDescription className="text-zinc-500 text-sm px-4 leading-normal">
-            El enlace de recuperación que utilizaste ya no es válido, ha caducado o el usuario no existe. Los tokens de seguridad son de un solo uso.
+            El enlace de recuperación que utilizaste ya no es válido, ha
+            caducado o el usuario no existe. Los tokens de seguridad son de un
+            solo uso.
           </CardDescription>
         </CardHeader>
 
@@ -275,19 +313,26 @@ function ResetPasswordForm() {
 
       <CardContent className="space-y-5">
         {errorGlobal && (
-          <Alert variant="destructive" className="border-red-200 bg-red-50/50 text-red-900 py-3 rounded-lg">
+          <Alert
+            variant="destructive"
+            className="border-red-200 bg-red-50/50 text-red-900 py-3 rounded-lg"
+          >
             <AlertCircle className="w-4 h-4 text-red-600" />
             <AlertTitle className="text-xs font-semibold">Error</AlertTitle>
-            <AlertDescription className="text-[11px] mt-0.5">{errorGlobal}</AlertDescription>
+            <AlertDescription className="text-[11px] mt-0.5">
+              {errorGlobal}
+            </AlertDescription>
           </Alert>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <FieldGroup className="gap-4">
-            
             {/* Campo Nueva Contraseña */}
             <Field>
-              <FieldLabel htmlFor="newPassword" className="text-xs font-semibold text-zinc-700">
+              <FieldLabel
+                htmlFor="newPassword"
+                className="text-xs font-semibold text-zinc-700"
+              >
                 Nueva Contraseña
               </FieldLabel>
               <div className="relative flex items-center">
@@ -301,7 +346,9 @@ function ResetPasswordForm() {
                   onChange={(e) => setNewPassword(e.target.value)}
                   disabled={isSubmitting}
                   className={`pl-9 pr-10 h-10 text-sm border-zinc-200/80 focus-visible:ring-emerald-500/20 focus-visible:border-emerald-600 rounded-lg text-black bg-zinc-50/20 ${
-                    errorsByField.new_password ? "border-red-500 bg-red-50/10 focus-visible:ring-red-500/20 focus-visible:border-red-500" : ""
+                    errorsByField.new_password
+                      ? "border-red-500 bg-red-50/10 focus-visible:ring-red-500/20 focus-visible:border-red-500"
+                      : ""
                   }`}
                   required
                 />
@@ -311,7 +358,11 @@ function ResetPasswordForm() {
                   disabled={isSubmitting}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 transition-colors focus:outline-none"
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
                 </button>
               </div>
 
@@ -319,24 +370,40 @@ function ResetPasswordForm() {
               {newPassword && (
                 <div className="mt-2 space-y-1">
                   <div className="flex h-1.5 w-full gap-1 rounded-full bg-zinc-100 overflow-hidden">
-                    <div className={`h-full transition-all duration-300 ${getScoreColorClass()}`} style={{ width: `${(passwordScore / 4) * 100}%` }} />
+                    <div
+                      className={`h-full transition-all duration-300 ${getScoreColorClass()}`}
+                      style={{ width: `${(passwordScore / 4) * 100}%` }}
+                    />
                   </div>
-                  <span className={`text-[10px] font-semibold transition-colors ${
-                    passwordScore <= 1 ? "text-red-500" : passwordScore === 2 ? "text-orange-500" : passwordScore === 3 ? "text-yellow-600" : "text-emerald-600"
-                  }`}>
+                  <span
+                    className={`text-[10px] font-semibold transition-colors ${
+                      passwordScore <= 1
+                        ? "text-red-500"
+                        : passwordScore === 2
+                          ? "text-orange-500"
+                          : passwordScore === 3
+                            ? "text-yellow-600"
+                            : "text-emerald-600"
+                    }`}
+                  >
                     {passwordFeedback}
                   </span>
                 </div>
               )}
 
               {errorsByField.new_password && (
-                <FieldError className="text-[10px] text-red-600 mt-1">{errorsByField.new_password}</FieldError>
+                <FieldError className="text-[10px] text-red-600 mt-1">
+                  {errorsByField.new_password}
+                </FieldError>
               )}
             </Field>
 
             {/* Campo Confirmar Contraseña */}
             <Field>
-              <FieldLabel htmlFor="newPasswordConfirm" className="text-xs font-semibold text-zinc-700">
+              <FieldLabel
+                htmlFor="newPasswordConfirm"
+                className="text-xs font-semibold text-zinc-700"
+              >
                 Confirmar Contraseña
               </FieldLabel>
               <div className="relative flex items-center">
@@ -350,7 +417,9 @@ function ResetPasswordForm() {
                   onChange={(e) => setNewPasswordConfirm(e.target.value)}
                   disabled={isSubmitting}
                   className={`pl-9 pr-10 h-10 text-sm border-zinc-200/80 focus-visible:ring-emerald-500/20 focus-visible:border-emerald-600 rounded-lg text-black bg-zinc-50/20 ${
-                    errorsByField.new_password_confirm ? "border-red-500 bg-red-50/10 focus-visible:ring-red-500/20 focus-visible:border-red-500" : ""
+                    errorsByField.new_password_confirm
+                      ? "border-red-500 bg-red-50/10 focus-visible:ring-red-500/20 focus-visible:border-red-500"
+                      : ""
                   }`}
                   required
                 />
@@ -360,14 +429,19 @@ function ResetPasswordForm() {
                   disabled={isSubmitting}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 transition-colors focus:outline-none"
                 >
-                  {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showConfirmPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
                 </button>
               </div>
               {errorsByField.new_password_confirm && (
-                <FieldError className="text-[10px] text-red-600 mt-1">{errorsByField.new_password_confirm}</FieldError>
+                <FieldError className="text-[10px] text-red-600 mt-1">
+                  {errorsByField.new_password_confirm}
+                </FieldError>
               )}
             </Field>
-
           </FieldGroup>
 
           <Button

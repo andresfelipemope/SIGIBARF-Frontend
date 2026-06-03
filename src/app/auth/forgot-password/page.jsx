@@ -3,14 +3,32 @@
 import { useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Mail, Loader2, AlertCircle, CheckCircle2, ArrowLeft } from "lucide-react";
+import {
+  Mail,
+  Loader2,
+  AlertCircle,
+  CheckCircle2,
+  ArrowLeft,
+} from "lucide-react";
 
-import { Card, CardHeader, CardContent, CardDescription, CardTitle, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardDescription,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Field, FieldLabel, FieldGroup, FieldError } from "@/components/ui/field";
+import {
+  Field,
+  FieldLabel,
+  FieldGroup,
+  FieldError,
+} from "@/components/ui/field";
 
 import { authService } from "@/lib/api";
 
@@ -35,7 +53,9 @@ export default function ForgotPasswordPage() {
       setIsSuccess(true);
       toast.success("Solicitud enviada. Revisa tu bandeja de entrada.");
     } catch (err) {
-      setError(err.message || "No se pudo procesar tu solicitud de restablecimiento.");
+      setError(
+        err.message || "No se pudo procesar tu solicitud de restablecimiento.",
+      );
       toast.error("Error al enviar la solicitud");
     } finally {
       setIsLoading(false);
@@ -53,14 +73,19 @@ export default function ForgotPasswordPage() {
             ¡Correo enviado!
           </CardTitle>
           <CardDescription className="text-zinc-500 text-sm max-w-xs">
-            Si el correo <span className="font-semibold text-zinc-800 break-all">{correo}</span> está registrado en Athletic Barf, recibirás un enlace de restablecimiento en unos momentos.
+            Si el correo{" "}
+            <span className="font-semibold text-zinc-800 break-all">
+              {correo}
+            </span>{" "}
+            está registrado en Athletic Barf, recibirás un enlace de
+            restablecimiento en unos momentos.
           </CardDescription>
         </CardHeader>
 
         <CardContent className="text-xs text-zinc-500 space-y-4 px-6 pb-6">
           <p className="leading-relaxed">
-            Revisa tu bandeja de entrada (y la carpeta de spam o correo no deseado). 
-            El enlace de recuperación es válido por tiempo limitado.
+            Revisa tu bandeja de entrada (y la carpeta de spam o correo no
+            deseado). El enlace de recuperación es válido por tiempo limitado.
           </p>
           <div className="pt-2">
             <Button
@@ -96,16 +121,24 @@ export default function ForgotPasswordPage() {
           <div className="h-2 w-2 rounded-full bg-orange-500 animate-pulse" />
         </div>
         <CardDescription className="text-zinc-500 text-sm">
-          Ingresa tu correo registrado y te enviaremos las instrucciones de restablecimiento.
+          Ingresa tu correo registrado y te enviaremos las instrucciones de
+          restablecimiento.
         </CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-5">
         {error && (
-          <Alert variant="destructive" className="border-red-200 bg-red-50/50 text-red-900 py-3 rounded-lg">
+          <Alert
+            variant="destructive"
+            className="border-red-200 bg-red-50/50 text-red-900 py-3 rounded-lg"
+          >
             <AlertCircle className="w-4 h-4 text-red-600" />
-            <AlertTitle className="text-xs font-semibold">Error al enviar solicitud</AlertTitle>
-            <AlertDescription className="text-[11px] mt-0.5">{error}</AlertDescription>
+            <AlertTitle className="text-xs font-semibold">
+              Error al enviar solicitud
+            </AlertTitle>
+            <AlertDescription className="text-[11px] mt-0.5">
+              {error}
+            </AlertDescription>
           </Alert>
         )}
 
@@ -113,7 +146,10 @@ export default function ForgotPasswordPage() {
           <FieldGroup className="gap-4">
             {/* Campo Correo */}
             <Field>
-              <FieldLabel htmlFor="correo" className="text-xs font-semibold text-zinc-700">
+              <FieldLabel
+                htmlFor="correo"
+                className="text-xs font-semibold text-zinc-700"
+              >
                 Correo Electrónico
               </FieldLabel>
               <div className="relative flex items-center">
