@@ -10,7 +10,7 @@ export function useProductos() {
     try {
       setLoadingProductos(true);
       setErrorProductos(null);
-      const data = await movimientosProductoService.getProductos();
+      const data = await movimientosProductoService.getPublicProductos();
       // Filtrar u ordenar si es necesario, o simplemente retornar el listado
       setProductos(data || []);
     } catch (err) {

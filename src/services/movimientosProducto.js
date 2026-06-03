@@ -47,4 +47,12 @@ export const movimientosProductoService = {
       headers: authHeaders(),
     });
   },
+
+  async getPublicProductos() {
+    return apiRequest('/api/inventario/public/productos/', {
+      method: 'GET',
+    });
+  }
 };
+
+

@@ -17,7 +17,6 @@ export function PedidoManualFormDialog({
   const [items, setItems] = useState([{ ...EMPTY_ITEM }]);
   const [tipoPago, setTipoPago] = useState("contado");
   const [cantidadCuotas, setCantidadCuotas] = useState("6");
-  const [interes, setInteres] = useState("0.05");
   const [frecuenciaDias, setFrecuenciaDias] = useState("30");
   const [observaciones, setObservaciones] = useState("");
   const [formError, setFormError] = useState(null);
@@ -30,7 +29,6 @@ export function PedidoManualFormDialog({
     setItems([{ ...EMPTY_ITEM }]);
     setTipoPago("contado");
     setCantidadCuotas("6");
-    setInteres("0.05");
     setFrecuenciaDias("30");
     setObservaciones("");
     setFormError(null);
@@ -60,11 +58,6 @@ export function PedidoManualFormDialog({
     setFormError(null);
     setCreditoCreadoId(null);
 
-    if (!usuarioId) {
-      setFormError("Debes indicar el cliente (ID de usuario).");
-      return;
-    }
-
     const parsedItems = items
       .filter((it) => it.producto_id && Number(it.cantidad) > 0)
       .map((it) => ({
@@ -78,17 +71,22 @@ export function PedidoManualFormDialog({
     }
 
     const body = {
-      usuario: parseInt(usuarioId, 10),
       items: parsedItems,
       tipo_pago: tipoPago,
     };
 
+    if (usuarioId) {
+      body.usuario = parseInt(usuarioId, 10);
+    }
+
     if (tipoPago === "credito") {
-      body.cantidad_cuotas = parseInt(cantidadCuotas, 10);
-      body.interes = parseFloat(interes);
-      body.frecuencia_dias = parseInt(frecuenciaDias, 10);
+      body.credito = {
+        cantidad_cuotas: parseInt(cantidadCuotas, 10),
+        frecuencia_dias: parseInt(frecuenciaDias, 10),
+      };
+
       if (observaciones.trim()) {
-        body.observaciones = observaciones.trim();
+        body.credito.observaciones = observaciones.trim();
       }
     }
 
@@ -172,18 +170,6 @@ export function PedidoManualFormDialog({
                       min="1"
                       value={cantidadCuotas}
                       onChange={(e) => setCantidadCuotas(e.target.value)}
-                      className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
-                      disabled={creating}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-bold uppercase text-gray-500">Interés</label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={interes}
-                      onChange={(e) => setInteres(e.target.value)}
                       className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
                       disabled={creating}
                     />
