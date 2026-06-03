@@ -2,8 +2,10 @@
 
 import { ProductCarousel } from "../components/ProductCarousel"
 import { Leaf, Shield, Heart } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 export default function Home() {
+    const router = useRouter()
     return (
         <main>
 
@@ -30,10 +32,14 @@ export default function Home() {
                     </p>
 
                     <div className="flex gap-4 mt-6">
-                        <button className="bg-green-600 px-6 py-3 rounded-full">
+                        <button 
+                            onClick={() => router.push("/catalogo")}
+                            className="bg-green-600 px-6 py-3 rounded-full">
                             Comprar Ahora →
                         </button>
-                        <button className="border px-6 py-3 rounded-full">
+                        <button 
+                            onClick={() => router.push("/calculadora")}
+                            className="border px-6 py-3 rounded-full">
                             Calcular Porción
                         </button>
                     </div>

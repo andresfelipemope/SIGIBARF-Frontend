@@ -8,32 +8,35 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
+import { useRouter } from "next/navigation"
 
 export function ProductCarousel() {
+  const router = useRouter()
   const [api, setApi] = React.useState()
-  const [items, setItems] = React.useState([])
+  const [products, setProducts] = React.useState([])
   const [activeIndex, setActiveIndex] = React.useState(0)
 
-  // Fetch pokemones
   React.useEffect(() => {
-    const fetchData = async () => {
-      const res = await fetch("https://pokeapi.co/api/v2/pokemon?limit=11")
-      const data = await res.json()
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/inventario/public/productos/`
+        )
 
-      const detailed = await Promise.all(
-        data.results.map(async (p) => {
-          const res2 = await fetch(p.url)
-          return res2.json()
-        })
-      )
+        if (!response.ok) {
+          throw new Error("Error cargando productos")
+        }
 
-      setItems(detailed)
+        const data = await response.json()
+        setProducts(data)
+      } catch (error) {
+        console.error(error)
+      }
     }
 
-    fetchData()
+    fetchProducts()
   }, [])
 
-  // Detectar centro activo
   React.useEffect(() => {
     if (!api) return
 
@@ -47,38 +50,50 @@ export function ProductCarousel() {
     return () => api.off("select", onSelect)
   }, [api])
 
-  return (
-    <div className="w-full max-w-5xl mx-auto py-16 text-center">
+  if (!products.length) return null
 
-      {/* Nombre dinámico */}
-      {items[activeIndex] && (
-        <h2 className="text-3xl font-bold mb-6 capitalize">
-          {items[activeIndex].name}
-        </h2>
+  return (
+    <div className="w-full max-w-6xl mx-auto py-16 text-center">
+      {products[activeIndex] && (
+        <>
+          <h2 className="text-3xl font-bold mb-2">
+            {products[activeIndex].nombre}
+          </h2>
+
+          <p className="text-xl font-semibold text-orange-500 mb-8">
+            ${Number(products[activeIndex].precio).toLocaleString("es-CO")}
+          </p>
+        </>
       )}
 
-      <Carousel setApi={setApi} opts={{ loop: true }}>
+      <Carousel
+        setApi={setApi}
+        opts={{ loop: true }}
+      >
         <CarouselContent>
-          {items.map((item, index) => {
+          {products.map((product, index) => {
             const isActive = index === activeIndex
 
             return (
               <CarouselItem
-                key={item.id}
+                key={product.id}
                 className="basis-1/3 flex justify-center"
               >
                 <div
-                  className={`transition-all duration-500 ${
+                  onClick={() => router.push(`/catalogo/${product.id}`)}
+                  className={`cursor-pointer transition-all duration-500 ${
                     isActive
-                      ? "scale-110 opacity-100"
-                      : "scale-75 opacity-50"
+                      ? "scale-105 opacity-100"
+                      : "scale-90 opacity-50"
                   }`}
                 >
-                  <img
-                    src={item.sprites.front_default}
-                    alt={item.name}
-                    className="w-40 h-40 object-contain"
-                  />
+                  <div className="w-52 h-52 rounded-3xl overflow-hidden bg-white shadow-lg border border-gray-200">
+                    <img
+                      src={product.imagen}
+                      alt={product.nombre}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                 </div>
               </CarouselItem>
             )
