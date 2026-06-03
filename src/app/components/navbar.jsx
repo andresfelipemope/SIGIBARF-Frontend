@@ -95,6 +95,14 @@ export function Navbar() {
   };
 
   const handleCart = () => {
+    const token = localStorage.getItem("access");
+
+    if (!token) {
+      toast.error("Debes iniciar sesión para acceder al carrito.");
+      router.push("/auth/login");
+      return;
+    }
+
     router.push("/cart");
   };
 
