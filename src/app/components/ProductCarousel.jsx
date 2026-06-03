@@ -60,9 +60,14 @@ export function ProductCarousel() {
             {products[activeIndex].nombre}
           </h2>
 
+          <p className="text-md mb-2">
+            {products[activeIndex].presentacion}
+          </p>
+
           <p className="text-xl font-semibold text-orange-500 mb-8">
             ${Number(products[activeIndex].precio).toLocaleString("es-CO")}
           </p>
+
         </>
       )}
 
