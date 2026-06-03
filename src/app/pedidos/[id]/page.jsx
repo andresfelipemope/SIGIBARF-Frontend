@@ -181,7 +181,10 @@ export default function PedidoDetallePage() {
   }
 
   const numeroPedido = pedido.numero_pedido || pedido.id;
-  const fecha = pedido.created_at || pedido.fecha;
+  const fecha =
+    pedido.fecha_creacion ||
+    pedido.created_at ||
+    pedido.fecha;
   const status = pedido.estado_pago || pedido.estado;
   const total = parseFloat(pedido.precio_total || pedido.total || "0");
   const productos = pedido.productos || pedido.items || [];
@@ -294,9 +297,20 @@ export default function PedidoDetallePage() {
             <CardContent className="p-6 pt-0 divide-y divide-zinc-100">
               {productos.map((item, idx) => {
                 const nombre = item.producto_nombre || item.nombre || "Producto";
-                const precio = parseFloat(item.producto_precio || item.precio || "0");
+
+                const precio = parseFloat(
+                  item.precio_unitario ||
+                  item.producto_precio ||
+                  item.precio ||
+                  "0"
+                );
+
                 const cantidad = item.cantidad || item.cantidad_productos || 1;
-                const subtotal = precio * cantidad;
+
+                const subtotal = parseFloat(
+                  item.subtotal ||
+                  (precio * cantidad)
+                );
 
                 return (
                   <div key={item.id || idx} className="py-4 first:pt-0 last:pb-0 flex items-center justify-between gap-4">
