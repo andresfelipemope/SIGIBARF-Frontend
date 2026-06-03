@@ -69,13 +69,16 @@ export function CuotasTable({ cuotas, loading, onToggleNotificaciones, togglingI
                   {formatFecha(cuota.fecha_vencimiento || cuota.vencimiento)}
                 </td>
                 <td className="py-3 px-4 text-right font-semibold">
-                  {formatPrice(parseFloat(cuota.valor || cuota.monto || 0))}
+                  {formatPrice(parseFloat(cuota.valor_cuota_final || cuota.monto || 0))}
                 </td>
                 <td className="py-3 px-4 text-right text-green-700 font-semibold">
-                  {formatPrice(parseFloat(cuota.pagado || cuota.monto_pagado || 0))}
+                  {formatPrice(parseFloat(cuota.valor_pagado || cuota.monto_pagado || 0))}
                 </td>
                 <td className="py-3 px-4 text-right font-bold">
-                  {formatPrice(parseFloat(cuota.saldo || 0))}
+                  {formatPrice(
+                    parseFloat(cuota.valor_cuota_final || 0) -
+                    parseFloat(cuota.valor_pagado || 0)
+                  )}
                 </td>
                 <td className="py-3 px-4 text-center">
                   <CuotaEstadoBadge estado={cuota.estado} />
@@ -84,11 +87,10 @@ export function CuotasTable({ cuotas, loading, onToggleNotificaciones, togglingI
                   <button
                     onClick={() => onToggleNotificaciones(cuota.id, !activas)}
                     disabled={togglingId === cuota.id}
-                    className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-bold border cursor-pointer ${
-                      activas
+                    className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-bold border cursor-pointer ${activas
                         ? "border-green-200 bg-green-50 text-green-700"
                         : "border-gray-200 bg-gray-50 text-gray-500"
-                    }`}
+                      }`}
                     title={activas ? "Desactivar notificaciones" : "Activar notificaciones"}
                   >
                     {togglingId === cuota.id ? (

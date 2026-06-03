@@ -87,7 +87,7 @@ export function CreditosTable({ creditos, error, onRetry }) {
               const id = c.id;
               const pedidoNum = c.pedido_numero ?? c.numero_pedido ?? c.pedido_id ?? "—";
               const pedidoId = c.pedido_id ?? c.pedido;
-              const cliente = c.cliente_nombre || c.usuario_nombre || "—";
+              const cliente = c.usuario || c.usuario_nombre || "—";
               const total = parseFloat(
                 c.valor_total ??
                 c.total ??

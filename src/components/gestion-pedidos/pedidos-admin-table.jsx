@@ -81,8 +81,10 @@ export function PedidosAdminTable({
             {pedidos.map((pedido) => {
               const id = pedido.id;
               const numero = pedido.numero_pedido ?? id;
-              const cliente = pedido.cliente_nombre || pedido.usuario_nombre || "—";
-              const correo = pedido.cliente_correo || pedido.usuario_correo || "—";
+              const correo = pedido.usuario_email || "—";
+              const cliente = correo !== "—"
+                ? correo.split("@")[0]
+                : "Cliente presencial";
               const fecha = pedido.fecha_creacion || pedido.created_at;
               const estado = pedido.estado_pago || pedido.estado;
               const total = parseFloat(pedido.precio_total || pedido.total || 0);

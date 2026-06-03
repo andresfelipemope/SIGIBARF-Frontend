@@ -5,7 +5,6 @@ import { toast } from 'sonner';
 const DEFAULT_FILTERS = {
   search: '',
   estado: 'todos',
-  usuarioId: '',
   soloCredito: false,
   ordering: 'fecha_desc',
 };
@@ -44,9 +43,8 @@ export function useAdminPedidos() {
 
       const query = { page: pageNum };
       if (filters.estado !== 'todos') query.estado = filters.estado;
-      if (filters.usuarioId) query.usuario = filters.usuarioId;
       if (filters.soloCredito) query.con_credito = 'true';
-      if (filters.search) query.search = filters.search;
+      //if (filters.search) query.search = filters.search;
       if (filters.ordering === 'fecha_desc') query.ordering = '-fecha_creacion';
       if (filters.ordering === 'fecha_asc') query.ordering = 'fecha_creacion';
 
@@ -77,11 +75,19 @@ export function useAdminPedidos() {
 
     if (filters.search) {
       const q = filters.search.toLowerCase();
+
       list = list.filter((p) => {
-        const num = String(p.numero_pedido ?? p.id ?? '');
-        const cliente = (p.cliente_nombre || p.usuario_nombre || p.cliente?.nombre || '').toLowerCase();
-        const correo = (p.cliente_correo || p.usuario_correo || p.cliente?.correo || '').toLowerCase();
-        return num.includes(q) || cliente.includes(q) || correo.includes(q);
+        const num = String(p.numero_pedido ?? p.id ?? "");
+
+        const correo = (p.usuario_email || "").toLowerCase();
+
+        const cliente = correo.split("@")[0].toLowerCase();
+
+        return (
+          num.includes(q) ||
+          cliente.includes(q) ||
+          correo.includes(q)
+        );
       });
     }
 
@@ -94,13 +100,6 @@ export function useAdminPedidos() {
 
     if (filters.soloCredito) {
       list = list.filter((p) => p.credito_id || p.tiene_credito || p.tipo_pago === 'credito');
-    }
-
-    if (filters.usuarioId) {
-      list = list.filter((p) => {
-        const uid = p.usuario_id || p.usuario?.id || p.cliente_id;
-        return String(uid) === String(filters.usuarioId);
-      });
     }
 
     list.sort((a, b) => {

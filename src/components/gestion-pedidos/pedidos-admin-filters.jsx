@@ -9,7 +9,6 @@ export function PedidosAdminFilters({
   const hasActive =
     filters.search ||
     filters.estado !== "todos" ||
-    filters.usuarioId ||
     filters.soloCredito;
 
   return (
@@ -17,9 +16,10 @@ export function PedidosAdminFilters({
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="relative flex-1 max-w-lg">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
+
           <input
             type="text"
-            placeholder="Buscar por número, cliente o correo..."
+            placeholder="Buscar por cliente o correo..."
             value={filters.search}
             onChange={(e) => updateFilter("search", e.target.value)}
             className="w-full rounded-xl border border-gray-200 bg-gray-50/50 py-2.5 pl-10 pr-4 text-sm text-black placeholder-gray-400 focus:border-green-600 focus:bg-white focus:outline-hidden"
@@ -40,15 +40,6 @@ export function PedidosAdminFilters({
               <option value="rechazado">Rechazado</option>
             </select>
           </div>
-
-          <input
-            type="number"
-            placeholder="ID usuario"
-            value={filters.usuarioId}
-            onChange={(e) => updateFilter("usuarioId", e.target.value)}
-            className="w-28 rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2 text-xs font-bold text-gray-700"
-            title="Filtrar por ID de usuario"
-          />
 
           <select
             value={filters.ordering}

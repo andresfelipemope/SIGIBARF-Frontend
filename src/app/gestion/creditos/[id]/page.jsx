@@ -51,8 +51,12 @@ export default function CreditoDetallePage() {
   const pedidoId = credito?.pedido_id ?? credito?.pedido;
   const pedidoNum = credito?.pedido_numero ?? credito?.numero_pedido;
   const saldo = parseFloat(credito?.saldo ?? credito?.saldo_restante ?? 0);
-  const total = parseFloat(credito?.total ?? credito?.monto_total ?? 0);
-
+  const total = parseFloat(
+    credito?.valor_total ??
+    credito?.total ??
+    credito?.monto_total ??
+    0
+  );
   const handleGuardarObs = async () => {
     await guardarObservaciones(observaciones);
   };
@@ -128,7 +132,7 @@ export default function CreditoDetallePage() {
               Crédito #{id}
             </h1>
             <p className="text-sm text-gray-500 mt-1 font-medium">
-              {credito?.cliente_nombre || credito?.usuario_nombre || "Cliente"}
+              {credito?.usuario || credito?.usuario_nombre || "Cliente"}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
