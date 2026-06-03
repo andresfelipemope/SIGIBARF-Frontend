@@ -48,7 +48,7 @@ export default function Home() {
 
             {/* WHY SECTION */}
             <section className="py-20 text-center">
-                <h2 className="text-3xl font-bold text-green-600">
+                <h2 className="text-3xl font-bold text-green-600 pb-6">
                     ¿Por qué elegir BARF?
                 </h2>
                 <p className="text-gray-600 mt-2">

@@ -67,18 +67,18 @@ export default function CatalogoPage() {
       {/* title y meta se manejan en metadata export si es server component */}
 
       {/* ═══ HERO ═══ */}
-      <section className="relative bg-gradient-to-br from-green-50 via-white to-emerald-50 border-b border-gray-100">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center">
+      <section className="relative bg-gradient-to-br from-green-200 via-white to-orange-200 border-b border-gray-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-12 text-center">
 
           {/* Pill badge */}
-          <div className="inline-flex items-center gap-2 bg-green-100 text-green-700 text-xs font-semibold px-4 py-1.5 rounded-full mb-5">
+          <div className="inline-flex items-center gap-2 bg-orange-100 text-orange-700 text-xs font-semibold px-4 py-1.5 rounded-full mb-5">
             <Leaf size={13} />
             100% Natural · Grado Humano · Sin Conservantes
           </div>
 
           <h1 className="text-4xl sm:text-5xl font-bold text-gray-800 leading-tight">
-            Nuestras{" "}
-            <span className="text-green-600">Dietas Naturales</span>
+            Nuestros{" "} 
+            <span className="text-green-600">Productos</span>
           </h1>
 
           <p className="mt-4 text-gray-500 max-w-xl mx-auto text-sm sm:text-base leading-relaxed">

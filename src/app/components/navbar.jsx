@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { ShoppingCart, User, Menu } from "lucide-react";
 import { toast } from "sonner";
 
@@ -16,15 +16,7 @@ import {
 
 export function Navbar() {
   const router = useRouter();
-
-  const [active, setActive] = useState({
-    home: true,
-    catalogo: false,
-    calculadora: false,
-    nosotros: false,
-    gestion: false,
-  });
-
+  const pathname = usePathname();
   const [admin, setAdmin] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -59,16 +51,7 @@ export function Navbar() {
     };
   }, []);
 
-  const handleClick = (section, route) => {
-    setActive({
-      home: false,
-      catalogo: false,
-      calculadora: false,
-      nosotros: false,
-      gestion: false,
-      [section]: true,
-    });
-
+  const handleClick = (route) => {
     router.push(route);
   };
 
@@ -129,9 +112,9 @@ export function Navbar() {
       <div className="hidden lg:flex shrink-0 gap-6 text-lg justify-center text-zinc-600 font-medium">
         
         <p
-          onClick={() => handleClick("home", "/home")}
+          onClick={() => handleClick("/home")}
           className={`cursor-pointer transition-all duration-300 ${
-            active.home
+            pathname === "/home"
               ? "border-b-2 border-green-500 text-green-700 font-semibold"
               : "hover:border-b-2 border-gray-200"
           }`}
@@ -140,9 +123,9 @@ export function Navbar() {
         </p>
 
         <p
-          onClick={() => handleClick("catalogo", "/catalogo")}
+          onClick={() => handleClick("/catalogo")}
           className={`cursor-pointer transition-all duration-300 ${
-            active.catalogo
+            pathname.startsWith("/catalogo")
               ? "border-b-2 border-green-500 text-green-700 font-semibold"
               : "hover:border-b-2 border-gray-200"
           }`}
@@ -151,9 +134,9 @@ export function Navbar() {
         </p>
 
         <p
-          onClick={() => handleClick("calculadora", "/calculadora")}
+          onClick={() => handleClick("/calculadora")}
           className={`cursor-pointer transition-all duration-300 ${
-            active.calculadora
+            pathname.startsWith("/calculadora")
               ? "border-b-2 border-green-500 text-green-700 font-semibold"
               : "hover:border-b-2 border-gray-200"
           }`}
@@ -162,9 +145,9 @@ export function Navbar() {
         </p>
 
         <p
-          onClick={() => handleClick("nosotros", "/nosotros")}
+          onClick={() => handleClick("/nosotros")}
           className={`cursor-pointer transition-all duration-300 ${
-            active.nosotros
+            pathname.startsWith("/nosotros")
               ? "border-b-2 border-green-500 text-green-700 font-semibold"
               : "hover:border-b-2 border-gray-200"
           }`}
@@ -174,9 +157,9 @@ export function Navbar() {
 
         {admin && (
           <p
-            onClick={() => handleClick("gestion", "/gestion")}
+            onClick={() => handleClick("/gestion")}
             className={`cursor-pointer transition-all duration-300 ${
-              active.gestion
+              pathname.startsWith("/gestion")
                 ? "border-b-2 border-green-500 text-green-700 font-semibold"
                 : "hover:border-b-2 border-gray-200"
             }`}
@@ -285,7 +268,7 @@ export function Navbar() {
                   <SheetClose
                     onClick={() => handleClick("home", "/home")}
                     className={`w-full text-left px-3 py-2.5 rounded-xl transition-all cursor-pointer font-bold ${
-                      active.home
+                      pathname === "/home"
                         ? "bg-green-50/70 text-green-700 border-l-4 border-orange-500 pl-2.5 rounded-l-none"
                         : "hover:bg-zinc-50 hover:text-zinc-950"
                     }`}
@@ -296,7 +279,7 @@ export function Navbar() {
                   <SheetClose
                     onClick={() => handleClick("catalogo", "/catalogo")}
                     className={`w-full text-left px-3 py-2.5 rounded-xl transition-all cursor-pointer font-bold ${
-                      active.catalogo
+                      pathname.startsWith("/catalogo")
                         ? "bg-green-50/70 text-green-700 border-l-4 border-orange-500 pl-2.5 rounded-l-none"
                         : "hover:bg-zinc-50 hover:text-zinc-950"
                     }`}
@@ -307,7 +290,7 @@ export function Navbar() {
                   <SheetClose
                     onClick={() => handleClick("calculadora", "/calculadora")}
                     className={`w-full text-left px-3 py-2.5 rounded-xl transition-all cursor-pointer font-bold ${
-                      active.calculadora
+                      pathname.startsWith("/calculadora")
                         ? "bg-green-50/70 text-green-700 border-l-4 border-orange-500 pl-2.5 rounded-l-none"
                         : "hover:bg-zinc-50 hover:text-zinc-950"
                     }`}
@@ -318,7 +301,7 @@ export function Navbar() {
                   <SheetClose
                     onClick={() => handleClick("nosotros", "/nosotros")}
                     className={`w-full text-left px-3 py-2.5 rounded-xl transition-all cursor-pointer font-bold ${
-                      active.nosotros
+                      pathname.startsWith("/nosotros")
                         ? "bg-green-50/70 text-green-700 border-l-4 border-orange-500 pl-2.5 rounded-l-none"
                         : "hover:bg-zinc-50 hover:text-zinc-950"
                     }`}
@@ -330,7 +313,7 @@ export function Navbar() {
                     <SheetClose
                       onClick={() => handleClick("gestion", "/gestion")}
                       className={`w-full text-left px-3 py-2.5 rounded-xl transition-all cursor-pointer font-bold ${
-                        active.gestion
+                        pathname.startsWith("/gestion")
                           ? "bg-green-50/70 text-green-700 border-l-4 border-orange-500 pl-2.5 rounded-l-none"
                           : "hover:bg-zinc-50 hover:text-zinc-950"
                       }`}
