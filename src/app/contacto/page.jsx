@@ -68,7 +68,7 @@ export default function ContactoPage() {
             </section>
 
             {/* ── Canales de contacto ───────────────────────────────────────── */}
-            <section className="max-w-5xl mx-auto px-6 pb-16">
+            <section className="max-w-5xl mx-auto px-6 pb-16 mt-12">
                 <h2 className="text-xl font-extrabold text-gray-900 mb-6">Canales de contacto</h2>
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     <CanalCard
