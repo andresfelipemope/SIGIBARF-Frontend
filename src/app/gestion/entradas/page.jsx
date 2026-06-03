@@ -341,7 +341,6 @@ export default function EntradasIngredientesPage() {
           <table className="w-full border-collapse text-left">
             <thead>
               <tr className="border-b border-gray-100 text-xs font-bold uppercase tracking-wider text-gray-400">
-                <th className="py-4 px-5">ID</th>
                 <th className="py-4 px-5">Ingrediente</th>
                 <th className="py-4 px-5 text-right">Cantidad</th>
                 <th className="py-4 px-5 text-right">Stock Anterior</th>
@@ -363,7 +362,6 @@ export default function EntradasIngredientesPage() {
                   const ing = ingMap[m.id_ingrediente];
                   return (
                     <tr key={m.id} className="hover:bg-green-50/20 transition-colors">
-                      <td className="py-4 px-5 text-xs font-bold text-gray-400">#{m.id}</td>
                       <td className="py-4 px-5">
                         <p className="text-sm font-semibold text-black">{ing?.nombre ?? `Ingrediente #${m.id_ingrediente}`}</p>
                         <p className="text-xs text-gray-400">{ing?.unidad_medida ?? ""}</p>
