@@ -1,7 +1,13 @@
 "use client";
 
 import { ProductCarousel } from "../components/ProductCarousel"
-import { Leaf, Shield, Heart } from "lucide-react"
+import {
+  Bone,
+  Leaf,
+  ShieldCheck,
+  HeartPulse,
+  Sparkles,
+} from "lucide-react";
 import { useRouter } from "next/navigation"
 
 export default function Home() {
@@ -46,55 +52,122 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* WHY SECTION */}
-            <section className="py-20 text-center">
-                <h2 className="text-3xl font-bold text-green-600 pb-6">
-                    ¿Por qué elegir BARF?
-                </h2>
-                <p className="text-gray-600 mt-2">
-                    A diferencia de los alimentos industriales, BARF respeta las necesidades biológicas de perros y gatos, ayudando a mejorar su salud desde adentro.
-                </p>
-                <p className="text-gray-600">
-                    Al elegir BARF, no solo estás alimentando a tu mascota… estás invirtiendo en su bienestar, longevidad y calidad de vida.
-                </p>
+            {/* ═══ ¿QUÉ ES BARF? ═══ */}
+            <section className="py-20">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6">
 
-                <div className="grid md:grid-cols-3 gap-10 mt-12 max-w-5xl mx-auto">
-                    <div>
-                        <div className="flex justify-center mb-4">
-                            <div className="bg-green-100 p-4 rounded-full flex items-center justify-center">
-                                <Leaf className="w-6 h-6 text-green-600" />
-                            </div>
-                        </div>
-                        <h3 className="font-semibold mt-2">100% Natural</h3>
-                        <p className="text-sm text-gray-600">
-                            Sin conservantes, colorantes ni rellenos artificiales. Solo alimentos reales e integrales.
-                        </p>
-                    </div>
-
-                    <div>
-                        <div className="flex justify-center mb-4">
-                            <div className="bg-blue-100 p-4 rounded-full flex items-center justify-center">
-                                <Shield className="w-6 h-6 text-blue-600" />
-                            </div>
-                        </div>
-                        <h3 className="font-semibold mt-2">Grado Humano</h3>
-                        <p className="text-sm text-gray-600">
-                            Ingredientes obtenidos de los mismos proveedores que abastecen tu supermercado local.
-                        </p>
-                    </div>
-
-                    <div>
-                        <div className="flex justify-center mb-4">
-                            <div className="bg-red-100 p-4 rounded-full flex items-center justify-center">
-                                <Heart className="w-6 h-6 text-red-600" />
-                            </div>
-                        </div>
-                        <h3 className="font-semibold mt-2">Vida Saludable</h3>
-                        <p className="text-sm text-gray-600">
-                            Promueve pelaje brillante, dientes limpios y mayores niveles de energía.
-                        </p>
+                <div className="text-center max-w-4xl mx-auto">
+                <div className="flex justify-center mb-4">
+                    <div className="bg-orange-100 p-4 rounded-full">
+                    <Bone className="w-8 h-8 text-orange-600" />
                     </div>
                 </div>
+
+                <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
+                    ¿Qué es la Dieta BARF?
+                </h2>
+
+                <p className="mt-6 text-gray-600 leading-relaxed text-lg">
+                    BARF significa <strong>Biologically Appropriate Raw Food </strong>
+                    (Alimentación Cruda Biológicamente Apropiada). Es una filosofía de
+                    alimentación basada en ingredientes naturales y frescos que busca
+                    respetar las necesidades nutricionales de perros y gatos.
+                </p>
+
+                <p className="mt-4 text-gray-600 leading-relaxed text-lg">
+                    A diferencia de muchos alimentos altamente procesados, la dieta BARF
+                    está compuesta por carnes, vísceras, huesos carnosos, frutas y verduras
+                    cuidadosamente seleccionadas para aportar nutrientes de forma natural y
+                    equilibrada.
+                </p>
+                </div>
+
+                {/* Beneficios */}
+                <div className="mt-16">
+                <h3 className="text-2xl font-bold text-center text-orange-600">
+                    ¿Por qué elegir BARF?
+                </h3>
+
+                <p className="text-center text-gray-600 mt-4 max-w-3xl mx-auto">
+                    Alimentar con BARF no es solo darle comida a tu mascota; es invertir en
+                    su bienestar, energía y calidad de vida mediante una nutrición más
+                    cercana a su naturaleza.
+                </p>
+
+                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mt-12">
+
+                    <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 text-center">
+                    <div className="flex justify-center mb-4">
+                        <div className="bg-green-100 p-4 rounded-full">
+                        <Leaf className="w-6 h-6 text-green-600" />
+                        </div>
+                    </div>
+
+                    <h4 className="font-semibold text-lg">
+                        100% Natural
+                    </h4>
+
+                    <p className="text-sm text-gray-600 mt-2">
+                        Sin conservantes, colorantes ni rellenos artificiales. Solo
+                        ingredientes reales y naturales.
+                    </p>
+                    </div>
+
+                    <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 text-center">
+                    <div className="flex justify-center mb-4">
+                        <div className="bg-blue-100 p-4 rounded-full">
+                        <ShieldCheck className="w-6 h-6 text-blue-600" />
+                        </div>
+                    </div>
+
+                    <h4 className="font-semibold text-lg">
+                        Grado Humano
+                    </h4>
+
+                    <p className="text-sm text-gray-600 mt-2">
+                        Elaborada con ingredientes aptos para consumo humano y sometidos a
+                        estrictos controles de calidad.
+                    </p>
+                    </div>
+
+                    <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 text-center">
+                    <div className="flex justify-center mb-4">
+                        <div className="bg-red-100 p-4 rounded-full">
+                        <HeartPulse className="w-6 h-6 text-red-600" />
+                        </div>
+                    </div>
+
+                    <h4 className="font-semibold text-lg">
+                        Más Salud
+                    </h4>
+
+                    <p className="text-sm text-gray-600 mt-2">
+                        Favorece una mejor digestión, fortalece el sistema inmunológico y
+                        ayuda a mantener un peso saludable.
+                    </p>
+                    </div>
+
+                    <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 text-center">
+                    <div className="flex justify-center mb-4">
+                        <div className="bg-orange-100 p-4 rounded-full">
+                        <Sparkles className="w-6 h-6 text-orange-600" />
+                        </div>
+                    </div>
+
+                    <h4 className="font-semibold text-lg">
+                        Mejor Calidad de Vida
+                    </h4>
+
+                    <p className="text-sm text-gray-600 mt-2">
+                        Contribuye a un pelaje brillante, dientes más limpios, mayor
+                        energía y bienestar general.
+                    </p>
+                    </div>
+
+                </div>
+                </div>
+
+            </div>
             </section>
 
             {/* CAROUSEL */}
