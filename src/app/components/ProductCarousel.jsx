@@ -68,23 +68,25 @@ export function ProductCarousel() {
 
       <Carousel
         setApi={setApi}
-        opts={{ loop: true }}
+        opts={{ loop: true, align: "center" }}
+        className="max-w-4xl mx-auto"
       >
-        <CarouselContent>
+      <div className="overflow-hidden">
+        <CarouselContent className="-ml-16 items-center py-8">
           {products.map((product, index) => {
             const isActive = index === activeIndex
 
             return (
               <CarouselItem
                 key={product.id}
-                className="basis-1/3 flex justify-center"
+                className="basis-1/3 pl-16 flex justify-center"
               >
                 <div
                   onClick={() => router.push(`/catalogo/${product.id}`)}
                   className={`cursor-pointer transition-all duration-500 ${
                     isActive
-                      ? "scale-105 opacity-100"
-                      : "scale-90 opacity-50"
+                      ? "scale-110 opacity-100 z-20"
+                      : "scale-80 opacity-50 -mx-6"
                   }`}
                 >
                   <div className="w-52 h-52 rounded-3xl overflow-hidden bg-white shadow-lg border border-gray-200">
@@ -99,10 +101,11 @@ export function ProductCarousel() {
             )
           })}
         </CarouselContent>
+      </div>
 
         <CarouselPrevious />
         <CarouselNext />
       </Carousel>
-    </div>
+  </div>
   )
 }
