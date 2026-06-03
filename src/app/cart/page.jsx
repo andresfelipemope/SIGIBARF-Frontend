@@ -30,6 +30,7 @@ import {
 
 import { cartService } from "@/services/cart.service";
 import { formatPrice } from "@/lib/format-price";
+import { openWompiWidget, loadWompiScript } from "@/lib/wompi";
 
 export default function CartPage() {
   const router = useRouter();
@@ -64,6 +65,11 @@ export default function CartPage() {
 
   useEffect(() => {
     fetchCart();
+    
+    // Preload Wompi script in the background
+    loadWompiScript().catch((err) => {
+      console.warn("Wompi script preload warning (will retry on checkout click):", err);
+    });
   }, []);
 
   // Update item quantity
@@ -104,9 +110,9 @@ export default function CartPage() {
       });
 
       // Call API
-        await cartService.updateCartItem(productId, newQty);
-        await fetchCart();
-        toast.success("Cantidad actualizada correctamente");
+      await cartService.updateCartItem(productId, newQty);
+      await fetchCart();
+      toast.success("Cantidad actualizada correctamente");
     } catch (err) {
       console.error("Error updating quantity:", err);
       toast.error(err.message || "Error al actualizar la cantidad del producto");
@@ -134,7 +140,6 @@ export default function CartPage() {
       next.add(productId);
       return next;
     });
-    const currentToDelete = itemToDelete;
     setItemToDelete(null);
 
     try {
@@ -157,24 +162,95 @@ export default function CartPage() {
     }
   };
 
-  // Checkout process
+  // Checkout and Wompi integration process
   const handleCheckout = async () => {
     setIsCheckingOut(true);
     try {
+      // 1. Ejecutar el checkout actual y recibir la respuesta del backend
       const response = await cartService.checkout();
-      
-      // Save checkout response for future Wompi integration
-      setCheckoutData(response);
-      
-      toast.success("¡Checkout generado con éxito!");
-      
-      // TODO: Integración Widget Wompi
-      // Aquí se debe instanciar el widget de Wompi utilizando los datos recibidos de response.
       console.log("Checkout response data:", response);
 
+      if (!response) {
+        throw new Error("Respuesta de checkout inválida del servidor.");
+      }
+
+      // 2. Validar que listo_para_pago sea true
+      if (response.listo_para_pago !== true) {
+        throw new Error("El pedido no se encuentra listo para procesar el pago.");
+      }
+
+      // 3. Validar datos de Wompi recibidos
+      const wompiData = response.wompi;
+      if (!wompiData) {
+        throw new Error("Datos incompletos de Wompi en la respuesta del servidor.");
+      }
+
+      const { public_key, currency, amount_in_cents, reference, integrity } = wompiData;
+      if (!public_key || !amount_in_cents || !reference) {
+        throw new Error("Datos de transacción incompletos recibidos de la pasarela.");
+      }
+
+      // Guardar los datos en el estado local
+      setCheckoutData(response);
+
+      // 4. Abrir inmediatamente el Widget Oficial de Wompi y esperar a que termine
+      let transaction = null;
+      try {
+        transaction = await openWompiWidget({
+          publicKey: public_key,
+          currency: currency || "COP",
+          amountInCents: amount_in_cents,
+          reference: reference,
+          integrity: integrity
+        });
+        console.log("Resultado transacción Wompi:", transaction);
+      } catch (widgetErr) {
+        console.error("Error opening Wompi widget:", widgetErr);
+        toast.error("Ocurrió un error al cargar o abrir la pasarela de pagos.");
+      }
+
+      // 5. Mostrar toast correspondiente según el resultado
+      if (!transaction) {
+        toast.info("Pago cancelado o cerrado por el usuario.");
+      } else {
+        const status = transaction.status;
+        if (status === "APPROVED") {
+          toast.success("¡Pago aprobado! Tu pedido ha sido procesado.");
+          setCart(null); // Limpiar carrito localmente
+        } else if (status === "DECLINED") {
+          toast.error("El pago fue declinado. Intenta con otro medio de pago.");
+        } else if (status === "ERROR") {
+          toast.error("Ocurrió un error procesando el pago en Wompi.");
+        } else if (status === "PENDING") {
+          toast.info("Tu pago está pendiente de confirmación.");
+          setCart(null);
+        } else {
+          toast.info(`Transacción finalizada con estado: ${status}`);
+        }
+      }
+
+      // 6. Redirigir al usuario a /pedidos al terminar el proceso o cerrar el widget
+      router.push("/pedidos");
+
     } catch (err) {
-      console.error("Error during checkout:", err);
-      toast.error(err.message || "Error al generar el checkout");
+      console.error("Error during checkout integration workflow:", err);
+
+      const message = err.message || "";
+
+      if (
+        message.toLowerCase().includes("pendiente") ||
+        message.toLowerCase().includes("pedido pendiente")
+      ) {
+        toast.error("Ya tienes un pedido pendiente. Serás redirigido a Mis Pedidos.");
+
+        setTimeout(() => {
+          router.push("/pedidos");
+        }, 3000);
+
+        return;
+      }
+
+      toast.error(message || "Error al procesar el checkout");
     } finally {
       setIsCheckingOut(false);
     }
@@ -395,7 +471,7 @@ export default function CartPage() {
                 </CardFooter>
               </Card>
 
-              {/* Checkout details display for future Wompi integration */}
+              {/* Checkout details display for Wompi integration confirmation */}
               {checkoutData && (
                 <Card className="border-emerald-100 bg-emerald-50/20 overflow-hidden shadow-xs animate-in fade-in slide-in-from-top-4 duration-200">
                   <CardContent className="p-4 space-y-3">
@@ -404,7 +480,7 @@ export default function CartPage() {
                       <span>Checkout generado</span>
                     </div>
                     <p className="text-xs text-emerald-850/80 leading-relaxed">
-                      El checkout se ha generado exitosamente en el servidor. La estructura está lista para la pasarela de pagos.
+                      El checkout se ha generado exitosamente en el servidor. El Widget flotante de Wompi ha sido inicializado.
                     </p>
                     <div className="bg-white/80 p-2.5 rounded-lg border border-emerald-100 text-[10px] font-mono text-zinc-700 break-all select-all">
                       {JSON.stringify(checkoutData)}
@@ -433,7 +509,7 @@ export default function CartPage() {
             <Button
               variant="outline"
               onClick={() => setItemToDelete(null)}
-              className="rounded-xl border-zinc-200 text-zinc-700 font-medium px-4 py-2 hover:bg-zinc-50 cursor-pointer"
+              className="rounded-xl border-zinc-200 text-zinc-700 font-medium px-4 py-2 hover:bg-gray-50 cursor-pointer"
             >
               Cancelar
             </Button>

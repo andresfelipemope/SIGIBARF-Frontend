@@ -222,6 +222,16 @@ export function Navbar() {
                 </button>
 
                 <button
+                  onClick={() => {
+                    setShowDropdown(false);
+                    router.push("/pedidos");
+                  }}
+                  className="w-full text-left px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-50 hover:text-zinc-950 rounded-lg transition-colors font-medium cursor-pointer"
+                >
+                  Mis Pedidos
+                </button>
+
+                <button
                   onClick={handleLogout}
                   className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors font-semibold cursor-pointer"
                 >
