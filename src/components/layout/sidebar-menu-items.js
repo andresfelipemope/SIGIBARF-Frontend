@@ -6,9 +6,11 @@ import {
   FlaskConical, 
   Factory, 
   AlertCircle, 
-  ShoppingBag, 
+  ShoppingBag,
+  ClipboardCheck,
   Coins,
-  History
+  History,
+  CreditCard,
 } from "lucide-react";
 
 export const sidebarMenuItems = [
@@ -46,12 +48,22 @@ export const sidebarMenuItems = [
     title: "Alertas",
     url: "/gestion/alertas",
     icon: AlertCircle,
-    badge: "3", // Example badge count (could be loaded from an API/state later)
+    badge: "3",
   },
   {
-    title: "Movimientos de Inventario",
+    title: "Auditoría de Inventario",
+    url: "/gestion/auditoria-inventario",
+    icon: ClipboardCheck,
+  },
+  {
+    title: "Gestión de Pedidos",
     url: "/gestion/pedidos",
     icon: ShoppingBag,
+  },
+  {
+    title: "Gestión de Créditos",
+    url: "/gestion/creditos",
+    icon: CreditCard,
   },
   {
     title: "Historial de Inventario",

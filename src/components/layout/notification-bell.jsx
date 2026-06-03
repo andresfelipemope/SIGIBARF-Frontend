@@ -22,7 +22,7 @@ const TIPO_CONFIG = {
 const SOURCE_ROUTES = {
     producto: "/gestion/inventario",
     ingrediente: "/gestion/ingredientes",
-    credito: "/gestion/deudas",
+    credito: "/gestion/creditos",
 };
 
 function getTipoConfig(tipo) {

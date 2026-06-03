@@ -13,14 +13,16 @@ export default function DashboardLayout({ children }) {
   const pathSegments = pathname.split("/").filter(Boolean);
 
   const labelMap = {
-    gestion:       "Gestión",
-    inventario:    "Inventario",
-    ingredientes:  "Ingredientes",
-    entradas:      "Entradas de Ingredientes",
+    gestion: "Gestión",
+    inventario: "Inventario",
+    ingredientes: "Ingredientes",
+    entradas: "Entradas de Ingredientes",
     formulaciones: "Formulaciones",
     produccion: "Producción",
     alertas: "Alertas",
-    pedidos: "Movimientos de Inventario",
+    "auditoria-inventario": "Auditoría de Inventario",
+    pedidos: "Gestión de Pedidos",
+    creditos: "Gestión de Créditos",
     historial: "Historial de Inventario",
     deudas: "Gestión de Deudas",
   };
