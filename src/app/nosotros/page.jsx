@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Target, Eye } from 'lucide-react';
+import { Target, Eye, MapPinned, PawPrint } from 'lucide-react';
 import Image from 'next/image';
 
 export default function Nosotros() {
@@ -48,7 +48,7 @@ export default function Nosotros() {
   };
 
   return (
-    <section className="py-20 bg-gradient-to-b from-[#F5F1E8] to-white font-sans">
+    <section className="py-20 bg-gradient-to-br from-orange-200 via-white to-green-200 font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-start">
           
@@ -70,9 +70,13 @@ export default function Nosotros() {
           {/* Contenido */}
           <div className="space-y-8">
             <div className="space-y-4">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
-                ¿Quiénes somos?
-              </h2>
+              <div className="flex items-center justify-center gap-3 mb-3">
+                <PawPrint className="w-8 h-8 text-green-600" />
+
+                <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
+                  ¿Quiénes somos?
+                </h2>
+              </div>
               <p className="text-gray-600 leading-relaxed">
                 ATHLETIC BARF es una empresa colombiana, ubicada en la capital del departamento de Norte de Santander, dedicada a la fabricación y elaboración de alimentos 100% naturales, dieta BARF para mascotas.
               </p>
@@ -135,6 +139,53 @@ export default function Nosotros() {
 
           </div>
         </div>
+
+        {/* ═══ UBICACIÓN ═══ */}
+          <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-20 pt-20">
+            <div className="text-center mb-8">
+              <div className="flex items-center justify-center gap-3 mb-3">
+                <MapPinned className="w-8 h-8 text-green-600" />
+
+                <h2 className="text-3xl font-bold text-gray-800">
+                  ¿Dónde nos ubicamos?
+                </h2>
+              </div>
+
+              <p className="mt-3 text-gray-500 max-w-2xl mx-auto">
+                Este es nuestro punto de producción y también el lugar donde puedes
+                recoger tus pedidos. Toca el mapa para abrir la navegación y llegar
+                fácilmente hasta nosotros.
+              </p>
+            </div>
+
+            <a
+              href="https://www.google.com/maps/dir/?api=1&destination=7.9065182,-72.515661"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block overflow-hidden rounded-3xl border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              <iframe
+                src="https://maps.google.com/maps?q=7.9065182,-72.515661&z=17&output=embed"
+                width="100%"
+                height="450"
+                style={{ border: 0 }}
+                loading="lazy"
+                allowFullScreen
+              />
+            </a>
+
+            <div className="flex justify-center mt-6">
+              <a
+                href="https://www.google.com/maps/dir/?api=1&destination=7.9065182,-72.515661"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-6 py-3 rounded-xl bg-green-600 text-white font-semibold shadow-lg hover:scale-105 transition-transform"
+              >
+                Cómo llegar
+              </a>
+            </div>
+          </section>
+
       </div>
     </section>
   );
