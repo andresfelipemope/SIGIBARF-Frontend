@@ -1,15 +1,10 @@
 "use client";
-
-import { useState } from "react";
+ 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
   ShoppingCart,
-  Package,
-  Weight,
-  CalendarClock,
-  CalendarCheck2,
-  Hash,
   ImageOff,
   CheckCircle2,
   AlertCircle,
@@ -17,11 +12,12 @@ import {
   ChevronRight,
   BadgeCheck,
 } from "lucide-react";
-import { formatPrice, formatDate } from "@/lib/format-price";
+import { formatPrice } from "@/lib/format-price";
 import QuantitySelector from "@/components/catalogo/quantity-selector";
-
+import { useCart } from "@/hooks/useCart";
+ 
 /* ─────────────────────────── constantes ─────────────────────────── */
-
+ 
 const CATEGORY_COLORS = {
   "Dieta Tradicional": {
     badge: "bg-amber-100 text-amber-700 border border-amber-200",
@@ -44,15 +40,15 @@ const CATEGORY_COLORS = {
     ring: "ring-orange-200",
   },
 };
-
+ 
 const CATEGORY_FALLBACK = {
   badge: "bg-green-100 text-green-700 border border-green-200",
   accent: "text-green-600",
   ring: "ring-green-200",
 };
-
+ 
 /* ─────────────────────────── sub-componentes ─────────────────────── */
-
+ 
 function Breadcrumb({ productName }) {
   return (
     <nav className="flex items-center gap-1.5 text-xs text-gray-400 mb-6">
@@ -64,8 +60,7 @@ function Breadcrumb({ productName }) {
     </nav>
   );
 }
-
-
+ 
 function ImagePlaceholder({ category }) {
   return (
     <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 gap-4">
@@ -76,7 +71,7 @@ function ImagePlaceholder({ category }) {
     </div>
   );
 }
-
+ 
 function DetailRow({ icon: Icon, label, value }) {
   return (
     <div className="flex items-center gap-3 py-3.5 border-b border-gray-100 last:border-0">
@@ -88,7 +83,7 @@ function DetailRow({ icon: Icon, label, value }) {
     </div>
   );
 }
-
+ 
 function TrustBadge({ text }) {
   return (
     <div className="flex items-center gap-2 text-xs text-gray-500">
@@ -97,36 +92,81 @@ function TrustBadge({ text }) {
     </div>
   );
 }
-
+ 
 /* ─────────────────────────── componente principal ─────────────────── */
-
+ 
 /**
  * ProductDetail — Vista detallada de un producto.
  *
- * @param {object}   product     - Producto completo (ver /data/products.js)
- * @param {function} onAddToCart - Callback al agregar al carrito: ({ product, quantity }) => void
+ * @param {object} product - Producto completo
  */
-export default function ProductDetail({ product, onAddToCart }) {
-  const [quantity, setQuantity] = useState(1);
+export default function ProductDetail({ product }) {
+  const { cartMap, updatingItems, addToCart, updateQuantity } = useCart();
+  const cartQuantity = cartMap[product.id];
+  const [quantity, setQuantity] = useState(product.stock_actual > 0 ? (cartQuantity || 1) : 0);
   const [imgError, setImgError] = useState(false);
-  const [cartState, setCartState] = useState("idle"); // "idle" | "added"
-
-  const colors = CATEGORY_COLORS[product.categoria] ?? CATEGORY_FALLBACK;
+  const [cartState, setCartState] = useState("idle");
+ 
+  const isUpdating = Boolean(updatingItems[product.id]);
   const inStock = product.stock_actual > 0;
-  const lowStock = product.stock_actual > 0 && product.stock_actual <= 10;
-
-  const handleAddToCart = () => {
-    if (!inStock) return;
-    if (onAddToCart) onAddToCart({ product, quantity });
-    // TODO: dispatch al store/contexto del carrito
-    setCartState("added");
-    setTimeout(() => setCartState("idle"), 2500);
+  const lowStock = inStock && product.stock_actual <= 10;
+  const colors = CATEGORY_COLORS[product.categoria] || CATEGORY_FALLBACK;
+ 
+  // ── LOG TEMPORAL DE DEPURACIÓN ──────────────────────────────────────────────
+  // Permite identificar el nombre exacto del campo de imagen enviado por el backend.
+  // Eliminar una vez confirmado el campo correcto.
+  console.log("PRODUCTO RECIBIDO:", product);
+  // ───────────────────────────────────────────────────────────────────────────
+ 
+  useEffect(() => {
+    if (typeof cartQuantity === "number") {
+      setQuantity(Math.max(0, cartQuantity));
+    } else if (quantity === 0) {
+      setQuantity(inStock ? 1 : 0);
+    }
+  }, [cartQuantity, inStock, quantity]);
+ 
+  const handleDecrease = async () => {
+    const next = quantity - 1;
+    if (next < 0) return;
+ 
+    if (typeof cartQuantity === "number" && cartQuantity > 0) {
+      const success = await updateQuantity({ product, quantity: next });
+      if (success && next === 0) {
+        setQuantity(inStock ? 1 : 0);
+      }
+      return;
+    }
+ 
+    if (next >= 1) {
+      setQuantity(next);
+    }
   };
-
+ 
+  const handleIncrease = async () => {
+    const next = Math.min(quantity + 1, product.stock_actual || 1);
+ 
+    if (typeof cartQuantity === "number" && cartQuantity > 0) {
+      await updateQuantity({ product, quantity: next });
+      return;
+    }
+ 
+    setQuantity(next);
+  };
+ 
+  const handleAddToCart = async () => {
+    if (!inStock) return;
+    const success = await addToCart({ product, quantity });
+    if (success) {
+      setCartState("added");
+      setTimeout(() => setCartState("idle"), 2500);
+    }
+  };
+ 
   return (
     <div className="min-h-screen bg-gray-50/60">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-
+ 
         {/* ── Breadcrumb + Volver ── */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
           <Breadcrumb productName={product.nombre} />
@@ -141,18 +181,18 @@ export default function ProductDetail({ product, onAddToCart }) {
             Volver al catálogo
           </Link>
         </div>
-
+ 
         {/* ── Layout principal ── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 xl:gap-12">
-
+ 
           {/* ══ COLUMNA IZQUIERDA — Imagen ══ */}
           <div className="flex flex-col gap-4">
-
+ 
             {/* Imagen principal */}
             <div className="relative rounded-3xl overflow-hidden border border-gray-200 bg-white shadow-sm aspect-square">
               {!imgError ? (
                 <img
-                  src={product.image || "/images/products/placeholder.png"}
+                  src={product.imagen}               
                   alt={product.nombre}
                   onError={() => setImgError(true)}
                   className="w-full h-full object-cover"
@@ -160,7 +200,7 @@ export default function ProductDetail({ product, onAddToCart }) {
               ) : (
                 <ImagePlaceholder category={product.categoria || "Producto"} />
               )}
-
+ 
               {/* Badges flotantes sobre la imagen */}
               <div className="absolute top-4 left-4 flex flex-col gap-2">
                 <span className={`text-xs font-semibold px-3 py-1 rounded-full ${colors.badge}`}>
@@ -173,7 +213,7 @@ export default function ProductDetail({ product, onAddToCart }) {
                 )}
               </div>
             </div>
-
+ 
             {/* Tarjeta de confianza / garantías */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 grid grid-cols-2 gap-3">
               <TrustBadge text="100% Natural" />
@@ -182,17 +222,17 @@ export default function ProductDetail({ product, onAddToCart }) {
               <TrustBadge text="Cadena de frío" />
             </div>
           </div>
-
+ 
           {/* ══ COLUMNA DERECHA — Info + acciones ══ */}
           <div className="flex flex-col gap-6">
-
+ 
             {/* Nombre */}
             <div className="flex flex-col gap-3">
               <h1 className="text-3xl xl:text-4xl font-bold text-gray-800 leading-tight">
                 {product.nombre}
               </h1>
             </div>
-
+ 
             {/* Precio + peso */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center justify-between">
               <div>
@@ -206,7 +246,7 @@ export default function ProductDetail({ product, onAddToCart }) {
                   Presentación: <span className="font-semibold text-gray-600">{product.unidad_medida || "1 unidad"}</span>
                 </p>
               </div>
-
+ 
               {/* Indicador de stock */}
               <div className="text-right">
                 {inStock ? (
@@ -227,7 +267,7 @@ export default function ProductDetail({ product, onAddToCart }) {
                 )}
               </div>
             </div>
-
+ 
             {/* Descripción */}
             <div>
               <h2 className="text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
@@ -238,8 +278,7 @@ export default function ProductDetail({ product, onAddToCart }) {
                 {product.descripcion || "Sin descripción detallada disponible."}
               </p>
             </div>
-
-
+ 
             {/* Composición del producto */}
             {product.composicion && product.composicion.length > 0 && (
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
@@ -260,7 +299,7 @@ export default function ProductDetail({ product, onAddToCart }) {
                 </div>
               </div>
             )}
-
+ 
             {/* Selector cantidad + botón carrito */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-4">
               <div className="flex items-center justify-between">
@@ -268,11 +307,14 @@ export default function ProductDetail({ product, onAddToCart }) {
                 <QuantitySelector
                   value={quantity}
                   onChange={setQuantity}
-                  min={1}
+                  onDecrease={handleDecrease}
+                  onIncrease={handleIncrease}
+                  min={typeof cartQuantity === "number" && cartQuantity > 0 ? 0 : 1}
                   max={product.stock_actual || 1}
+                  disabled={isUpdating}
                 />
               </div>
-
+ 
               {/* Subtotal dinámico */}
               <div className="flex items-center justify-between text-sm border-t border-gray-100 pt-3">
                 <span className="text-gray-500">Subtotal estimado</span>
@@ -280,7 +322,7 @@ export default function ProductDetail({ product, onAddToCart }) {
                   {formatPrice(parseFloat(product.precio || 0) * quantity)}
                 </span>
               </div>
-
+ 
               {/* Botón principal */}
               <button
                 type="button"
@@ -309,7 +351,7 @@ export default function ProductDetail({ product, onAddToCart }) {
                   </>
                 )}
               </button>
-
+ 
               {!inStock && (
                 <p className="text-center text-xs text-red-400 -mt-1 flex items-center justify-center gap-1">
                   <AlertCircle size={12} />
@@ -317,7 +359,7 @@ export default function ProductDetail({ product, onAddToCart }) {
                 </p>
               )}
             </div>
-
+ 
           </div>
         </div>
       </div>

@@ -50,6 +50,39 @@ export const cartService = {
   },
 
   /**
+   * Adds a product to the shopping cart.
+   * POST /api/ventas/carrito/productos/
+   */
+  async addToCart(productId, cantidad) {
+    return apiRequest('/api/ventas/carrito/productos/', {
+      method: 'POST',
+      body: { producto_id: productId, cantidad },
+      headers: authHeaders(),
+    });
+  },
+
+  /**
+   * Retrieves the current cart and returns product quantities keyed by product ID.
+   */
+  async syncCart() {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('access') : null;
+    if (!token) return {};
+
+    try {
+      const cart = await this.getCart();
+      if (!cart || !Array.isArray(cart.productos)) return {};
+
+      return cart.productos.reduce((map, item) => {
+        map[item.producto_id] = item.cantidad;
+        return map;
+      }, {});
+    } catch (error) {
+      if (error.status === 401) return {};
+      throw error;
+    }
+  },
+
+  /**
    * Initiates checkout and processes order details.
    * POST /api/ventas/checkout/
    */

@@ -9,8 +9,18 @@ import { PackageSearch } from "lucide-react";
  * @param {Array} products - Lista de productos a mostrar
  * @param {boolean} isLoading - Muestra skeleton mientras carga
  * @param {function} onAddToCart - Callback al agregar producto al carrito
+ * @param {function} onUpdateQuantity - Callback para actualizar cantidad en carrito
+ * @param {Object} cartMap - Mapa de cantidades por producto
+ * @param {Object} updatingItems - Elementos en estado de actualización
  */
-export default function ProductGrid({ products, isLoading = false, onAddToCart }) {
+export default function ProductGrid({
+  products,
+  isLoading = false,
+  onAddToCart,
+  onUpdateQuantity,
+  cartMap = {},
+  updatingItems = {},
+}) {
 
   // Estado de carga — skeleton cards
   if (isLoading) {
@@ -62,7 +72,10 @@ export default function ProductGrid({ products, isLoading = false, onAddToCart }
         <ProductCard
           key={product.id}
           product={product}
+          cartQuantity={cartMap[product.id]}
           onAddToCart={onAddToCart}
+          onUpdateQuantity={onUpdateQuantity}
+          isUpdating={Boolean(updatingItems[product.id])}
         />
       ))}
     </div>
