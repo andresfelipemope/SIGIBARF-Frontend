@@ -10,6 +10,14 @@ import { PedidosAdminTable } from "@/components/gestion-pedidos/pedidos-admin-ta
 import { PedidosLoading } from "@/components/gestion-pedidos/pedidos-loading";
 import { PedidoDetalleDialog } from "@/components/gestion-pedidos/pedido-detalle-dialog";
 import { PedidoManualFormDialog } from "@/components/gestion-pedidos/pedido-manual-form-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 export default function GestionPedidosAdminPage() {
   const {
@@ -32,6 +40,10 @@ export default function GestionPedidosAdminPage() {
   const [selectedPedido, setSelectedPedido] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
 
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogAction, setDialogAction] = useState(null);
+  const [selectedPedidoId, setSelectedPedidoId] = useState(null);
+
   useEffect(() => {
     if (typeof window === "undefined" || loading || !pedidos.length) return;
     const verId = new URLSearchParams(window.location.search).get("ver");
@@ -40,14 +52,32 @@ export default function GestionPedidosAdminPage() {
     if (found) setSelectedPedido(found);
   }, [pedidos, loading]);
 
-  const handleConfirmar = async (id) => {
-    if (!window.confirm("¿Confirmar el pago de este pedido?")) return;
-    await confirmarPago(id);
+  const handleConfirmar = (id) => {
+    setSelectedPedidoId(id);
+    setDialogAction("confirmar");
+    setDialogOpen(true);
   };
 
-  const handleCancelar = async (id) => {
-    if (!window.confirm("¿Cancelar este pedido? Quedará en estado rechazado.")) return;
-    await cancelarPedido(id);
+  const handleCancelar = (id) => {
+    setSelectedPedidoId(id);
+    setDialogAction("cancelar");
+    setDialogOpen(true);
+  };
+
+  const executeAction = async () => {
+    if (!selectedPedidoId) return;
+
+    if (dialogAction === "confirmar") {
+      await confirmarPago(selectedPedidoId);
+    }
+
+    if (dialogAction === "cancelar") {
+      await cancelarPedido(selectedPedidoId);
+    }
+
+    setDialogOpen(false);
+    setSelectedPedidoId(null);
+    setDialogAction(null);
   };
 
   return (
@@ -129,6 +159,59 @@ export default function GestionPedidosAdminPage() {
           creating={actionLoading}
         />
       </div>
+      <Dialog
+        open={dialogOpen}
+        onOpenChange={(open) => {
+          if (actionLoading) return;
+
+          if (!open) {
+            setDialogOpen(false);
+            setSelectedPedidoId(null);
+            setDialogAction(null);
+            return;
+          }
+
+          setDialogOpen(true);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {dialogAction === "confirmar"
+                ? "Confirmar pago"
+                : "Cancelar pedido"}
+            </DialogTitle>
+
+            <DialogDescription>
+              {dialogAction === "confirmar"
+                ? "¿Deseas confirmar el pago de este pedido?"
+                : "¿Deseas cancelar este pedido? Quedará rechazado."}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              disabled={actionLoading}
+              onClick={() => setDialogOpen(false)}
+            >
+              Cerrar
+            </Button>
+
+            <Button
+              disabled={actionLoading}
+              variant={dialogAction === "confirmar" ? "default" : "destructive"}
+              onClick={executeAction}
+            >
+              {actionLoading
+                ? "Procesando..."
+                : dialogAction === "confirmar"
+                  ? "Confirmar pago"
+                  : "Cancelar pedido"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

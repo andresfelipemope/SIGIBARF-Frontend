@@ -76,7 +76,6 @@ export function CreditosTable({ creditos, error, onRetry }) {
               <th className="py-4 px-4 text-right">Total</th>
               <th className="py-4 px-4 text-center">Cuotas</th>
               <th className="py-4 px-4 text-right">Valor cuota</th>
-              <th className="py-4 px-4 text-center">Interés</th>
               <th className="py-4 px-4 text-center">Estado</th>
               <th className="py-4 px-4">Inicio</th>
               <th className="py-4 px-4">Fin</th>
@@ -89,10 +88,14 @@ export function CreditosTable({ creditos, error, onRetry }) {
               const pedidoNum = c.pedido_numero ?? c.numero_pedido ?? c.pedido_id ?? "—";
               const pedidoId = c.pedido_id ?? c.pedido;
               const cliente = c.cliente_nombre || c.usuario_nombre || "—";
-              const total = parseFloat(c.total || c.monto_total || 0);
+              const total = parseFloat(
+                c.valor_total ??
+                c.total ??
+                c.monto_total ??
+                0
+              );
               const cuotas = c.cantidad_cuotas ?? c.cuotas_totales ?? "—";
               const valorCuota = parseFloat(c.valor_cuota || 0);
-              const interes = c.interes != null ? `${(parseFloat(c.interes) * 100).toFixed(1)}%` : "—";
 
               return (
                 <tr key={id} className="hover:bg-green-50/10 transition-colors">
@@ -105,7 +108,6 @@ export function CreditosTable({ creditos, error, onRetry }) {
                   <td className="py-4 px-4 text-right text-sm font-semibold">
                     {valorCuota ? formatPrice(valorCuota) : "—"}
                   </td>
-                  <td className="py-4 px-4 text-center text-xs font-bold">{interes}</td>
                   <td className="py-4 px-4 text-center">
                     <CreditoEstadoBadge estado={c.estado} />
                   </td>
