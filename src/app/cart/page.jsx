@@ -234,7 +234,23 @@ export default function CartPage() {
 
     } catch (err) {
       console.error("Error during checkout integration workflow:", err);
-      toast.error(err.message || "Error al procesar el checkout");
+
+      const message = err.message || "";
+
+      if (
+        message.toLowerCase().includes("pendiente") ||
+        message.toLowerCase().includes("pedido pendiente")
+      ) {
+        toast.error("Ya tienes un pedido pendiente. Serás redirigido a Mis Pedidos.");
+
+        setTimeout(() => {
+          router.push("/pedidos");
+        }, 3000);
+
+        return;
+      }
+
+      toast.error(message || "Error al procesar el checkout");
     } finally {
       setIsCheckingOut(false);
     }
