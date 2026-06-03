@@ -15,7 +15,7 @@ export function PedidoManualFormDialog({
 }) {
   const [usuarioId, setUsuarioId] = useState("");
   const [items, setItems] = useState([{ ...EMPTY_ITEM }]);
-  const [tipoPago, setTipoPago] = useState("contado");
+  const [tipoPago, setTipoPago] = useState("contado"); // valor real del backend: "contado" (no "efectivo")
   const [cantidadCuotas, setCantidadCuotas] = useState("6");
   const [frecuenciaDias, setFrecuenciaDias] = useState("30");
   const [observaciones, setObservaciones] = useState("");
@@ -70,9 +70,14 @@ export function PedidoManualFormDialog({
       return;
     }
 
+    if (tipoPago === "credito" && !usuarioId) {
+      setFormError("Para pedidos a crédito debes seleccionar un cliente.");
+      return;
+    }
+
     const body = {
       items: parsedItems,
-      tipo_pago: tipoPago,
+      tipo_pago: tipoPago, // "contado" o "credito"
     };
 
     if (usuarioId) {
@@ -156,7 +161,8 @@ export function PedidoManualFormDialog({
                   disabled={creating}
                   className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-2.5 text-sm font-bold cursor-pointer"
                 >
-                  <option value="contado">Contado</option>
+                  {/* Valor real del backend para efectivo es "contado" (ver TipoPago en models.py) */}
+                  <option value="contado">Efectivo</option>
                   <option value="credito">Crédito</option>
                 </select>
               </div>
@@ -223,7 +229,7 @@ export function PedidoManualFormDialog({
                         <option value="">Producto...</option>
                         {productos.map((p) => (
                           <option key={p.id} value={p.id}>
-                            {p.nombre}
+                            {p.nombre} — Stock: {p.stock_actual}
                           </option>
                         ))}
                       </select>

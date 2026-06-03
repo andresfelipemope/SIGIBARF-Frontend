@@ -48,7 +48,6 @@ export const sidebarMenuItems = [
     title: "Alertas",
     url: "/gestion/alertas",
     icon: AlertCircle,
-    badge: "3",
   },
   {
     title: "Auditoría de Inventario",
@@ -70,9 +69,4 @@ export const sidebarMenuItems = [
     url: "/gestion/historial",
     icon: History,
   },
-  {
-    title: "Gestión de Deudas",
-    url: "/gestion/deudas",
-    icon: Coins,
-  }
 ];
