@@ -104,9 +104,9 @@ export default function HistorialTable({ data = [], loading = false }) {
                 }
 
                 // Format numbers elegantly
-                const fmtQty = parseFloat(item.cantidad).toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                const fmtStockAnt = parseFloat(item.stock_anterior).toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                const fmtStockPos = parseFloat(item.stock_posterior).toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                const fmtQty = Number(item.cantidad).toLocaleString("es-ES");
+                const fmtStockAnt = Number(item.stock_anterior).toLocaleString("es-ES");
+                const fmtStockPos = Number(item.stock_posterior).toLocaleString("es-ES");
 
                 return (
                   <tr key={item.uniqueId} className="hover:bg-green-50/10 transition-colors group">
