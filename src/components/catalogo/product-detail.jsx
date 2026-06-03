@@ -243,7 +243,7 @@ export default function ProductDetail({ product }) {
                   {formatPrice(parseFloat(product.precio || 0))}
                 </p>
                 <p className="text-sm text-gray-400 mt-1">
-                  Presentación: <span className="font-semibold text-gray-600">{product.unidad_medida || "1 unidad"}</span>
+                  Presentación: <span className="font-semibold text-gray-600">{product.presentacion || "1 unidad"}</span>
                 </p>
               </div>
  

@@ -10,7 +10,8 @@ import {
   Loader2, 
   ArrowRight, 
   AlertCircle,
-  CheckCircle2
+  CheckCircle2,
+  ImageOff
 } from "lucide-react";
 import { Toaster, toast } from "sonner";
 
@@ -74,12 +75,9 @@ export default function CartPage() {
 
   // Update item quantity
   const handleUpdateQuantity = async (productId, currentQty, delta) => {
-    console.log("productId:", productId);
-    console.log("currentQty:", currentQty);
     const newQty = currentQty + delta;
-    if (newQty < 1) return; // Prevent less than 1 quantity via controls (use trash icon instead)
+    if (newQty < 1) return;
 
-    // Add to updating items set
     setUpdatingItems((prev) => {
       const next = new Set(prev);
       next.add(productId);
@@ -87,7 +85,6 @@ export default function CartPage() {
     });
 
     try {
-      // Optimistic state update for immediate user feedback
       setCart((prevCart) => {
         if (!prevCart) return prevCart;
         const updatedProducts = prevCart.productos.map((item) => {
@@ -97,7 +94,6 @@ export default function CartPage() {
           return item;
         });
         
-        // Recalculate subtotal locally
         const newSubtotal = updatedProducts.reduce((sum, item) => {
           return sum + (parseFloat(item.producto_precio) * item.cantidad);
         }, 0);
@@ -109,18 +105,14 @@ export default function CartPage() {
         };
       });
 
-      // Call API
       await cartService.updateCartItem(productId, newQty);
       await fetchCart();
       toast.success("Cantidad actualizada correctamente");
     } catch (err) {
       console.error("Error updating quantity:", err);
       toast.error(err.message || "Error al actualizar la cantidad del producto");
-      
-      // Revert optimistic update by reloading cart
       await fetchCart();
     } finally {
-      // Remove from updating items
       setUpdatingItems((prev) => {
         const next = new Set(prev);
         next.delete(productId);
@@ -145,8 +137,6 @@ export default function CartPage() {
     try {
       await cartService.removeCartItem(productId);
       toast.success(`"${productName}" eliminado del carrito`);
-      
-      // Refresh cart data
       const data = await cartService.getCart();
       setCart(data);
     } catch (err) {
@@ -166,34 +156,18 @@ export default function CartPage() {
   const handleCheckout = async () => {
     setIsCheckingOut(true);
     try {
-      // 1. Ejecutar el checkout actual y recibir la respuesta del backend
       const response = await cartService.checkout();
-      console.log("Checkout response data:", response);
+      if (!response) throw new Error("Respuesta de checkout inválida del servidor.");
+      if (response.listo_para_pago !== true) throw new Error("El pedido no se encuentra listo para procesar el pago.");
 
-      if (!response) {
-        throw new Error("Respuesta de checkout inválida del servidor.");
-      }
-
-      // 2. Validar que listo_para_pago sea true
-      if (response.listo_para_pago !== true) {
-        throw new Error("El pedido no se encuentra listo para procesar el pago.");
-      }
-
-      // 3. Validar datos de Wompi recibidos
       const wompiData = response.wompi;
-      if (!wompiData) {
-        throw new Error("Datos incompletos de Wompi en la respuesta del servidor.");
-      }
+      if (!wompiData) throw new Error("Datos incompletos de Wompi en la respuesta del servidor.");
 
       const { public_key, currency, amount_in_cents, reference, integrity } = wompiData;
-      if (!public_key || !amount_in_cents || !reference) {
-        throw new Error("Datos de transacción incompletos recibidos de la pasarela.");
-      }
+      if (!public_key || !amount_in_cents || !reference) throw new Error("Datos de transacción incompletos recibidos de la pasarela.");
 
-      // Guardar los datos en el estado local
       setCheckoutData(response);
 
-      // 4. Abrir inmediatamente el Widget Oficial de Wompi y esperar a que termine
       let transaction = null;
       try {
         transaction = await openWompiWidget({
@@ -203,20 +177,18 @@ export default function CartPage() {
           reference: reference,
           integrity: integrity
         });
-        console.log("Resultado transacción Wompi:", transaction);
       } catch (widgetErr) {
         console.error("Error opening Wompi widget:", widgetErr);
         toast.error("Ocurrió un error al cargar o abrir la pasarela de pagos.");
       }
 
-      // 5. Mostrar toast correspondiente según el resultado
       if (!transaction) {
         toast.info("Pago cancelado o cerrado por el usuario.");
       } else {
         const status = transaction.status;
         if (status === "APPROVED") {
           toast.success("¡Pago aprobado! Tu pedido ha sido procesado.");
-          setCart(null); // Limpiar carrito localmente
+          setCart(null);
         } else if (status === "DECLINED") {
           toast.error("El pago fue declinado. Intenta con otro medio de pago.");
         } else if (status === "ERROR") {
@@ -229,24 +201,15 @@ export default function CartPage() {
         }
       }
 
-      // 6. Redirigir al usuario a /pedidos al terminar el proceso o cerrar el widget
       router.push("/pedidos");
 
     } catch (err) {
       console.error("Error during checkout integration workflow:", err);
-
       const message = err.message || "";
 
-      if (
-        message.toLowerCase().includes("pendiente") ||
-        message.toLowerCase().includes("pedido pendiente")
-      ) {
+      if (message.toLowerCase().includes("pendiente") || message.toLowerCase().includes("pedido pendiente")) {
         toast.error("Ya tienes un pedido pendiente. Serás redirigido a Mis Pedidos.");
-
-        setTimeout(() => {
-          router.push("/pedidos");
-        }, 3000);
-
+        setTimeout(() => router.push("/pedidos"), 3000);
         return;
       }
 
@@ -256,7 +219,6 @@ export default function CartPage() {
     }
   };
 
-  // Render Skeletons during initial load
   if (loading && !cart) {
     return (
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 w-full flex-1 flex flex-col justify-center">
@@ -275,20 +237,14 @@ export default function CartPage() {
     );
   }
 
-  // Render Error state if loading failed
   if (error && !cart) {
     return (
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 w-full flex-1 flex flex-col items-center justify-center text-center">
         <Alert variant="destructive" className="max-w-md rounded-2xl border-red-200 bg-red-50 p-6 flex flex-col items-center gap-4">
           <AlertCircle className="h-10 w-10 text-red-600 animate-bounce" />
           <AlertTitle className="text-lg font-bold text-red-900">Error de carga</AlertTitle>
-          <AlertDescription className="text-sm text-red-800 leading-relaxed">
-            {error}
-          </AlertDescription>
-          <Button 
-            onClick={fetchCart} 
-            className="mt-2 bg-red-600 hover:bg-red-700 text-white rounded-xl px-6 py-2 cursor-pointer"
-          >
+          <AlertDescription className="text-sm text-red-800 leading-relaxed">{error}</AlertDescription>
+          <Button onClick={fetchCart} className="mt-2 bg-red-600 hover:bg-red-700 text-white rounded-xl px-6 py-2 cursor-pointer">
             Reintentar
           </Button>
         </Alert>
@@ -296,7 +252,6 @@ export default function CartPage() {
     );
   }
 
-  // Extract products
   const products = cart?.productos || [];
   const isEmpty = products.length === 0;
 
@@ -310,7 +265,6 @@ export default function CartPage() {
         </h1>
 
         {isEmpty ? (
-          // Empty State
           <div className="flex flex-col items-center justify-center py-20 text-center flex-1">
             <div className="bg-emerald-50 p-6 rounded-full mb-6">
               <ShoppingBag className="w-16 h-16 text-emerald-600 animate-pulse" />
@@ -328,10 +282,9 @@ export default function CartPage() {
             </Button>
           </div>
         ) : (
-          // Cart Content Layout
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
             
-            {/* Products List (Left 2 Columns) */}
+            {/* Products List */}
             <div className="lg:col-span-2 space-y-4">
               {products.map((item) => {
                 const price = parseFloat(item.producto_precio);
@@ -340,74 +293,97 @@ export default function CartPage() {
 
                 return (
                   <Card key={item.id} className="overflow-hidden border-zinc-100 shadow-xs hover:shadow-sm transition-shadow duration-200">
-                    <CardContent className="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                      
-                      {/* Product Details */}
-                      <div className="space-y-1">
-                        <h3 className="font-bold text-lg text-zinc-800">{item.producto_nombre}</h3>
-                        <p className="text-sm text-zinc-500 font-medium">
-                          Precio unitario: <span className="text-zinc-700">{formatPrice(price)}</span>
-                        </p>
+                    <CardContent className="p-5 flex flex-row items-center gap-4">
+
+                      {/* ── Miniatura de imagen ── */}
+                      <div className="w-16 h-16 shrink-0 rounded-xl overflow-hidden border border-zinc-100 bg-zinc-50 flex items-center justify-center">
+                        {item.producto_imagen ? (
+                          <img
+                            src={item.producto_imagen}
+                            alt={item.producto_nombre}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.style.display = "none";
+                              e.currentTarget.nextSibling.style.display = "flex";
+                            }}
+                          />
+                        ) : null}
+                        <div
+                          className="w-full h-full items-center justify-center text-zinc-300"
+                          style={{ display: item.producto_imagen ? "none" : "flex" }}
+                        >
+                          <ImageOff size={20} strokeWidth={1.5} />
+                        </div>
                       </div>
 
-                      {/* Quantity Controls & Prices */}
-                      <div className="flex flex-wrap items-center justify-between sm:justify-end gap-6 w-full sm:w-auto">
-                        
-                        {/* Quantity Counter */}
-                        <div className="flex items-center border border-zinc-200 rounded-xl bg-zinc-50/50 p-1">
-                          <Button
-                            variant="ghost"
-                            onClick={() => handleUpdateQuantity(item.producto_id, item.cantidad, -1)}
-                            disabled={item.cantidad <= 1 || isItemUpdating}
-                            className="h-8 w-8 p-0 rounded-lg hover:bg-white text-zinc-600 disabled:opacity-50 cursor-pointer"
-                          >
-                            <Minus className="h-4 w-4" />
-                          </Button>
-                          
-                          <span className="w-10 text-center font-bold text-sm text-zinc-800">
-                            {isItemUpdating ? (
-                              <Loader2 className="w-4 h-4 animate-spin mx-auto text-emerald-600" />
-                            ) : (
-                              item.cantidad
-                            )}
-                          </span>
+                      {/* ── Info + controles ── */}
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 flex-1 min-w-0">
 
-                          <Button
-                            variant="ghost"
-                            onClick={() => handleUpdateQuantity(item.producto_id, item.cantidad, 1)}
-                            disabled={isItemUpdating}
-                            className="h-8 w-8 p-0 rounded-lg hover:bg-white text-zinc-600 disabled:opacity-50 cursor-pointer"
-                          >
-                            <Plus className="h-4 w-4" />
-                          </Button>
-                        </div>
-
-                        {/* Individual Item Subtotal */}
-                        <div className="text-right min-w-[100px]">
-                          <p className="text-[10px] text-zinc-400 font-semibold uppercase tracking-wider">Subtotal</p>
-                          <p className="font-bold text-zinc-800 text-lg">
-                            {formatPrice(subtotal)}
+                        {/* Nombre y precio unitario */}
+                        <div className="space-y-1 min-w-0">
+                          <h3 className="font-bold text-lg text-zinc-800 leading-tight truncate">{item.producto_nombre}</h3>
+                          <p className="text-sm text-zinc-500 font-medium">
+                            Precio unitario: <span className="text-zinc-700">{formatPrice(price)}</span>
                           </p>
                         </div>
 
-                        {/* Trash Button */}
-                        <Button
-                          variant="ghost"
-                          onClick={() => setItemToDelete(item)}
-                          disabled={isItemUpdating}
-                          className="text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-xl h-10 w-10 p-0 transition-colors cursor-pointer"
-                        >
-                          <Trash2 className="h-5 w-5" />
-                        </Button>
-                      </div>
+                        {/* Cantidad + subtotal + eliminar */}
+                        <div className="flex flex-wrap items-center justify-between sm:justify-end gap-6 w-full sm:w-auto">
+                          
+                          {/* Quantity Counter */}
+                          <div className="flex items-center border border-zinc-200 rounded-xl bg-zinc-50/50 p-1">
+                            <Button
+                              variant="ghost"
+                              onClick={() => handleUpdateQuantity(item.producto_id, item.cantidad, -1)}
+                              disabled={item.cantidad <= 1 || isItemUpdating}
+                              className="h-8 w-8 p-0 rounded-lg hover:bg-white text-zinc-600 disabled:opacity-50 cursor-pointer"
+                            >
+                              <Minus className="h-4 w-4" />
+                            </Button>
+                            
+                            <span className="w-10 text-center font-bold text-sm text-zinc-800">
+                              {isItemUpdating ? (
+                                <Loader2 className="w-4 h-4 animate-spin mx-auto text-emerald-600" />
+                              ) : (
+                                item.cantidad
+                              )}
+                            </span>
 
+                            <Button
+                              variant="ghost"
+                              onClick={() => handleUpdateQuantity(item.producto_id, item.cantidad, 1)}
+                              disabled={isItemUpdating}
+                              className="h-8 w-8 p-0 rounded-lg hover:bg-white text-zinc-600 disabled:opacity-50 cursor-pointer"
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          </div>
+
+                          {/* Subtotal */}
+                          <div className="text-right min-w-[100px]">
+                            <p className="text-[10px] text-zinc-400 font-semibold uppercase tracking-wider">Subtotal</p>
+                            <p className="font-bold text-zinc-800 text-lg">{formatPrice(subtotal)}</p>
+                          </div>
+
+                          {/* Trash */}
+                          <Button
+                            variant="ghost"
+                            onClick={() => setItemToDelete(item)}
+                            disabled={isItemUpdating}
+                            className="text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-xl h-10 w-10 p-0 transition-colors cursor-pointer"
+                          >
+                            <Trash2 className="h-5 w-5" />
+                          </Button>
+                        </div>
+
+                      </div>
                     </CardContent>
                   </Card>
                 );
               })}
             </div>
 
-            {/* Order Summary Side panel (Right Column) */}
+            {/* Order Summary */}
             <div className="lg:sticky lg:top-24 space-y-6">
               <Card className="border-zinc-100 shadow-xs bg-zinc-50/30">
                 <CardHeader className="p-6 pb-4">
@@ -420,25 +396,17 @@ export default function CartPage() {
                       {formatPrice(parseFloat(cart?.subtotal_carrito || "0"))}
                     </span>
                   </div>
-                <div className="rounded-xl border border-red-200 bg-red-50 p-4">
-                    <p className="text-sm font-bold text-red-700 mb-2">
-                        Importante sobre la entrega
-                    </p>
-
+                  <div className="rounded-xl border border-red-200 bg-red-50 p-4">
+                    <p className="text-sm font-bold text-red-700 mb-2">Importante sobre la entrega</p>
                     <p className="text-sm text-red-600 leading-relaxed">
-                        Athletic Barf no realiza envíos ni domicilios.
-                        El transporte de los productos corre completamente por cuenta del cliente.
+                      Athletic Barf no realiza envíos ni domicilios. El transporte de los productos corre completamente por cuenta del cliente.
                     </p>
-
-                    <p className="text-sm text-red-600 leading-relaxed mt-2">
-                        Puedes:
-                    </p>
-
+                    <p className="text-sm text-red-600 leading-relaxed mt-2">Puedes:</p>
                     <ul className="mt-2 space-y-1 text-sm text-red-700 list-disc list-inside">
-                        <li>Recoger tu pedido personalmente en la sucursal.</li>
-                        <li>Enviar un domiciliario o transportador de tu confianza.</li>
+                      <li>Recoger tu pedido personalmente en la sucursal.</li>
+                      <li>Enviar un domiciliario o transportador de tu confianza.</li>
                     </ul>
-                </div>
+                  </div>
                   <Separator className="bg-zinc-100" />
                   <div className="flex justify-between items-end">
                     <div>
@@ -471,7 +439,6 @@ export default function CartPage() {
                 </CardFooter>
               </Card>
 
-              {/* Checkout details display for Wompi integration confirmation */}
               {checkoutData && (
                 <Card className="border-emerald-100 bg-emerald-50/20 overflow-hidden shadow-xs animate-in fade-in slide-in-from-top-4 duration-200">
                   <CardContent className="p-4 space-y-3">
@@ -494,13 +461,11 @@ export default function CartPage() {
         )}
       </div>
 
-      {/* Confirmation Dialog for Deleting Cart Item */}
+      {/* Delete confirmation dialog */}
       <Dialog open={!!itemToDelete} onOpenChange={(open) => !open && setItemToDelete(null)}>
         <DialogContent className="max-w-xs sm:max-w-sm rounded-2xl p-6 bg-white border border-zinc-100 shadow-xl">
           <DialogHeader>
-            <DialogTitle className="text-lg font-bold text-zinc-800">
-              ¿Eliminar producto?
-            </DialogTitle>
+            <DialogTitle className="text-lg font-bold text-zinc-800">¿Eliminar producto?</DialogTitle>
             <DialogDescription className="text-sm text-zinc-500 mt-2 leading-relaxed">
               ¿Estás seguro de que deseas eliminar "{itemToDelete?.producto_nombre}" de tu carrito de compras?
             </DialogDescription>

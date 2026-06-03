@@ -30,10 +30,12 @@ export default function InventarioPage() {
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
     nombre: "",
+    presentacion: "",
     precio: "",
     stock_actual: 0,
     stock_minimo: 0,
-    inhabilitado: false
+    inhabilitado: false,
+    descripcion: ""
   });
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState(null);
@@ -82,13 +84,14 @@ export default function InventarioPage() {
   const openNewModal = () => {
     setEditingId(null);
     setFormData({
-      nombre: "",
-      precio: "",
-      stock_actual: 0,
-      stock_minimo: 0,
-      inhabilitado: false,
-      descripcion: ''
-    });
+    nombre: "",
+    presentacion: "",
+    precio: "",
+    stock_actual: 0,
+    stock_minimo: 0,
+    inhabilitado: false,
+    descripcion: ''
+  });
     setFieldErrors({});
     setFormError(null);
     setIsModalOpen(true);
@@ -98,6 +101,7 @@ export default function InventarioPage() {
     setEditingId(producto.id);
     setFormData({
       nombre: producto.nombre,
+      presentacion: producto.presentacion || '',
       precio: producto.precio,
       stock_actual: producto.stock_actual,
       stock_minimo: producto.stock_minimo,
@@ -150,6 +154,24 @@ export default function InventarioPage() {
       return;
     }
 
+    const presentacionVal = String(formData.presentacion || '').trim();
+
+    if (!presentacionVal) {
+      setFieldErrors(prev => ({
+        ...prev,
+        presentacion: 'La presentación es obligatoria'
+      }));
+      return;
+    }
+
+    if (presentacionVal.length > 50) {
+      setFieldErrors(prev => ({
+        ...prev,
+        presentacion: 'Máximo 50 caracteres'
+      }));
+      return;
+    }
+
     // Precio: string decimal, hasta 10 dígitos en la parte entera y 2 decimales, y > 0
     const precioStr = String(formData.precio || '').trim();
     const precioRegex = /^\d{1,10}(\.\d{1,2})?$/;
@@ -187,6 +209,7 @@ export default function InventarioPage() {
         // Modo Edición: no se envía stock_actual
         const payload = {
           nombre: formData.nombre,
+          presentacion: formData.presentacion,
           precio: String(formData.precio),
           stock_minimo: parseInt(formData.stock_minimo, 10) || 0,
           inhabilitado: formData.inhabilitado,
@@ -197,10 +220,12 @@ export default function InventarioPage() {
       } else {
         // Modo Creación
         const payload = {
-          ...formData,
-          precio: String(formData.precio), // El backend pide string decimal
+          nombre: formData.nombre,
+          presentacion: formData.presentacion,
+          precio: String(formData.precio),
           stock_actual: parseInt(formData.stock_actual, 10) || 0,
           stock_minimo: parseInt(formData.stock_minimo, 10) || 0,
+          inhabilitado: formData.inhabilitado,
           descripcion: formData.descripcion || null
         };
         await inventarioService.createProducto(payload);
@@ -348,6 +373,7 @@ export default function InventarioPage() {
             <thead>
               <tr className="border-b border-gray-100 text-xs font-bold uppercase tracking-wider text-gray-400">
                 <th className="py-4 px-3">Producto</th>
+                <th className="py-4 px-3">Presentación</th>
                 <th className="py-4 px-3 text-right">Precio</th>
                 <th className="py-4 px-3 text-right">Stock Actual</th>
                 <th className="py-4 px-3 text-right">Mínimo</th>
@@ -369,8 +395,11 @@ export default function InventarioPage() {
                     <td className="py-4 px-3 text-sm font-semibold text-black">
                       {item.nombre}
                     </td>
+                    <td className="py-4 px-3 text-sm text-gray-600">
+                      {item.presentacion}
+                    </td>
                     <td className="py-4 px-3 text-right text-sm font-bold text-gray-700">
-                      ${parseFloat(item.precio).toLocaleString()}
+                      ${parseFloat(item.precio).toLocaleString("es-CO")}
                     </td>
                     <td className="py-4 px-3 text-right text-sm font-bold text-black">
                       {item.stock_actual}
@@ -469,6 +498,34 @@ export default function InventarioPage() {
                     disabled={formLoading}
                   />
                   {fieldErrors.nombre && <p className="text-red-500 text-xs mt-1 font-medium">{Array.isArray(fieldErrors.nombre) ? fieldErrors.nombre[0] : fieldErrors.nombre}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1.5">
+                    Presentación <span className="text-red-500">*</span>
+                  </label>
+
+                  <input
+                    type="text"
+                    name="presentacion"
+                    value={formData.presentacion}
+                    onChange={handleInputChange}
+                    className={`w-full rounded-xl border ${
+                      fieldErrors.presentacion
+                        ? "border-red-500 focus:border-red-500"
+                        : "border-gray-200 focus:border-green-600"
+                    } bg-gray-50/50 px-4 py-2.5 text-sm text-black focus:bg-white focus:outline-hidden transition-all`}
+                    placeholder="Ej. 500 gr"
+                    disabled={formLoading}
+                  />
+
+                  {fieldErrors.presentacion && (
+                    <p className="text-red-500 text-xs mt-1 font-medium">
+                      {Array.isArray(fieldErrors.presentacion)
+                        ? fieldErrors.presentacion[0]
+                        : fieldErrors.presentacion}
+                    </p>
+                  )}
                 </div>
 
                 <div>

@@ -141,7 +141,7 @@ export default function ProductCard({ product, cartQuantity, onAddToCart, onUpda
             <p className="text-green-600 text-xl font-bold">
               {formatPrice(parseFloat(product.precio || 0))}
             </p>
-            <p className="text-gray-400 text-xs mt-0.5">{product.unidad_medida || "1 unidad"}</p>
+            <p className="text-gray-400 text-xs mt-0.5">{product.presentacion || "1 unidad"}</p>
           </div>
           {product.stock_actual > 0 ? (
             <span className="text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded-full">
