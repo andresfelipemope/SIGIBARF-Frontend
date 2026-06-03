@@ -8,9 +8,11 @@ import {
   FlaskConical,
   Factory,
   ShoppingBag,
+  ClipboardCheck,
   History,
   AlertCircle,
   Coins,
+  CreditCard,
   ArrowRight,
 } from "lucide-react";
 
@@ -56,12 +58,28 @@ const MODULES = [
     accent: "green",
   },
   {
-    title: "Movimientos de Inventario",
+    title: "Auditoría de Inventario",
     description:
-      "Gestiona ventas externas, ajustes manuales y auditorías que afectan directamente el stock de productos.",
+      "Historial de auditoría, entradas, salidas y ajustes manuales del stock de productos.",
+    icon: ClipboardCheck,
+    href: "/gestion/auditoria-inventario",
+    accent: "green",
+  },
+  {
+    title: "Gestión de Pedidos",
+    description:
+      "Lista pedidos del sistema, registra pedidos manuales y confirma o cancela pagos.",
     icon: ShoppingBag,
     href: "/gestion/pedidos",
     accent: "orange",
+  },
+  {
+    title: "Gestión de Créditos",
+    description:
+      "Administra créditos de clientes, cuotas, pagos y notificaciones asociadas a pedidos.",
+    icon: CreditCard,
+    href: "/gestion/creditos",
+    accent: "green",
   },
   {
     title: "Historial de Inventario",
@@ -118,6 +136,8 @@ export default function GestionDashboard() {
           <span className="font-semibold text-green-700">movimientos</span>,{" "}
           <span className="font-semibold text-green-700">historial</span>,{" "}
           <span className="font-semibold text-green-700">alertas</span> y{" "}
+          <span className="font-semibold text-green-700">pedidos</span>,{" "}
+          <span className="font-semibold text-green-700">créditos</span> y{" "}
           <span className="font-semibold text-green-700">deudas</span> de Athletic Barf.
           Selecciona el módulo al que deseas acceder para comenzar.
         </p>
