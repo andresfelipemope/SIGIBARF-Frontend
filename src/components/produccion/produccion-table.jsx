@@ -3,6 +3,24 @@
 import { useState } from "react";
 import { Search, Loader2, Factory, Calendar } from "lucide-react";
 
+const formatLocalDate = (dateString) => {
+  if (!dateString) return "N/A";
+  
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString;
+    
+    return new Intl.DateTimeFormat("es-ES", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      timeZone: "UTC", // 👈 Fuerza a usar UTC para evitar conversiones
+    }).format(date);
+  } catch (e) {
+    return dateString;
+  }
+};
+
 export default function ProduccionTable({ producciones, productos, loading }) {
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -59,53 +77,15 @@ export default function ProduccionTable({ producciones, productos, loading }) {
             ) : filteredItems.length > 0 ? (
               filteredItems.map((item) => {
                 const producto = productosMap[item.id_producto];
-                // Formatear la fecha de creación
-                let formattedDate = "N/A";
-                if (item.fecha_creacion) {
-                  try {
-                    const date = new Date(item.fecha_creacion);
-                    if (!isNaN(date.getTime())) {
-                      formattedDate = new Intl.DateTimeFormat("es-ES", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                      }).format(date);
-                    } else {
-                      formattedDate = item.fecha_creacion;
-                    }
-                  } catch (e) {
-                    formattedDate = item.fecha_creacion;
-                  }
-                }
-
-                // Formatear la fecha de vencimiento
-                let formattedVencimiento = "N/A";
-                if (item.fecha_vencimiento) {
-                  try {
-                    const date = new Date(item.fecha_vencimiento);
-                    if (!isNaN(date.getTime())) {
-                      formattedVencimiento = new Intl.DateTimeFormat("es-ES", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                      }).format(date);
-                    } else {
-                      formattedVencimiento = item.fecha_vencimiento;
-                    }
-                  } catch (e) {
-                    formattedVencimiento = item.fecha_vencimiento;
-                  }
-                }
+                
+                // 👇 Simplificado usando la función helper
+                const formattedDate = formatLocalDate(item.fecha_creacion);
+                const formattedVencimiento = formatLocalDate(item.fecha_vencimiento);
 
                 return (
-                  <tr
-                    key={item.id}
-                    className="transition-colors hover:bg-green-50/10"
-                  >
+                  <tr key={item.id} className="transition-colors hover:bg-green-50/10">
                     <td className="py-4 px-3 text-sm font-semibold text-black">
-                      {producto
-                        ? producto.nombre
-                        : `Desconocido (ID: ${item.id_producto})`}
+                      {producto ? producto.nombre : `Desconocido (ID: ${item.id_producto})`}
                     </td>
                     <td className="py-4 px-3 text-right text-sm font-extrabold text-green-700">
                       +{item.cantidad_producida}

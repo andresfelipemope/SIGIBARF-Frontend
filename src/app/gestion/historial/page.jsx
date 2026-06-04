@@ -12,6 +12,15 @@ import HistorialStats from "@/components/historial/HistorialStats";
 import HistorialFilters from "@/components/historial/HistorialFilters";
 import HistorialTable from "@/components/historial/HistorialTable";
 
+// Función helper para normalizar fechas a zona horaria local
+const normalizeDate = (dateString) => {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 const DEFAULT_FILTERS = {
   nombre: "",
   tipo: "Todos",
@@ -159,7 +168,7 @@ export default function HistorialPage() {
 
     // 4. Filter by Date Range (Fecha Inicio & Fecha Fin)
     if (item.fecha) {
-      const itemDateStr = item.fecha.split("T")[0]; // "YYYY-MM-DD"
+      const itemDateStr = normalizeDate(item.fecha); // ✅ CORRECTO
 
       if (filters.fechaInicio && itemDateStr < filters.fechaInicio) {
         return false;
