@@ -2,9 +2,19 @@
 
 import { useState, useEffect, useCallback } from "react";
 import {
-  Package, Search, Filter, Plus, Loader2,
-  X, CheckCircle, AlertTriangle, RefreshCw,
-  Pencil, Trash2, Scale
+  Package,
+  Search,
+  Filter,
+  Plus,
+  Loader2,
+  X,
+  CheckCircle,
+  AlertTriangle,
+  RefreshCw,
+  Pencil,
+  Trash2,
+  Scale,
+  TriangleAlert
 } from "lucide-react";
 import { inventarioService } from "@/services/inventario";
 
@@ -214,6 +224,8 @@ export default function IngredientesPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editData, setEditData]   = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchIngredientes = useCallback(async () => {
     setLoading(true);
@@ -244,14 +256,22 @@ export default function IngredientesPage() {
 
   const handleEdit = (ing) => { setEditData(ing); setModalOpen(true); };
 
-  const handleDelete = async (id, nombre) => {
-    if (!confirm(`¿Eliminar "${nombre}"? Esta acción no se puede deshacer.`)) return;
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+
     try {
-      await inventarioService.deleteIngrediente(id);
+      setDeleting(true);
+
+      await inventarioService.deleteIngrediente(deleteTarget.id);
+
       fetchIngredientes();
-      showSuccess("Ingrediente eliminado");
+      showSuccess("Ingrediente eliminado correctamente");
+
+      setDeleteTarget(null);
     } catch (err) {
       setError(err.message || "Error al eliminar");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -283,7 +303,7 @@ export default function IngredientesPage() {
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-extrabold text-black tracking-tight">
-            Catálogo de Ingredientes
+            Gestión de Ingredientes
           </h1>
           <p className="text-sm text-gray-500 mt-1 font-medium">
             Insumos registrados con stock y proveedor para formulaciones y producción.
@@ -412,7 +432,13 @@ export default function IngredientesPage() {
                             className="inline-flex size-8 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-400 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-100 transition-colors">
                             <Pencil className="size-3.5" />
                           </button>
-                          <button onClick={() => handleDelete(ing.id, ing.nombre)} title="Eliminar"
+                          <button
+                            onClick={() =>
+                              setDeleteTarget({
+                                id: ing.id,
+                                nombre: ing.nombre,
+                              })
+                            } title="Eliminar"
                             className="inline-flex size-8 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-400 hover:bg-red-50 hover:text-red-600 hover:border-red-100 transition-colors">
                             <Trash2 className="size-3.5" />
                           </button>
@@ -442,6 +468,53 @@ export default function IngredientesPage() {
         onSaved={handleSaved}
         editData={editData}
       />
+
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="w-full max-w-sm rounded-3xl bg-white p-8 shadow-2xl">
+
+            <div className="flex justify-center mb-5">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-red-100">
+                <TriangleAlert className="h-7 w-7 text-red-600" />
+              </div>
+            </div>
+
+            <h3 className="text-center text-2xl font-bold text-gray-900">
+              Eliminar Ingrediente
+            </h3>
+
+            <p className="mt-3 text-center text-sm text-gray-500 leading-relaxed">
+              ¿Está seguro de que desea eliminar{" "}
+              <span className="font-semibold text-gray-700">
+                {deleteTarget.nombre}
+              </span>
+              ? Esta acción no se puede deshacer.
+            </p>
+
+            <div className="mt-8 flex items-center justify-center gap-4">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                disabled={deleting}
+                className="rounded-xl px-5 py-2.5 font-semibold text-gray-600 hover:bg-gray-100 transition"
+              >
+                Cancelar
+              </button>
+
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="rounded-xl bg-red-600 px-6 py-2.5 font-bold text-white shadow-lg hover:bg-red-700 disabled:opacity-50"
+              >
+                {deleting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  "Eliminar"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

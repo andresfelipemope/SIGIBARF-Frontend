@@ -5,20 +5,18 @@ import {
   Boxes,
   Beef,
   Import,
-  FlaskConical,
+  ChefHat,
   Factory,
   ShoppingBag,
   ClipboardCheck,
-  History,
   AlertCircle,
-  Coins,
   CreditCard,
   ArrowRight,
 } from "lucide-react";
 
 const MODULES = [
   {
-    title: "Inventario",
+    title: "Gestión de Productos",
     description:
       "Consulta y administra los productos disponibles del sistema, incluyendo stock actual y unidades de medida.",
     icon: Boxes,
@@ -26,7 +24,7 @@ const MODULES = [
     accent: "green",
   },
   {
-    title: "Ingredientes",
+    title: "Gestión de Ingredientes",
     description:
       "Gestiona los ingredientes registrados, sus proveedores y niveles mínimos de stock requeridos.",
     icon: Beef,
@@ -34,19 +32,19 @@ const MODULES = [
     accent: "orange",
   },
   {
+    title: "Recetarios",
+    description:
+      "Define y administra las recetas de producción, especificando proporciones de ingredientes por producto.",
+    icon: ChefHat,
+    href: "/gestion/formulaciones",
+    accent: "green",
+  },
+  {
     title: "Entradas de Ingredientes",
     description:
       "Registra ingresos de materia prima al inventario con su respectivo proveedor y cantidad.",
     icon: Import,
     href: "/gestion/entradas",
-    accent: "green",
-  },
-  {
-    title: "Formulaciones",
-    description:
-      "Define y administra las recetas de producción, especificando proporciones de ingredientes por producto.",
-    icon: FlaskConical,
-    href: "/gestion/formulaciones",
     accent: "orange",
   },
   {
@@ -58,38 +56,6 @@ const MODULES = [
     accent: "green",
   },
   {
-    title: "Auditoría de Inventario",
-    description:
-      "Historial de auditoría, entradas, salidas y ajustes manuales del stock de productos.",
-    icon: ClipboardCheck,
-    href: "/gestion/auditoria-inventario",
-    accent: "green",
-  },
-  {
-    title: "Gestión de Pedidos",
-    description:
-      "Lista pedidos del sistema, registra pedidos manuales y confirma o cancela pagos.",
-    icon: ShoppingBag,
-    href: "/gestion/pedidos",
-    accent: "orange",
-  },
-  {
-    title: "Gestión de Créditos",
-    description:
-      "Administra créditos de clientes, cuotas, pagos y notificaciones asociadas a pedidos.",
-    icon: CreditCard,
-    href: "/gestion/creditos",
-    accent: "green",
-  },
-  {
-    title: "Historial de Inventario",
-    description:
-      "Consulta el historial completo de movimientos de ingredientes y productos con filtros avanzados.",
-    icon: History,
-    href: "/gestion/historial",
-    accent: "green",
-  },
-  {
     title: "Alertas",
     description:
       "Visualiza eventos importantes, stock crítico y situaciones operativas que requieren atención inmediata.",
@@ -98,11 +64,27 @@ const MODULES = [
     accent: "orange",
   },
   {
-    title: "Gestión de Deudas",
+    title: "Gestión de Pedidos",
     description:
-      "Administra obligaciones financieras pendientes y realiza seguimiento a compromisos de pago.",
-    icon: Coins,
-    href: "/gestion/deudas",
+      "Lista pedidos del sistema, registra pedidos manuales y confirma o cancela pagos.",
+    icon: ShoppingBag,
+    href: "/gestion/pedidos",
+    accent: "green",
+  },
+  {
+    title: "Gestión de Créditos",
+    description:
+      "Administra créditos de clientes, cuotas, pagos y notificaciones asociadas a pedidos.",
+    icon: CreditCard,
+    href: "/gestion/creditos",
+    accent: "orange",
+  },
+  {
+    title: "Historial y Auditorías",
+    description:
+      "Consulta el historial completo de movimientos de ingredientes y productos con filtros avanzados y realiza ajustes manuales del stock de productos.",
+    icon: ClipboardCheck,
+    href: "/gestion/historial",
     accent: "green",
   },
 ];

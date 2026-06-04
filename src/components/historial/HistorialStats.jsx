@@ -4,7 +4,8 @@ import {
   Beef, 
   ShoppingBag, 
   ArrowDownLeft, 
-  ArrowUpRight 
+  ArrowUpRight,
+  ClipboardCheck
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -14,6 +15,9 @@ export default function HistorialStats({ data = [], loading = false }) {
   const totalProductos = data.filter(item => item.registroTipo === "Producto").length;
   const totalEntradas = data.filter(item => item.tipo_movimiento === "ENTRADA").length;
   const totalSalidas = data.filter(item => item.tipo_movimiento === "SALIDA").length;
+  const totalAjustes = data.filter(
+    item => item.tipo_movimiento === "AJUSTE"
+  ).length;
 
   const stats = [
     {
@@ -40,10 +44,16 @@ export default function HistorialStats({ data = [], loading = false }) {
       icon: ArrowUpRight,
       color: "text-orange-600 bg-orange-50 border-orange-100",
     },
+    {
+      label: "Total Ajustes Manuales",
+      value: totalAjustes,
+      icon: ClipboardCheck,
+      color: "text-gray-700 bg-gray-50 border-gray-100",
+    },
   ];
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
       {stats.map((stat, idx) => (
         <div 
           key={idx} 

@@ -3,13 +3,11 @@ import {
   Boxes, 
   Beef, 
   Import, 
-  FlaskConical, 
+  ChefHat, 
   Factory, 
   AlertCircle, 
   ShoppingBag,
   ClipboardCheck,
-  Coins,
-  History,
   CreditCard,
 } from "lucide-react";
 
@@ -20,24 +18,24 @@ export const sidebarMenuItems = [
     icon: LayoutDashboard,
   },
   {
-    title: "Inventario",
+    title: "Gestión de Productos",
     url: "/gestion/inventario",
     icon: Boxes,
   },
   {
-    title: "Ingredientes",
+    title: "Gestión de Ingredientes",
     url: "/gestion/ingredientes",
     icon: Beef,
+  },
+  {
+    title: "Recetarios",
+    url: "/gestion/formulaciones",
+    icon: ChefHat,
   },
   {
     title: "Entradas de Ingredientes",
     url: "/gestion/entradas",
     icon: Import,
-  },
-  {
-    title: "Formulaciones",
-    url: "/gestion/formulaciones",
-    icon: FlaskConical,
   },
   {
     title: "Producción",
@@ -50,11 +48,6 @@ export const sidebarMenuItems = [
     icon: AlertCircle,
   },
   {
-    title: "Auditoría de Inventario",
-    url: "/gestion/auditoria-inventario",
-    icon: ClipboardCheck,
-  },
-  {
     title: "Gestión de Pedidos",
     url: "/gestion/pedidos",
     icon: ShoppingBag,
@@ -65,8 +58,8 @@ export const sidebarMenuItems = [
     icon: CreditCard,
   },
   {
-    title: "Historial de Inventario",
+    title: "Historial y Auditorías",
     url: "/gestion/historial",
-    icon: History,
+    icon: ClipboardCheck,
   },
 ];

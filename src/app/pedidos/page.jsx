@@ -26,6 +26,7 @@ export default function PedidosPage() {
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [cancelandoPedido, setCancelandoPedido] = useState(false);
 
   // Cargar pedidos
   async function fetchPedidos() {
@@ -40,6 +41,55 @@ export default function PedidosPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  async function handleCancelarPedidoMasReciente() {
+    toast.custom((t) => (
+      <div className="bg-white border rounded-xl p-4 shadow-lg max-w-sm">
+        <p className="font-semibold">
+          ¿Deseas cancelar tu pedido pendiente más reciente?
+        </p>
+
+        <div className="flex justify-end gap-2 mt-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => toast.dismiss(t)}
+          >
+            No
+          </Button>
+
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={async () => {
+              toast.dismiss(t);
+
+              try {
+                setCancelandoPedido(true);
+
+                await pedidosService.cancelarPedidoPendiente();
+
+                toast.success("Pedido cancelado correctamente");
+
+                await fetchPedidos();
+              } catch (err) {
+                toast.error(
+                  err.data?.error ||
+                  err.data?.detail ||
+                  err.message ||
+                  "No se pudo cancelar el pedido"
+                );
+              } finally {
+                setCancelandoPedido(false);
+              }
+            }}
+          >
+            Sí, cancelar
+          </Button>
+        </div>
+      </div>
+    ));
   }
 
   useEffect(() => {
@@ -103,15 +153,44 @@ export default function PedidosPage() {
   }
 
   const hasPedidos = pedidos.length > 0;
+  const tienePedidoPendiente = pedidos.some((pedido) => {
+    const estado = (pedido.estado_pago || pedido.estado || "").toLowerCase();
+
+    return (
+      estado === "pending" ||
+      estado === "pendiente" ||
+      estado === "espera"
+    );
+  });
 
   return (
     <>
       <Toaster position="top-right" richColors closeButton expand={false} />
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12 w-full flex-1 flex flex-col justify-start">
-        <h1 className="text-3xl font-bold text-zinc-800 mb-8 border-b border-zinc-100 pb-4">
-          Mis Pedidos
-        </h1>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 border-b border-zinc-100 pb-4">
+          <h1 className="text-3xl font-bold text-zinc-800">
+            Mis Pedidos
+          </h1>
+
+          {tienePedidoPendiente && (
+            <Button
+              variant="destructive"
+              onClick={handleCancelarPedidoMasReciente}
+              disabled={cancelandoPedido}
+              className="cursor-pointer"
+            >
+              {cancelandoPedido ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Cancelando...
+                </>
+              ) : (
+                "Cancelar Pedido Más Reciente"
+              )}
+            </Button>
+          )}
+        </div>
 
         {!hasPedidos ? (
           // Empty State

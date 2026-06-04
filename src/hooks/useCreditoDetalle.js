@@ -66,8 +66,26 @@ export function useCreditoDetalle(creditoId) {
       toast.success('Pago registrado correctamente');
       return { success: true, data };
     } catch (err) {
-      toast.error(err.message || 'Error al registrar el pago');
-      return { success: false, error: err.message };
+      console.error(err);
+
+      const responseData =
+        err?.response?.data ||
+        err?.data ||
+        {};
+
+      const message =
+        responseData.error ||
+        responseData.detail ||
+        responseData.message ||
+        err.message ||
+        "Error al registrar el pago";
+
+      toast.error(message);
+
+      return {
+        success: false,
+        error: message,
+      };
     } finally {
       setActionLoading(false);
     }

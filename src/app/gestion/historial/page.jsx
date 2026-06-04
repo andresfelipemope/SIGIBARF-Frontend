@@ -3,7 +3,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { RefreshCw, History } from "lucide-react";
 import { toast } from "sonner";
-
+import { MovimientoForm } from "@/components/auditoria-inventario/movimiento-form";
+import { useMovimientosProducto } from "@/hooks/useMovimientosProducto";
+import { useProductos } from "@/hooks/useProductos";
+import { Plus } from "lucide-react";
 import { historialService } from "@/services/historialService";
 import HistorialStats from "@/components/historial/HistorialStats";
 import HistorialFilters from "@/components/historial/HistorialFilters";
@@ -19,6 +22,14 @@ const DEFAULT_FILTERS = {
 
 export default function HistorialPage() {
   const [loading, setLoading] = useState(true);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const {
+    createMovimiento,
+    creating,
+  } = useMovimientosProducto();
+  const {
+    productos,
+  } = useProductos();
   const [error, setError] = useState(null);
   
   // Base raw data fetched from API
@@ -165,6 +176,17 @@ export default function HistorialPage() {
     toast.success("Filtros restablecidos");
   };
 
+  const handleCreateMovement = async (payload) => {
+    const result = await createMovimiento(payload);
+
+    if (result.success) {
+      await fetchHistorialData(true);
+      toast.success("Movimiento registrado correctamente");
+    }
+
+    return result;
+  };
+
   return (
     <div className="space-y-8 animate-fade-in text-black">
       
@@ -179,13 +201,21 @@ export default function HistorialPage() {
             Registro unificado de todos los movimientos de stock para ingredientes y productos.
           </p>
         </div>
-        <div>
-          <button 
+        <div className="flex gap-2">
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-orange-500/20 hover:bg-orange-600 transition-all duration-200"
+          >
+            <Plus className="size-4 shrink-0" />
+            Registrar Auditoría
+          </button>
+
+          <button
             onClick={() => fetchHistorialData(false)}
             disabled={loading}
-            className="flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-xs font-semibold text-gray-600 hover:bg-gray-50 hover:text-green-700 transition active:scale-[0.98] disabled:opacity-50"
+            className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-xs font-semibold text-gray-600 hover:bg-gray-50 hover:text-green-700 transition active:scale-[0.98] disabled:opacity-50"
           >
-            <RefreshCw className={`size-3.5 ${loading ? "animate-spin" : ""}`} /> 
+            <RefreshCw className={`size-3.5 ${loading ? "animate-spin" : ""}`} />
             Actualizar
           </button>
         </div>
@@ -208,6 +238,14 @@ export default function HistorialPage() {
       <HistorialTable 
         data={filteredMovimientos} 
         loading={loading} 
+      />
+
+      <MovimientoForm
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSubmit={handleCreateMovement}
+        productos={productos}
+        creating={creating}
       />
 
     </div>

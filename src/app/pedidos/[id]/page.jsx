@@ -189,6 +189,7 @@ export default function PedidoDetallePage() {
   const total = parseFloat(pedido.precio_total || pedido.total || "0");
   const productos = pedido.productos || pedido.items || [];
   const isPendiente = (status || "").toLowerCase() === "pendiente" || (status || "").toLowerCase() === "pending";
+  const isDeclined = (status || "").toLowerCase() === "rechazado";
 
   return (
     <>
@@ -259,7 +260,7 @@ export default function PedidoDetallePage() {
             </CardContent>
 
             {/* Footer con Reintento de Pago */}
-            {isPendiente && (
+            {(isPendiente || isDeclined) && (
               <CardFooter className="p-6 border-t border-zinc-100 bg-zinc-50/50 flex flex-col sm:flex-row items-center gap-4 justify-between">
                 <div className="flex items-center gap-2.5 text-orange-600 text-xs font-semibold">
                   <Clock className="w-5 h-5 shrink-0 animate-pulse" />

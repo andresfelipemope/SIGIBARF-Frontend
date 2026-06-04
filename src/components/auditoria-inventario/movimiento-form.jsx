@@ -12,7 +12,7 @@ export function MovimientoForm({
 }) {
   const [formData, setFormData] = useState({
     id_producto: "",
-    tipo_movimiento: "SALIDA",
+    tipo_movimiento: "AJUSTE",
     cantidad: "",
     comentarios: "",
   });
@@ -44,9 +44,6 @@ export function MovimientoForm({
     if (!formData.id_producto) {
       errors.id_producto = "Debes seleccionar un producto";
     }
-    if (!formData.tipo_movimiento) {
-      errors.tipo_movimiento = "Debes seleccionar un tipo de movimiento";
-    }
     if (!formData.cantidad || parseFloat(formData.cantidad) <= 0 || isNaN(Number(formData.cantidad))) {
       errors.cantidad = "La cantidad debe ser un número mayor a 0";
     }
@@ -59,7 +56,7 @@ export function MovimientoForm({
     // Enviar al hook padre
     const result = await onSubmit({
       id_producto: formData.id_producto,
-      tipo_movimiento: formData.tipo_movimiento,
+      tipo_movimiento: "AJUSTE",
       cantidad: formData.cantidad,
       comentarios: formData.comentarios,
     });
@@ -68,7 +65,7 @@ export function MovimientoForm({
       // Limpiar formulario y cerrar
       setFormData({
         id_producto: "",
-        tipo_movimiento: "SALIDA",
+        tipo_movimiento: "AJUSTE",
         cantidad: "",
         comentarios: "",
       });
@@ -144,46 +141,7 @@ export function MovimientoForm({
             </div>
 
             {/* Fila: Tipo de Operación & Cantidad */}
-            <div className="grid grid-cols-2 gap-4">
-              
-              {/* Tipo de Operación */}
-              <div>
-                <label className="block text-xs font-extrabold uppercase tracking-wider text-gray-700 mb-1.5">
-                  Tipo de Operación <span className="text-red-500">*</span>
-                </label>
-                <select
-                  name="tipo_movimiento"
-                  value={formData.tipo_movimiento}
-                  onChange={handleInputChange}
-                  className={cn(
-                    "w-full rounded-xl border bg-gray-50/50 px-4 py-2.5 text-sm text-black focus:bg-white focus:outline-hidden transition-all duration-200 cursor-pointer",
-                    fieldErrors.tipo_movimiento ? "border-red-500 focus:border-red-500" : "border-gray-200 focus:border-green-600"
-                  )}
-                  disabled={creating}
-                >
-                  <option value="SALIDA">Venta Externa</option>
-                  <option value="AJUSTE">Auditoría</option>
-                </select>
-                {fieldErrors.tipo_movimiento && (
-                  <p className="text-red-500 text-xs mt-1.5 font-bold">
-                    {Array.isArray(fieldErrors.tipo_movimiento) ? fieldErrors.tipo_movimiento[0] : fieldErrors.tipo_movimiento}
-                  </p>
-                )}
-                
-                {/* Ayuda Contextual */}
-                {formData.tipo_movimiento === "SALIDA" && (
-                  <div className="mt-2 rounded-lg border border-blue-100 bg-blue-50/50 p-2.5 text-[11px] font-semibold text-blue-700 flex items-start gap-2">
-                    <Info className="size-3.5 text-blue-600 shrink-0 mt-0.5" />
-                    <span>Esta operación descontará existencias del inventario.</span>
-                  </div>
-                )}
-                {formData.tipo_movimiento === "AJUSTE" && (
-                  <div className="mt-2 rounded-lg border border-blue-100 bg-blue-50/50 p-2.5 text-[11px] font-semibold text-blue-700 flex items-start gap-2">
-                    <Info className="size-3.5 text-blue-600 shrink-0 mt-0.5" />
-                    <span>Esta operación ajustará el stock al valor exacto indicado tras una validación física del inventario.</span>
-                  </div>
-                )}
-              </div>
+            <div>
 
               {/* Cantidad */}
               <div>
@@ -211,6 +169,14 @@ export function MovimientoForm({
                   </p>
                 )}
               </div>
+
+              <div className="mt-3 rounded-lg border border-blue-100 bg-blue-50/50 p-3 text-xs font-medium text-blue-700 flex items-start gap-2">
+                <Info className="size-4 text-blue-600 shrink-0 mt-0.5" />
+                <span>
+                  La auditoría ajustará el inventario al stock físico real contado durante la validación.
+                </span>
+              </div>
+
             </div>
 
             {/* Comentarios */}
@@ -223,7 +189,7 @@ export function MovimientoForm({
                 value={formData.comentarios}
                 onChange={handleInputChange}
                 rows="3"
-                placeholder="Indique el motivo de la operación (ej. venta a cliente externo, auditoría física mensual, merma...)"
+                placeholder="Indique el motivo del ajuste (ej. auditoría física mensual, diferencia encontrada en conteo, corrección de inventario...)"                
                 className={cn(
                   "w-full rounded-xl border bg-gray-50/50 px-4 py-2.5 text-sm text-black focus:bg-white focus:outline-hidden transition-all duration-200 resize-none font-medium placeholder-gray-400",
                   fieldErrors.comentarios ? "border-red-500 focus:border-red-500" : "border-gray-200 focus:border-green-600"

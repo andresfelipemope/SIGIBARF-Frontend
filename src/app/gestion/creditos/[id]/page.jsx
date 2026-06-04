@@ -34,13 +34,19 @@ export default function CreditoDetallePage() {
     registrarPago,
   } = useCreditoDetalle(id);
 
-  const { cuotas, loading: loadingCuotas, toggleNotificaciones } = useCuotas(id);
+  const {
+    cuotas,
+    loading: loadingCuotas,
+    toggleNotificaciones,
+    refetch: refetchCuotas,
+  } = useCuotas(id);
 
   const [observaciones, setObservaciones] = useState("");
   const [montoPago, setMontoPago] = useState("");
   const [showPagoForm, setShowPagoForm] = useState(false);
   const [togglingId, setTogglingId] = useState(null);
   const [ultimoPago, setUltimoPago] = useState(null);
+  const [pagoError, setPagoError] = useState(null);
 
   useEffect(() => {
     if (credito) {
@@ -73,13 +79,32 @@ export default function CreditoDetallePage() {
 
   const handlePago = async (e) => {
     e.preventDefault();
+
+    setPagoError(null);
+
     const monto = parseFloat(montoPago);
-    if (!monto || monto <= 0) return;
+
+    if (!monto || monto <= 0) {
+      setPagoError("Debes ingresar un monto válido.");
+      return;
+    }
+
     const result = await registrarPago(monto);
+
     if (result.success) {
       setUltimoPago(result.data);
+
+      await refetchCuotas();
+
       setMontoPago("");
       setShowPagoForm(false);
+      setPagoError(null);
+    } else {
+      setPagoError(
+        result.error ||
+        result.message ||
+        "No fue posible registrar el pago."
+      );
     }
   };
 
@@ -146,7 +171,10 @@ export default function CreditoDetallePage() {
               </Link>
             )}
             <button
-              onClick={() => setShowPagoForm(true)}
+              onClick={() => {
+                setPagoError(null);
+                setShowPagoForm(true);
+              }}
               className="inline-flex items-center gap-2 rounded-xl bg-orange-500 px-4 py-2 text-xs font-bold text-white hover:bg-orange-600 cursor-pointer"
             >
               <DollarSign className="size-4" />
@@ -239,6 +267,14 @@ export default function CreditoDetallePage() {
               className="bg-white rounded-2xl p-6 w-full max-w-sm border border-gray-100 shadow-xl space-y-4"
             >
               <h3 className="font-extrabold text-black">Registrar pago</h3>
+              {pagoError && (
+                <div className="rounded-xl border border-red-200 bg-red-50 p-3 flex items-start gap-2">
+                  <AlertTriangle className="size-4 text-red-600 shrink-0 mt-0.5" />
+                  <p className="text-xs font-semibold text-red-700">
+                    {pagoError}
+                  </p>
+                </div>
+              )}
               <input
                 type="number"
                 step="0.01"
@@ -252,7 +288,10 @@ export default function CreditoDetallePage() {
               <div className="flex justify-end gap-2">
                 <button
                   type="button"
-                  onClick={() => setShowPagoForm(false)}
+                onClick={() => {
+                  setPagoError(null);
+                  setShowPagoForm(false);
+                }}
                   className="text-xs font-bold text-gray-600 cursor-pointer"
                 >
                   Cancelar

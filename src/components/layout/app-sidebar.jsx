@@ -39,10 +39,10 @@ export function AppSidebar({ ...props }) {
           />
           <div className="flex flex-col group-data-[collapsible=icon]:hidden">
             <span className="text-lg font-extrabold tracking-tight text-black leading-none uppercase">
-              Athletic Barf
+              SIGIBARF
             </span>
             <span className="text-[10px] font-bold uppercase tracking-wider text-green-600 mt-1">
-              Gestión Integral
+              Gestión de Inventario
             </span>
           </div>
         </div>

@@ -1,13 +1,60 @@
 "use client";
 
-import { Search, Coins, RotateCcw } from "lucide-react";
-import { Toaster } from "sonner";
+import { useState } from "react";
+import { Coins, RotateCcw } from "lucide-react";
+import { Toaster, toast } from "sonner";
 import { useCreditos } from "@/hooks/useCreditos";
 import { CreditosTable } from "@/components/creditos/creditos-table";
+import CreditosFilters, { DEFAULT_FILTERS } from "@/components/creditos/CreditosFilters";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function CreditosPage() {
-  const { creditos, count, loading, error, search, setSearch, refetch } = useCreditos();
+  const { creditos, count, loading, error, refetch } = useCreditos();
+  
+  // Filtros adicionales locales
+  const [filters, setFilters] = useState(DEFAULT_FILTERS);
+
+  const handleResetFilters = () => {
+    setFilters(DEFAULT_FILTERS);
+    toast.success("Filtros restablecidos");
+  };
+
+  // Aplicar filtros en el frontend
+  const filteredCreditos = creditos.filter((credito) => {
+    // 1. Búsqueda por usuario (cliente) o pedido_id
+    if (filters.busqueda) {
+      const search = filters.busqueda.toLowerCase();
+      const usuarioMatch = credito.usuario?.toLowerCase().includes(search);
+      const pedidoMatch = credito.pedido_id?.toString().includes(search);
+      
+      if (!usuarioMatch && !pedidoMatch) {
+        return false;
+      }
+    }
+
+    // 2. Filtro por estado (activo, pagado, vencido)
+    if (filters.estado !== "Todos" && credito.estado !== filters.estado) {
+      return false;
+    }
+
+    // 3. Filtro por fecha inicio
+    if (filters.fechaInicio && credito.fecha_inicio) {
+      const creditoDate = new Date(credito.fecha_inicio).toISOString().split("T")[0];
+      if (creditoDate < filters.fechaInicio) {
+        return false;
+      }
+    }
+
+    // 4. Filtro por fecha fin
+    if (filters.fechaFin && credito.fecha_inicio) {
+      const creditoDate = new Date(credito.fecha_inicio).toISOString().split("T")[0];
+      if (creditoDate > filters.fechaFin) {
+        return false;
+      }
+    }
+
+    return true;
+  });
 
   return (
     <>
@@ -35,21 +82,15 @@ export default function CreditosPage() {
 
         <div className="rounded-2xl border border-gray-200 bg-white px-6 py-4 shadow-xs">
           <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Total</span>
-          <p className="text-2xl font-extrabold text-green-700 mt-1">{count}</p>
+          <p className="text-2xl font-extrabold text-green-700 mt-1">{filteredCreditos.length}</p>
         </div>
 
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-xs">
-          <div className="relative max-w-lg">
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Buscar por cliente o número de pedido..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-xl border border-gray-200 bg-gray-50/50 py-2.5 pl-10 pr-4 text-sm focus:border-green-600 focus:outline-hidden"
-            />
-          </div>
-        </div>
+        {/* Filtros */}
+        <CreditosFilters 
+          filters={filters} 
+          setFilters={setFilters} 
+          onReset={handleResetFilters} 
+        />
 
         {loading ? (
           <div className="space-y-3">
@@ -58,7 +99,7 @@ export default function CreditosPage() {
             ))}
           </div>
         ) : (
-          <CreditosTable creditos={creditos} error={error} onRetry={refetch} />
+          <CreditosTable creditos={filteredCreditos} error={error} onRetry={refetch} />
         )}
       </div>
     </>

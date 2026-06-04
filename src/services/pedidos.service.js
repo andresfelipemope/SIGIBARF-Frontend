@@ -46,4 +46,16 @@ export const pedidosService = {
       headers: authHeaders(),
     });
   },
+
+  /**
+   * Cancela el pedido pendiente más reciente del usuario.
+   * DELETE /api/ventas/pedidos/pending/
+   */
+  async cancelarPedidoPendiente() {
+    return apiRequest('/api/ventas/pedidos/pending/', {
+      method: 'DELETE',
+      headers: authHeaders(),
+    });
+  },
+
 };

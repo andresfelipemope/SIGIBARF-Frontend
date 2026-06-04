@@ -44,7 +44,6 @@ export default function CartPage() {
   // Interactive UI states
   const [updatingItems, setUpdatingItems] = useState(new Set());
   const [isCheckingOut, setIsCheckingOut] = useState(false);
-  const [checkoutData, setCheckoutData] = useState(null);
   
   // Delete item dialog state
   const [itemToDelete, setItemToDelete] = useState(null);
@@ -165,8 +164,6 @@ export default function CartPage() {
 
       const { public_key, currency, amount_in_cents, reference, integrity } = wompiData;
       if (!public_key || !amount_in_cents || !reference) throw new Error("Datos de transacción incompletos recibidos de la pasarela.");
-
-      setCheckoutData(response);
 
       let transaction = null;
       try {
@@ -411,7 +408,6 @@ export default function CartPage() {
                   <div className="flex justify-between items-end">
                     <div>
                       <p className="text-base font-bold text-zinc-850 font-heading">Total</p>
-                      <p className="text-[10px] text-zinc-400 font-medium">IVA incluido</p>
                     </div>
                     <span className="text-2xl font-extrabold text-emerald-600">
                       {formatPrice(parseFloat(cart?.subtotal_carrito || "0"))}
@@ -438,23 +434,6 @@ export default function CartPage() {
                   </Button>
                 </CardFooter>
               </Card>
-
-              {checkoutData && (
-                <Card className="border-emerald-100 bg-emerald-50/20 overflow-hidden shadow-xs animate-in fade-in slide-in-from-top-4 duration-200">
-                  <CardContent className="p-4 space-y-3">
-                    <div className="flex items-center gap-2 text-emerald-700 font-semibold text-sm">
-                      <CheckCircle2 className="w-5 h-5 shrink-0" />
-                      <span>Checkout generado</span>
-                    </div>
-                    <p className="text-xs text-emerald-850/80 leading-relaxed">
-                      El checkout se ha generado exitosamente en el servidor. El Widget flotante de Wompi ha sido inicializado.
-                    </p>
-                    <div className="bg-white/80 p-2.5 rounded-lg border border-emerald-100 text-[10px] font-mono text-zinc-700 break-all select-all">
-                      {JSON.stringify(checkoutData)}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
             </div>
 
           </div>

@@ -15,13 +15,28 @@ export function formatPrice(price, locale = "es-CO") {
 }
 
 /**
- * Formatea una fecha ISO a formato legible en español.
- * @param {string} dateString - Fecha en formato ISO (ej: "2025-05-01")
- * @returns {string} Fecha legible, ej: "1 de mayo de 2025"
+ * Formatea una fecha ISO o datetime ISO a formato legible en español.
+ * Soporta:
+ * - 2025-05-01
+ * - 2026-06-04T02:38:14.538835Z
  */
 export function formatDate(dateString) {
   if (!dateString) return "—";
-  const date = new Date(dateString + "T00:00:00");
+
+  let date;
+
+  // Fecha simple YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+    date = new Date(`${dateString}T00:00:00`);
+  } else {
+    // Datetime ISO completo
+    date = new Date(dateString);
+  }
+
+  if (isNaN(date.getTime())) {
+    return "—";
+  }
+
   return date.toLocaleDateString("es-CO", {
     day: "numeric",
     month: "long",
