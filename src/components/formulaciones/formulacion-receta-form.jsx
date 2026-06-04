@@ -16,6 +16,7 @@ export default function FormulacionRecetaForm({
   mode = "create",
   existingFormulaciones = null,
   productos,
+  productosSinReceta = [],
   ingredientes,
   onClose,
   onSave,
@@ -136,84 +137,33 @@ export default function FormulacionRecetaForm({
       return setError("Selecciona producto y al menos un ingrediente");
     }
 
+    if (Math.abs(totalPorcentaje - 100) > 0.001) {
+      return setError("El porcentaje acumulado debe ser exactamente 100%");
+    }
+
     setLoading(true);
     setError(null);
 
     try {
-      if (mode === "edit" && editData) {
-        const currentIds = ingredientesAgregados.map((i) => i.id_ingrediente);
-        const originalIds = originalIngredients.map((o) => o.id_ingrediente);
+      const payload = ingredientesAgregados.map((ing) => ({
+        id_producto: Number(productoSeleccionado),
+        id_ingrediente: Number(ing.id_ingrediente),
+        cantidad_ingrediente: String(ing.cantidad_ingrediente),
+        porcentaje_ingrediente: String(ing.porcentaje_ingrediente),
+      }));
 
-        const eliminados = originalIngredients.filter(
-          (orig) => !currentIds.includes(orig.id_ingrediente),
+      // Call onSave with null (single POST for both create and update)
+      const res = await onSave(null, payload);
+
+      if (res.success) {
+        onSuccess(
+          mode === "edit"
+            ? "Formulación actualizada correctamente"
+            : "Formulación creada correctamente",
         );
-        const nuevos = ingredientesAgregados.filter(
-          (i) => !originalIds.includes(i.id_ingrediente),
-        );
-        const modificados = ingredientesAgregados.filter((i) => {
-          const existing = editData.find(
-            (f) => f.id_ingrediente === i.id_ingrediente,
-          );
-          return (
-            existing &&
-            (existing.cantidad_ingrediente !== i.cantidad_ingrediente ||
-              existing.porcentaje_ingrediente !== i.porcentaje_ingrediente)
-          );
-        });
-
-        if (eliminados.length > 0) {
-          await Promise.all(eliminados.map((el) => onDelete(el.id)));
-        }
-
-        const createPromises = nuevos.map((ing) =>
-          onSave(null, {
-            id_producto: productoSeleccionado,
-            id_ingrediente: ing.id_ingrediente,
-            cantidad_ingrediente: ing.cantidad_ingrediente,
-            porcentaje_ingrediente: ing.porcentaje_ingrediente,
-          }),
-        );
-
-        const updatePromises = modificados.map((ing) => {
-          const existing = editData.find(
-            (f) => f.id_ingrediente === ing.id_ingrediente,
-          );
-          return onSave(existing.id, {
-            id_producto: productoSeleccionado,
-            id_ingrediente: ing.id_ingrediente,
-            cantidad_ingrediente: ing.cantidad_ingrediente,
-            porcentaje_ingrediente: ing.porcentaje_ingrediente,
-          });
-        });
-
-        const results = await Promise.all([
-          ...createPromises,
-          ...updatePromises,
-        ]);
-
-        if (results.every((r) => r?.success)) {
-          onSuccess("Formulación actualizada correctamente"); // ⭐ AQUÍ SE DISPARA
-          onClose();
-        } else {
-          setError("Algunos ingredientes no se guardaron correctamente");
-        }
+        onClose();
       } else {
-        const promises = ingredientesAgregados.map((ing) =>
-          onSave(null, {
-            id_producto: productoSeleccionado,
-            id_ingrediente: ing.id_ingrediente,
-            cantidad_ingrediente: ing.cantidad_ingrediente,
-            porcentaje_ingrediente: ing.porcentaje_ingrediente,
-          }),
-        );
-
-        const results = await Promise.all(promises);
-        if (results.every((r) => r?.success)) {
-          onSuccess("Formulación creada correctamente"); // ⭐ AQUÍ SE DISPARA
-          onClose();
-        } else {
-          setError("Error al crear algunas relaciones");
-        }
+        setError(res.error || "Error al guardar la formulación");
       }
     } catch (err) {
       console.error("Error guardando:", err);
@@ -295,7 +245,7 @@ export default function FormulacionRecetaForm({
                   Producto a formular <span className="text-red-500">*</span>
                 </label>
                 <div className="space-y-1.5 max-h-80 overflow-y-auto pr-1">
-                  {productos.map((p) => (
+                  {productosSinReceta.map((p) => (
                     <button
                       key={p.id}
                       onClick={() => setProductoSeleccionado(p.id)}
@@ -601,7 +551,7 @@ export default function FormulacionRecetaForm({
               ) : (
                 <button
                   onClick={handleSave}
-                  disabled={loading || ingredientesAgregados.length === 0}
+                  disabled={loading || ingredientesAgregados.length === 0 || Math.abs(totalPorcentaje - 100) > 0.001}
                   className="inline-flex items-center gap-1.5 rounded-lg bg-green-500 px-4 py-1.5 text-xs font-bold text-white hover:bg-green-600 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? (

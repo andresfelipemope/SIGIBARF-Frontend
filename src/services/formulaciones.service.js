@@ -31,16 +31,23 @@ export const FormulacionesService = {
   },
 
   /**
-   * @param {Object} data - { id_producto, id_ingrediente, cantidad_ingrediente, porcentaje_ingrediente }
-   * @returns {Promise<Object>}
+   * @param {Object|Array} data - Array of ingredient objects or a single ingredient object
+   * @returns {Promise<Object|Array>}
    */
   async createFormulacion(data) {
-    const payload = {
-      id_producto: Number(data.id_producto),
-      id_ingrediente: Number(data.id_ingrediente),
-      cantidad_ingrediente: String(data.cantidad_ingrediente),
-      porcentaje_ingrediente: String(data.porcentaje_ingrediente),
-    };
+    const payload = Array.isArray(data)
+      ? data.map((item) => ({
+          id_producto: Number(item.id_producto),
+          id_ingrediente: Number(item.id_ingrediente),
+          cantidad_ingrediente: String(item.cantidad_ingrediente),
+          porcentaje_ingrediente: String(item.porcentaje_ingrediente),
+        }))
+      : {
+          id_producto: Number(data.id_producto),
+          id_ingrediente: Number(data.id_ingrediente),
+          cantidad_ingrediente: String(data.cantidad_ingrediente),
+          porcentaje_ingrediente: String(data.porcentaje_ingrediente),
+        };
 
     return apiRequest(`${BASE_PATH}/producto-ingredientes/`, {
       method: "POST",
@@ -107,10 +114,14 @@ export const FormulacionesService = {
   },
 
   /**
+   * @param {boolean} sinReceta
    * @returns {Promise<Array>}
    */
-  async getProductos() {
-    return apiRequest(`${BASE_PATH}/productos/`, {
+  async getProductos(sinReceta = false) {
+    const url = sinReceta
+      ? `${BASE_PATH}/productos/?sin_receta=true`
+      : `${BASE_PATH}/productos/`;
+    return apiRequest(url, {
       method: "GET",
       headers: authHeaders(),
     });

@@ -6,6 +6,7 @@ import { FormulacionesService } from "@/services/formulaciones.service";
 export function useFormulaciones() {
   const [formulaciones, setFormulaciones] = useState([]);
   const [productos, setProductos] = useState([]);
+  const [productosSinReceta, setProductosSinReceta] = useState([]);
   const [ingredientes, setIngredientes] = useState([]);
 
   const [loading, setLoading] = useState(false);
@@ -22,86 +23,83 @@ export function useFormulaciones() {
     [ingredientes],
   );
 
+  const getErrorMessage = useCallback((err) => {
+    if (err?.data?.detail) {
+      if (typeof err.data.detail === "object") {
+        return Object.values(err.data.detail)[0];
+      }
+      return err.data.detail;
+    }
+    if (err?.detail) {
+      if (typeof err.detail === "object") {
+        return Object.values(err.detail)[0];
+      }
+      return err.detail;
+    }
+    return err?.message || "Error al realizar la operación";
+  }, []);
+
   const loadAllData = useCallback(async () => {
     setLoading(true);
     setError(null);
 
     try {
-      const [formulacionesData, productosData, ingredientesData] =
+      const [formulacionesData, productosData, productosSinRecetaData, ingredientesData] =
         await Promise.all([
           FormulacionesService.getFormulaciones(),
           FormulacionesService.getProductos(),
+          FormulacionesService.getProductos(true),
           FormulacionesService.getIngredientes(),
         ]);
 
       setFormulaciones(formulacionesData || []);
       setProductos(productosData || []);
+      setProductosSinReceta(productosSinRecetaData || []);
       setIngredientes(ingredientesData || []);
     } catch (err) {
       console.error("❌ Error cargando datos:", err);
-      setError(
-        err?.detail ||
-          err?.message ||
-          err?.error ||
-          "Error al cargar los datos",
-      );
+      setError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [getErrorMessage]);
 
   const createFormulacion = useCallback(async (formData) => {
     try {
       const nueva = await FormulacionesService.createFormulacion(formData);
-      setFormulaciones((prev) => [...prev, nueva]);
+      await loadAllData();
       return { success: true, data: nueva };
     } catch (err) {
       console.error("❌ Error creando:", err);
-      const errorMsg = err?.detail
-        ? typeof err.detail === "object"
-          ? Object.values(err.detail)[0]
-          : err.detail
-        : err?.message || "Error al crear";
-      return { success: false, error: errorMsg };
+      return { success: false, error: getErrorMessage(err) };
     }
-  }, []);
+  }, [loadAllData, getErrorMessage]);
 
   const updateFormulacion = useCallback(async (id, formData) => {
     try {
-      const actualizada = await FormulacionesService.patchFormulacion(
-        id,
-        formData,
-      );
-      setFormulaciones((prev) =>
-        prev.map((f) => (f.id === id ? actualizada : f)),
-      );
+      // In the new backend, updates also register the entire list of ingredients in a single POST.
+      // So we call createFormulacion with the new ingredient list.
+      const actualizada = await FormulacionesService.createFormulacion(formData);
+      await loadAllData();
       return { success: true, data: actualizada };
     } catch (err) {
       console.error("❌ Error actualizando:", err);
-      const errorMsg = err?.detail
-        ? typeof err.detail === "object"
-          ? Object.values(err.detail)[0]
-          : err.detail
-        : err?.message || "Error al actualizar";
-      return { success: false, error: errorMsg };
+      return { success: false, error: getErrorMessage(err) };
     }
-  }, []);
+  }, [loadAllData, getErrorMessage]);
 
   const deleteFormulacion = useCallback(async (id) => {
     try {
       await FormulacionesService.deleteFormulacion(id);
       setFormulaciones((prev) => prev.filter((f) => f.id !== id));
+      // Reload in case product recipes status changes
+      await loadAllData();
       return { success: true };
     } catch (err) {
       console.error("❌ Error eliminando:", err);
-      const errorMsg = err?.detail
-        ? typeof err.detail === "object"
-          ? Object.values(err.detail)[0]
-          : err.detail
-        : err?.message || "Error al eliminar";
-      return { success: false, error: errorMsg };
+      return { success: false, error: getErrorMessage(err) };
     }
-  }, []);
+  }, [loadAllData, getErrorMessage]);
 
   const clearMessages = useCallback(() => {
     setError(null);
@@ -116,6 +114,7 @@ export function useFormulaciones() {
   return {
     formulaciones,
     productos,
+    productosSinReceta,
     ingredientes,
     productosMap,
     ingredientesMap,

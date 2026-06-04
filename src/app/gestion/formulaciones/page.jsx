@@ -12,6 +12,7 @@ export default function FormulacionesPage() {
   const {
     formulaciones,
     productos,
+    productosSinReceta,
     ingredientes,
     productosMap,
     ingredientesMap,
@@ -161,6 +162,7 @@ export default function FormulacionesPage() {
         mode={formMode}
         existingFormulaciones={selectedItem}
         productos={productos}
+        productosSinReceta={productosSinReceta}
         ingredientes={ingredientes}
         onClose={() => {
           setIsRecetaFormOpen(false);
