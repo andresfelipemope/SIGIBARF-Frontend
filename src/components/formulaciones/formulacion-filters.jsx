@@ -13,7 +13,10 @@ export default function FormulacionFilters({
   ingredientes,
   onReset,
 }) {
-  const hasActiveFilters = searchTerm || selectedProductFilter !== "todos" || selectedIngredientFilter !== "todos";
+  const hasActiveFilters =
+    searchTerm ||
+    selectedProductFilter !== "todos" ||
+    selectedIngredientFilter !== "todos";
 
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-xs">

@@ -4,12 +4,17 @@ import { formatPrice } from "@/lib/format-price";
 function CuotaEstadoBadge({ estado }) {
   const s = (estado || "").toLowerCase();
   let cls = "bg-gray-50 text-gray-700 border-gray-200";
-  if (["pagada", "pagado"].includes(s)) cls = "bg-green-50 text-green-700 border-green-200";
-  else if (["pendiente", "parcial"].includes(s)) cls = "bg-orange-50 text-orange-700 border-orange-200";
-  else if (["vencida", "mora"].includes(s)) cls = "bg-red-50 text-red-700 border-red-200";
+  if (["pagada", "pagado"].includes(s))
+    cls = "bg-green-50 text-green-700 border-green-200";
+  else if (["pendiente", "parcial"].includes(s))
+    cls = "bg-orange-50 text-orange-700 border-orange-200";
+  else if (["vencida", "mora"].includes(s))
+    cls = "bg-red-50 text-red-700 border-red-200";
 
   return (
-    <span className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase ${cls}`}>
+    <span
+      className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase ${cls}`}
+    >
       {estado || "—"}
     </span>
   );
@@ -28,7 +33,12 @@ function formatFecha(f) {
   }
 }
 
-export function CuotasTable({ cuotas, loading, onToggleNotificaciones, togglingId }) {
+export function CuotasTable({
+  cuotas,
+  loading,
+  onToggleNotificaciones,
+  togglingId,
+}) {
   if (loading) {
     return (
       <div className="flex justify-center py-12">
@@ -64,20 +74,26 @@ export function CuotasTable({ cuotas, loading, onToggleNotificaciones, togglingI
             const activas = cuota.notificaciones_activas !== false;
             return (
               <tr key={cuota.id} className="hover:bg-green-50/10">
-                <td className="py-3 px-4 font-bold">{cuota.numero_cuota ?? cuota.numero ?? cuota.id}</td>
+                <td className="py-3 px-4 font-bold">
+                  {cuota.numero_cuota ?? cuota.numero ?? cuota.id}
+                </td>
                 <td className="py-3 px-4 text-gray-600">
                   {formatFecha(cuota.fecha_vencimiento || cuota.vencimiento)}
                 </td>
                 <td className="py-3 px-4 text-right font-semibold">
-                  {formatPrice(parseFloat(cuota.valor_cuota_final || cuota.monto || 0))}
+                  {formatPrice(
+                    parseFloat(cuota.valor_cuota_final || cuota.monto || 0),
+                  )}
                 </td>
                 <td className="py-3 px-4 text-right text-green-700 font-semibold">
-                  {formatPrice(parseFloat(cuota.valor_pagado || cuota.monto_pagado || 0))}
+                  {formatPrice(
+                    parseFloat(cuota.valor_pagado || cuota.monto_pagado || 0),
+                  )}
                 </td>
                 <td className="py-3 px-4 text-right font-bold">
                   {formatPrice(
                     parseFloat(cuota.valor_cuota_final || 0) -
-                    parseFloat(cuota.valor_pagado || 0)
+                      parseFloat(cuota.valor_pagado || 0),
                   )}
                 </td>
                 <td className="py-3 px-4 text-center">
@@ -87,11 +103,16 @@ export function CuotasTable({ cuotas, loading, onToggleNotificaciones, togglingI
                   <button
                     onClick={() => onToggleNotificaciones(cuota.id, !activas)}
                     disabled={togglingId === cuota.id}
-                    className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-bold border cursor-pointer ${activas
+                    className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-bold border cursor-pointer ${
+                      activas
                         ? "border-green-200 bg-green-50 text-green-700"
                         : "border-gray-200 bg-gray-50 text-gray-500"
-                      }`}
-                    title={activas ? "Desactivar notificaciones" : "Activar notificaciones"}
+                    }`}
+                    title={
+                      activas
+                        ? "Desactivar notificaciones"
+                        : "Activar notificaciones"
+                    }
                   >
                     {togglingId === cuota.id ? (
                       <Loader2 className="size-3 animate-spin" />

@@ -1,46 +1,84 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Target, Eye, MapPinned, PawPrint } from 'lucide-react';
-import Image from 'next/image';
+import { useState } from "react";
+import { Target, Eye, MapPinned, PawPrint } from "lucide-react";
+import Image from "next/image";
 
 export default function Nosotros() {
-  const [activeTab, setActiveTab] = useState('mision');
+  const [activeTab, setActiveTab] = useState("mision");
 
   const tabs = {
     mision: {
-      title: 'Misión',
+      title: "Misión",
       icon: Target,
       content: (
-        <div key="mision" className="space-y-4 transition-all duration-300 ease-out">
+        <div
+          key="mision"
+          className="space-y-4 transition-all duration-300 ease-out"
+        >
           <p className="text-gray-600 leading-relaxed">
-            Somos una empresa que ofrece <strong className="text-green-600">bienestar para la familia y su mascota</strong>, brindando una adecuada nutrición, ya que producimos y comercializamos alimento completamente natural, balanceado y seguro en el municipio de <strong className="text-green-600">Cúcuta</strong> y demás municipios de Norte de Santander.
+            Somos una empresa que ofrece{" "}
+            <strong className="text-green-600">
+              bienestar para la familia y su mascota
+            </strong>
+            , brindando una adecuada nutrición, ya que producimos y
+            comercializamos alimento completamente natural, balanceado y seguro
+            en el municipio de{" "}
+            <strong className="text-green-600">Cúcuta</strong> y demás
+            municipios de Norte de Santander.
           </p>
           <p className="text-gray-600 leading-relaxed">
-            Realizamos envíos a otras ciudades de nuestro país <strong className="text-green-600">Colombia</strong> y somos la única marca prestando el servicio en el país de <strong className="text-green-600">Venezuela</strong>.
+            Realizamos envíos a otras ciudades de nuestro país{" "}
+            <strong className="text-green-600">Colombia</strong> y somos la
+            única marca prestando el servicio en el país de{" "}
+            <strong className="text-green-600">Venezuela</strong>.
           </p>
           <p className="text-gray-600 leading-relaxed">
-            Por consiguiente, nuestros productos responden a las necesidades nutricionales de las mascotas, prestando el servicio profesional adecuado para asesoría personalizada, generando <strong className="text-green-600">confianza, lealtad, responsabilidad y calidad</strong>.
+            Por consiguiente, nuestros productos responden a las necesidades
+            nutricionales de las mascotas, prestando el servicio profesional
+            adecuado para asesoría personalizada, generando{" "}
+            <strong className="text-green-600">
+              confianza, lealtad, responsabilidad y calidad
+            </strong>
+            .
           </p>
           <p className="text-gray-600 leading-relaxed">
-            Finalmente, nuestro objetivo social es ofrecer satisfacción y una excelente atención a nuestros clientes.
+            Finalmente, nuestro objetivo social es ofrecer satisfacción y una
+            excelente atención a nuestros clientes.
           </p>
         </div>
       ),
     },
     vision: {
-      title: 'Visión',
+      title: "Visión",
       icon: Eye,
       content: (
-        <div key="vision" className="space-y-4 transition-all duration-300 ease-out">
+        <div
+          key="vision"
+          className="space-y-4 transition-all duration-300 ease-out"
+        >
           <p className="text-gray-600 leading-relaxed">
-            Para el año <strong className="text-green-600">2030</strong>, seremos la empresa de alimentación natural para mascotas preferida por todas las familias colombianas y venezolanas, propietarias de perros y gatos, brindando salud, bienestar, innovación y nutrición.
+            Para el año <strong className="text-green-600">2030</strong>,
+            seremos la empresa de alimentación natural para mascotas preferida
+            por todas las familias colombianas y venezolanas, propietarias de
+            perros y gatos, brindando salud, bienestar, innovación y nutrición.
           </p>
           <p className="text-gray-600 leading-relaxed">
-            Seremos reconocidos por la <strong className="text-green-600">ética, calidad y servicio personalizado</strong> a nuestros clientes, todo a través del desarrollo del talento humano, proporcionando una permanente capacitación a nuestra fuerza laboral.
+            Seremos reconocidos por la{" "}
+            <strong className="text-green-600">
+              ética, calidad y servicio personalizado
+            </strong>{" "}
+            a nuestros clientes, todo a través del desarrollo del talento
+            humano, proporcionando una permanente capacitación a nuestra fuerza
+            laboral.
           </p>
           <p className="text-gray-600 leading-relaxed">
-            De esta manera, buscamos contribuir al desarrollo de nuestro país y mejorar la <strong className="text-green-600">calidad de vida de las mascotas</strong>.
+            De esta manera, buscamos contribuir al desarrollo de nuestro país y
+            mejorar la{" "}
+            <strong className="text-green-600">
+              calidad de vida de las mascotas
+            </strong>
+            .
           </p>
         </div>
       ),
@@ -51,7 +89,6 @@ export default function Nosotros() {
     <section className="py-20 bg-gradient-to-br from-orange-200 via-white to-green-200 font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-start">
-          
           {/* Imagen */}
           <div className="relative">
             <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-gray-100">
@@ -78,13 +115,22 @@ export default function Nosotros() {
                 </h2>
               </div>
               <p className="text-gray-600 leading-relaxed">
-                ATHLETIC BARF es una empresa colombiana, ubicada en la capital del departamento de Norte de Santander, dedicada a la fabricación y elaboración de alimentos 100% naturales, dieta BARF para mascotas.
+                ATHLETIC BARF es una empresa colombiana, ubicada en la capital
+                del departamento de Norte de Santander, dedicada a la
+                fabricación y elaboración de alimentos 100% naturales, dieta
+                BARF para mascotas.
               </p>
               <p className="text-gray-600 leading-relaxed">
-                Desde el año 2019, hemos venido desarrollando cada una de nuestras recetas, las cuales están pensadas en todas aquellas personas amantes de los compañeros de cuatro patas y quienes queremos siempre lo mejor para ellos.
+                Desde el año 2019, hemos venido desarrollando cada una de
+                nuestras recetas, las cuales están pensadas en todas aquellas
+                personas amantes de los compañeros de cuatro patas y quienes
+                queremos siempre lo mejor para ellos.
               </p>
               <p className="text-gray-600 leading-relaxed">
-                Por tal motivo, proporcionamos una alternativa de nutrición con altos estándares de calidad, con todo el proceso adecuado, enfocándonos en brindar una mejor calidad de vida a cada una de sus mascotas.
+                Por tal motivo, proporcionamos una alternativa de nutrición con
+                altos estándares de calidad, con todo el proceso adecuado,
+                enfocándonos en brindar una mejor calidad de vida a cada una de
+                sus mascotas.
               </p>
             </div>
 
@@ -102,13 +148,16 @@ export default function Nosotros() {
                       className={`
                         flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-xl
                         font-semibold text-lg transition-all duration-300 transform
-                        ${isActive 
-                          ? 'bg-green-600 text-white shadow-lg scale-105' 
-                          : 'bg-white text-gray-600 hover:bg-gray-50 hover:shadow-md border-2 border-gray-200'
+                        ${
+                          isActive
+                            ? "bg-green-600 text-white shadow-lg scale-105"
+                            : "bg-white text-gray-600 hover:bg-gray-50 hover:shadow-md border-2 border-gray-200"
                         }
                       `}
                     >
-                      <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-green-600'}`} />
+                      <Icon
+                        className={`w-5 h-5 ${isActive ? "text-white" : "text-green-600"}`}
+                      />
                       {tab.title}
                     </button>
                   );
@@ -122,7 +171,7 @@ export default function Nosotros() {
               >
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-12 h-12 bg-green-600/10 rounded-full flex items-center justify-center">
-                    {activeTab === 'mision' ? (
+                    {activeTab === "mision" ? (
                       <Target className="w-6 h-6 text-green-600" />
                     ) : (
                       <Eye className="w-6 h-6 text-green-600" />
@@ -136,56 +185,54 @@ export default function Nosotros() {
                 {tabs[activeTab].content}
               </div>
             </div>
-
           </div>
         </div>
 
         {/* ═══ UBICACIÓN ═══ */}
-          <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-20 pt-20">
-            <div className="text-center mb-8">
-              <div className="flex items-center justify-center gap-3 mb-3">
-                <MapPinned className="w-8 h-8 text-green-600" />
+        <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-20 pt-20">
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <MapPinned className="w-8 h-8 text-green-600" />
 
-                <h2 className="text-3xl font-bold text-gray-800">
-                  ¿Dónde nos ubicamos?
-                </h2>
-              </div>
-
-              <p className="mt-3 text-gray-500 max-w-2xl mx-auto">
-                Este es nuestro punto de producción y también el lugar donde puedes
-                recoger tus pedidos. Toca el mapa para abrir la navegación y llegar
-                fácilmente hasta nosotros.
-              </p>
+              <h2 className="text-3xl font-bold text-gray-800">
+                ¿Dónde nos ubicamos?
+              </h2>
             </div>
 
+            <p className="mt-3 text-gray-500 max-w-2xl mx-auto">
+              Este es nuestro punto de producción y también el lugar donde
+              puedes recoger tus pedidos. Toca el mapa para abrir la navegación
+              y llegar fácilmente hasta nosotros.
+            </p>
+          </div>
+
+          <a
+            href="https://www.google.com/maps/dir/?api=1&destination=7.9065182,-72.515661"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block overflow-hidden rounded-3xl border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            <iframe
+              src="https://maps.google.com/maps?q=7.9065182,-72.515661&z=17&output=embed"
+              width="100%"
+              height="450"
+              style={{ border: 0 }}
+              loading="lazy"
+              allowFullScreen
+            />
+          </a>
+
+          <div className="flex justify-center mt-6">
             <a
               href="https://www.google.com/maps/dir/?api=1&destination=7.9065182,-72.515661"
               target="_blank"
               rel="noopener noreferrer"
-              className="block overflow-hidden rounded-3xl border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300"
+              className="px-6 py-3 rounded-xl bg-green-600 text-white font-semibold shadow-lg hover:scale-105 transition-transform"
             >
-              <iframe
-                src="https://maps.google.com/maps?q=7.9065182,-72.515661&z=17&output=embed"
-                width="100%"
-                height="450"
-                style={{ border: 0 }}
-                loading="lazy"
-                allowFullScreen
-              />
+              Cómo llegar
             </a>
-
-            <div className="flex justify-center mt-6">
-              <a
-                href="https://www.google.com/maps/dir/?api=1&destination=7.9065182,-72.515661"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-6 py-3 rounded-xl bg-green-600 text-white font-semibold shadow-lg hover:scale-105 transition-transform"
-              >
-                Cómo llegar
-              </a>
-            </div>
-          </section>
-
+          </div>
+        </section>
       </div>
     </section>
   );

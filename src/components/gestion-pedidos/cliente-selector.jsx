@@ -29,14 +29,12 @@ export function ClienteSelector({ value, onChange, disabled }) {
   }, []);
 
   const clienteSeleccionado = clientes.find(
-    (cliente) => String(cliente.id) === String(value)
+    (cliente) => String(cliente.id) === String(value),
   );
 
   useEffect(() => {
     if (clienteSeleccionado) {
-      setTexto(
-        `${clienteSeleccionado.nombre} ${clienteSeleccionado.apellido}`
-      );
+      setTexto(`${clienteSeleccionado.nombre} ${clienteSeleccionado.apellido}`);
     }
   }, [clienteSeleccionado]);
 
@@ -82,9 +80,7 @@ export function ClienteSelector({ value, onChange, disabled }) {
                   onClick={() => {
                     onChange(String(cliente.id));
 
-                    setTexto(
-                      `${cliente.nombre} ${cliente.apellido}`
-                    );
+                    setTexto(`${cliente.nombre} ${cliente.apellido}`);
 
                     setBusqueda("");
                     setMostrarResultados(false);
@@ -95,9 +91,7 @@ export function ClienteSelector({ value, onChange, disabled }) {
                     {cliente.nombre} {cliente.apellido}
                   </p>
 
-                  <p className="text-xs text-gray-500">
-                    {cliente.correo}
-                  </p>
+                  <p className="text-xs text-gray-500">{cliente.correo}</p>
                 </button>
               ))
             ) : (
@@ -119,9 +113,7 @@ export function ClienteSelector({ value, onChange, disabled }) {
             {clienteSeleccionado.nombre} {clienteSeleccionado.apellido}
           </p>
 
-          <p className="text-xs text-green-700">
-            {clienteSeleccionado.correo}
-          </p>
+          <p className="text-xs text-green-700">{clienteSeleccionado.correo}</p>
         </div>
       )}
     </div>

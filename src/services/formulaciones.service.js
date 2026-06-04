@@ -1,10 +1,10 @@
-import { apiRequest } from '@/lib/api';
+import { apiRequest } from "@/lib/api";
 
-const BASE_PATH = '/api/inventario';
-
+const BASE_PATH = "/api/inventario";
 
 function authHeaders() {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('access') : null;
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("access") : null;
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
@@ -14,7 +14,7 @@ export const FormulacionesService = {
    */
   async getFormulaciones() {
     return apiRequest(`${BASE_PATH}/producto-ingredientes/`, {
-      method: 'GET',
+      method: "GET",
       headers: authHeaders(),
     });
   },
@@ -25,14 +25,14 @@ export const FormulacionesService = {
    */
   async getFormulacionById(id) {
     return apiRequest(`${BASE_PATH}/producto-ingredientes/${id}/`, {
-      method: 'GET',
+      method: "GET",
       headers: authHeaders(),
     });
   },
 
   /**
    * @param {Object} data - { id_producto, id_ingrediente, cantidad_ingrediente, porcentaje_ingrediente }
-   * @returns {Promise<Object>} 
+   * @returns {Promise<Object>}
    */
   async createFormulacion(data) {
     const payload = {
@@ -41,9 +41,9 @@ export const FormulacionesService = {
       cantidad_ingrediente: String(data.cantidad_ingrediente),
       porcentaje_ingrediente: String(data.porcentaje_ingrediente),
     };
-    
+
     return apiRequest(`${BASE_PATH}/producto-ingredientes/`, {
-      method: 'POST',
+      method: "POST",
       body: payload,
       headers: authHeaders(),
     });
@@ -61,9 +61,9 @@ export const FormulacionesService = {
       cantidad_ingrediente: String(data.cantidad_ingrediente),
       porcentaje_ingrediente: String(data.porcentaje_ingrediente),
     };
-    
+
     return apiRequest(`${BASE_PATH}/producto-ingredientes/${id}/`, {
-      method: 'PUT',
+      method: "PUT",
       body: payload,
       headers: authHeaders(),
     });
@@ -76,9 +76,11 @@ export const FormulacionesService = {
    */
   async patchFormulacion(id, data) {
     const payload = {};
-    
-    if (data.id_producto !== undefined) payload.id_producto = Number(data.id_producto);
-    if (data.id_ingrediente !== undefined) payload.id_ingrediente = Number(data.id_ingrediente);
+
+    if (data.id_producto !== undefined)
+      payload.id_producto = Number(data.id_producto);
+    if (data.id_ingrediente !== undefined)
+      payload.id_ingrediente = Number(data.id_ingrediente);
     if (data.cantidad_ingrediente !== undefined) {
       payload.cantidad_ingrediente = String(data.cantidad_ingrediente);
     }
@@ -87,7 +89,7 @@ export const FormulacionesService = {
     }
 
     return apiRequest(`${BASE_PATH}/producto-ingredientes/${id}/`, {
-      method: 'PATCH',
+      method: "PATCH",
       body: Object.keys(payload).length > 0 ? payload : undefined,
       headers: authHeaders(),
     });
@@ -99,7 +101,7 @@ export const FormulacionesService = {
    */
   async deleteFormulacion(id) {
     return apiRequest(`${BASE_PATH}/producto-ingredientes/${id}/`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: authHeaders(),
     });
   },
@@ -109,7 +111,7 @@ export const FormulacionesService = {
    */
   async getProductos() {
     return apiRequest(`${BASE_PATH}/productos/`, {
-      method: 'GET',
+      method: "GET",
       headers: authHeaders(),
     });
   },
@@ -119,7 +121,7 @@ export const FormulacionesService = {
    */
   async getIngredientes() {
     return apiRequest(`${BASE_PATH}/ingredientes/`, {
-      method: 'GET',
+      method: "GET",
       headers: authHeaders(),
     });
   },

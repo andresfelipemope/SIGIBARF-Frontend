@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
-import { creditosService } from '@/services/creditos.service';
-import { toast } from 'sonner';
+import { useState, useEffect, useCallback } from "react";
+import { creditosService } from "@/services/creditos.service";
+import { toast } from "sonner";
 
 function normalizeListResponse(data) {
   if (Array.isArray(data)) return data;
@@ -24,7 +24,7 @@ export function useCuotas(creditoId) {
       const data = await creditosService.listCuotas({ credito: creditoId });
       setCuotas(normalizeListResponse(data));
     } catch (err) {
-      const msg = err.message || 'No se pudieron cargar las cuotas';
+      const msg = err.message || "No se pudieron cargar las cuotas";
       setError(msg);
       toast.error(msg);
       setCuotas([]);
@@ -37,17 +37,22 @@ export function useCuotas(creditoId) {
     fetchCuotas();
   }, [fetchCuotas]);
 
-  const toggleNotificaciones = useCallback(async (cuotaId, activas) => {
-    try {
-      await creditosService.toggleNotificacionesCuota(cuotaId, activas);
-      toast.success(activas ? 'Notificaciones activadas' : 'Notificaciones desactivadas');
-      await fetchCuotas();
-      return { success: true };
-    } catch (err) {
-      toast.error(err.message || 'Error al actualizar notificaciones');
-      return { success: false };
-    }
-  }, [fetchCuotas]);
+  const toggleNotificaciones = useCallback(
+    async (cuotaId, activas) => {
+      try {
+        await creditosService.toggleNotificacionesCuota(cuotaId, activas);
+        toast.success(
+          activas ? "Notificaciones activadas" : "Notificaciones desactivadas",
+        );
+        await fetchCuotas();
+        return { success: true };
+      } catch (err) {
+        toast.error(err.message || "Error al actualizar notificaciones");
+        return { success: false };
+      }
+    },
+    [fetchCuotas],
+  );
 
   return {
     cuotas,

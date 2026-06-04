@@ -11,18 +11,13 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default:
-          "bg-emerald-600 text-white hover:bg-emerald-700",
-        destructive:
-          "bg-red-600 text-white hover:bg-red-700",
+        default: "bg-emerald-600 text-white hover:bg-emerald-700",
+        destructive: "bg-red-600 text-white hover:bg-red-700",
         outline:
           "border border-zinc-200 bg-white hover:bg-zinc-100 text-zinc-900",
-        secondary:
-          "bg-zinc-100 text-zinc-900 hover:bg-zinc-200",
-        ghost:
-          "hover:bg-zinc-100 text-zinc-900",
-        link:
-          "text-emerald-600 underline-offset-4 hover:underline",
+        secondary: "bg-zinc-100 text-zinc-900 hover:bg-zinc-200",
+        ghost: "hover:bg-zinc-100 text-zinc-900",
+        link: "text-emerald-600 underline-offset-4 hover:underline",
       },
       size: {
         default: "h-10 px-4 py-2",
@@ -35,20 +30,11 @@ const buttonVariants = cva(
       variant: "default",
       size: "default",
     },
-  }
+  },
 );
 
 const Button = React.forwardRef(
-  (
-    {
-      className,
-      variant,
-      size,
-      asChild = false,
-      ...props
-    },
-    ref
-  ) => {
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
 
     return (
@@ -58,7 +44,7 @@ const Button = React.forwardRef(
         {...props}
       />
     );
-  }
+  },
 );
 
 Button.displayName = "Button";

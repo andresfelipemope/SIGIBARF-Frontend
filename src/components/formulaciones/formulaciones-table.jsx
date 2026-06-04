@@ -25,20 +25,33 @@ export default function FormulacionesTable({
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Producto</th>
-              <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Ingrediente</th>
-              <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Cantidad</th>
-              <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Porcentaje</th>
-              <th className="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider text-gray-500">Acciones</th>
+              <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-gray-500">
+                Producto
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-gray-500">
+                Ingrediente
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-gray-500">
+                Cantidad
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-gray-500">
+                Porcentaje
+              </th>
+              <th className="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider text-gray-500">
+                Acciones
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 bg-white">
             {formulaciones.map((f) => {
               const producto = productosMap[f.id_producto];
               const ingrediente = ingredientesMap[f.id_ingrediente];
-              
+
               return (
-                <tr key={f.id} className="hover:bg-gray-50/60 transition-colors">
+                <tr
+                  key={f.id}
+                  className="hover:bg-gray-50/60 transition-colors"
+                >
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       <div className="size-8 rounded-lg bg-orange-100 flex items-center justify-center">
@@ -50,7 +63,9 @@ export default function FormulacionesTable({
                         <p className="font-semibold text-gray-900 text-sm">
                           {producto?.nombre || `Producto #${f.id_producto}`}
                         </p>
-                        <p className="text-xs text-gray-400">ID: {f.id_producto}</p>
+                        <p className="text-xs text-gray-400">
+                          ID: {f.id_producto}
+                        </p>
                       </div>
                     </div>
                   </td>
@@ -63,7 +78,8 @@ export default function FormulacionesTable({
                       </div>
                       <div>
                         <p className="font-semibold text-gray-900 text-sm">
-                          {ingrediente?.nombre || `Ingrediente #${f.id_ingrediente}`}
+                          {ingrediente?.nombre ||
+                            `Ingrediente #${f.id_ingrediente}`}
                         </p>
                         <p className="text-xs text-gray-400">
                           {ingrediente?.unidad_medida || ""}
@@ -145,8 +161,18 @@ function EmptyState() {
   return (
     <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-12 text-center">
       <div className="mx-auto size-16 rounded-full bg-gray-50 flex items-center justify-center mb-4">
-        <svg className="size-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 13.5h3.75m-3.75 0H6m10.5 0a2.25 2.25 0 01-2.25-2.25v-1.5m-6 3h12a2.25 2.25 0 002.25-2.25v-6a2.25 2.25 0 00-2.25-2.25H6a2.25 2.25 0 00-2.25 2.25v6a2.25 2.25 0 002.25 2.25z" />
+        <svg
+          className="size-8 text-gray-400"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={1.5}
+            d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 13.5h3.75m-3.75 0H6m10.5 0a2.25 2.25 0 01-2.25-2.25v-1.5m-6 3h12a2.25 2.25 0 002.25-2.25v-6a2.25 2.25 0 00-2.25-2.25H6a2.25 2.25 0 00-2.25 2.25v6a2.25 2.25 0 002.25 2.25z"
+          />
         </svg>
       </div>
       <h3 className="text-lg font-semibold text-gray-900">Sin formulaciones</h3>

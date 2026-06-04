@@ -12,7 +12,7 @@ export default function ProduccionTable({ producciones, productos, loading }) {
     return acc;
   }, {});
 
-  const filteredItems = producciones.filter(item => {
+  const filteredItems = producciones.filter((item) => {
     const p = productosMap[item.id_producto];
     return p?.nombre?.toLowerCase().includes(searchTerm.toLowerCase());
   });
@@ -51,7 +51,9 @@ export default function ProduccionTable({ producciones, productos, loading }) {
               <tr>
                 <td colSpan="4" className="py-12 text-center">
                   <Loader2 className="size-8 animate-spin text-green-600 mx-auto" />
-                  <p className="text-sm text-gray-500 mt-2 font-medium">Cargando historial...</p>
+                  <p className="text-sm text-gray-500 mt-2 font-medium">
+                    Cargando historial...
+                  </p>
                 </td>
               </tr>
             ) : filteredItems.length > 0 ? (
@@ -63,10 +65,10 @@ export default function ProduccionTable({ producciones, productos, loading }) {
                   try {
                     const date = new Date(item.fecha_creacion);
                     if (!isNaN(date.getTime())) {
-                      formattedDate = new Intl.DateTimeFormat('es-ES', { 
-                        day: '2-digit', 
-                        month: 'short', 
-                        year: 'numeric' 
+                      formattedDate = new Intl.DateTimeFormat("es-ES", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
                       }).format(date);
                     } else {
                       formattedDate = item.fecha_creacion;
@@ -82,10 +84,10 @@ export default function ProduccionTable({ producciones, productos, loading }) {
                   try {
                     const date = new Date(item.fecha_vencimiento);
                     if (!isNaN(date.getTime())) {
-                      formattedVencimiento = new Intl.DateTimeFormat('es-ES', { 
-                        day: '2-digit', 
-                        month: 'short', 
-                        year: 'numeric' 
+                      formattedVencimiento = new Intl.DateTimeFormat("es-ES", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
                       }).format(date);
                     } else {
                       formattedVencimiento = item.fecha_vencimiento;
@@ -96,9 +98,14 @@ export default function ProduccionTable({ producciones, productos, loading }) {
                 }
 
                 return (
-                  <tr key={item.id} className="transition-colors hover:bg-green-50/10">
+                  <tr
+                    key={item.id}
+                    className="transition-colors hover:bg-green-50/10"
+                  >
                     <td className="py-4 px-3 text-sm font-semibold text-black">
-                      {producto ? producto.nombre : `Desconocido (ID: ${item.id_producto})`}
+                      {producto
+                        ? producto.nombre
+                        : `Desconocido (ID: ${item.id_producto})`}
                     </td>
                     <td className="py-4 px-3 text-right text-sm font-extrabold text-green-700">
                       +{item.cantidad_producida}
@@ -120,7 +127,9 @@ export default function ProduccionTable({ producciones, productos, loading }) {
               <tr>
                 <td colSpan="4" className="py-12 text-center">
                   <Factory className="size-8 text-gray-300 mx-auto mb-3" />
-                  <p className="text-sm text-gray-500 font-medium">No se encontraron producciones.</p>
+                  <p className="text-sm text-gray-500 font-medium">
+                    No se encontraron producciones.
+                  </p>
                 </td>
               </tr>
             )}

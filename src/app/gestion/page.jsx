@@ -92,7 +92,6 @@ const MODULES = [
 export default function GestionDashboard() {
   return (
     <div className="space-y-10 animate-fade-in text-black">
-
       {/* ── Header ───────────────────────────────────────────── */}
       <div className="border-b border-gray-100 pb-8">
         <div className="flex items-start gap-4">
@@ -120,8 +119,9 @@ export default function GestionDashboard() {
           <span className="font-semibold text-green-700">alertas</span> y{" "}
           <span className="font-semibold text-green-700">pedidos</span>,{" "}
           <span className="font-semibold text-green-700">créditos</span> y{" "}
-          <span className="font-semibold text-green-700">deudas</span> de Athletic Barf.
-          Selecciona el módulo al que deseas acceder para comenzar.
+          <span className="font-semibold text-green-700">deudas</span> de
+          Athletic Barf. Selecciona el módulo al que deseas acceder para
+          comenzar.
         </p>
       </div>
 
@@ -143,9 +143,10 @@ export default function GestionDashboard() {
                   group relative flex flex-col gap-4 rounded-2xl border bg-white p-6
                   shadow-xs transition-all duration-200
                   hover:-translate-y-0.5 hover:shadow-md
-                  ${isGreen
-                    ? "border-gray-200 hover:border-green-200"
-                    : "border-gray-200 hover:border-orange-200"
+                  ${
+                    isGreen
+                      ? "border-gray-200 hover:border-green-200"
+                      : "border-gray-200 hover:border-orange-200"
                   }
                 `}
               >
@@ -155,9 +156,10 @@ export default function GestionDashboard() {
                     className={`
                       flex size-11 shrink-0 items-center justify-center rounded-xl border transition-all duration-200
                       group-hover:scale-105
-                      ${isGreen
-                        ? "bg-green-50 border-green-100 text-green-700"
-                        : "bg-orange-50 border-orange-100 text-orange-600"
+                      ${
+                        isGreen
+                          ? "bg-green-50 border-green-100 text-green-700"
+                          : "bg-orange-50 border-orange-100 text-orange-600"
                       }
                     `}
                   >
@@ -169,9 +171,10 @@ export default function GestionDashboard() {
                     className={`
                       mt-1 flex size-6 shrink-0 items-center justify-center rounded-full opacity-0 transition-all duration-200
                       group-hover:opacity-100
-                      ${isGreen
-                        ? "bg-green-50 text-green-600"
-                        : "bg-orange-50 text-orange-500"
+                      ${
+                        isGreen
+                          ? "bg-green-50 text-green-600"
+                          : "bg-orange-50 text-orange-500"
                       }
                     `}
                   >
@@ -194,9 +197,10 @@ export default function GestionDashboard() {
                   <span
                     className={`
                       inline-flex items-center gap-1.5 text-xs font-bold transition-colors duration-200
-                      ${isGreen
-                        ? "text-green-600 group-hover:text-green-700"
-                        : "text-orange-500 group-hover:text-orange-600"
+                      ${
+                        isGreen
+                          ? "text-green-600 group-hover:text-green-700"
+                          : "text-orange-500 group-hover:text-orange-600"
                       }
                     `}
                   >

@@ -1,4 +1,11 @@
-import { Eye, CheckCircle, XCircle, CreditCard, Inbox, AlertTriangle } from "lucide-react";
+import {
+  Eye,
+  CheckCircle,
+  XCircle,
+  CreditCard,
+  Inbox,
+  AlertTriangle,
+} from "lucide-react";
 import Link from "next/link";
 import { formatPrice } from "@/lib/format-price";
 import { PedidoEstadoBadge } from "./pedido-estado-badge";
@@ -56,7 +63,9 @@ export function PedidosAdminTable({
       <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center">
         <Inbox className="size-10 text-gray-300 mx-auto mb-3" />
         <h3 className="font-bold text-black">No hay pedidos</h3>
-        <p className="text-xs text-gray-500 mt-1">Los pedidos del sistema aparecerán aquí.</p>
+        <p className="text-xs text-gray-500 mt-1">
+          Los pedidos del sistema aparecerán aquí.
+        </p>
       </div>
     );
   }
@@ -82,22 +91,29 @@ export function PedidosAdminTable({
               const id = pedido.id;
               const numero = pedido.numero_pedido ?? id;
               const correo = pedido.usuario_email || "—";
-              const cliente = correo !== "—"
-                ? correo.split("@")[0]
-                : "Cliente presencial";
+              const cliente =
+                correo !== "—" ? correo.split("@")[0] : "Cliente presencial";
               const fecha = pedido.fecha_creacion || pedido.created_at;
               const estado = pedido.estado_pago || pedido.estado;
-              const total = parseFloat(pedido.precio_total || pedido.total || 0);
+              const total = parseFloat(
+                pedido.precio_total || pedido.total || 0,
+              );
               const tipoPago = pedido.tipo_pago || "—";
               const creditoId = pedido.credito_id || pedido.credito;
               const pendiente = isPendiente(estado);
 
               return (
                 <tr key={id} className="hover:bg-green-50/10 transition-colors">
-                  <td className="py-4 px-4 text-sm font-bold text-green-700">#{numero}</td>
-                  <td className="py-4 px-4 text-sm font-semibold text-black">{cliente}</td>
+                  <td className="py-4 px-4 text-sm font-bold text-green-700">
+                    #{numero}
+                  </td>
+                  <td className="py-4 px-4 text-sm font-semibold text-black">
+                    {cliente}
+                  </td>
                   <td className="py-4 px-4 text-xs text-gray-600">{correo}</td>
-                  <td className="py-4 px-4 text-xs text-gray-600">{formatFecha(fecha)}</td>
+                  <td className="py-4 px-4 text-xs text-gray-600">
+                    {formatFecha(fecha)}
+                  </td>
                   <td className="py-4 px-4 text-center">
                     <PedidoEstadoBadge estado={estado} />
                   </td>

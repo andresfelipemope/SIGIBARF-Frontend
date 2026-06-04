@@ -12,41 +12,51 @@ export function loadWompiScript() {
       resolve(window.WidgetCheckout);
       return;
     }
-    
+
     // Evitar duplicar elementos de script en el DOM
-    const existingScript = document.querySelector('script[src="https://checkout.wompi.co/widget.js"]');
+    const existingScript = document.querySelector(
+      'script[src="https://checkout.wompi.co/widget.js"]',
+    );
     if (existingScript) {
       const handleLoad = () => {
         if (window.WidgetCheckout) {
           resolve(window.WidgetCheckout);
         } else {
-          reject(new Error("WidgetCheckout no encontrado tras cargar el script existente."));
+          reject(
+            new Error(
+              "WidgetCheckout no encontrado tras cargar el script existente.",
+            ),
+          );
         }
       };
       const handleError = () => {
         reject(new Error("Error al descargar el script existente de Wompi."));
       };
-      existingScript.addEventListener('load', handleLoad);
-      existingScript.addEventListener('error', handleError);
+      existingScript.addEventListener("load", handleLoad);
+      existingScript.addEventListener("error", handleError);
       return;
     }
 
     const script = document.createElement("script");
     script.src = "https://checkout.wompi.co/widget.js";
     script.async = true;
-    
+
     script.onload = () => {
       if (window.WidgetCheckout) {
         resolve(window.WidgetCheckout);
       } else {
-        reject(new Error("WidgetCheckout no encontrado tras descargar el script de Wompi"));
+        reject(
+          new Error(
+            "WidgetCheckout no encontrado tras descargar el script de Wompi",
+          ),
+        );
       }
     };
-    
+
     script.onerror = () => {
       reject(new Error("Error de red al descargar el script de Wompi."));
     };
-    
+
     document.body.appendChild(script);
   });
 }
@@ -61,7 +71,13 @@ export function loadWompiScript() {
  * @param {string} params.integrity - Firma de integridad generada por el backend.
  * @returns {Promise<Object|null>} Promesa que resuelve con la transacción de Wompi o null si se cancela.
  */
-export async function openWompiWidget({ publicKey, currency = "COP", amountInCents, reference, integrity }) {
+export async function openWompiWidget({
+  publicKey,
+  currency = "COP",
+  amountInCents,
+  reference,
+  integrity,
+}) {
   // Asegura la carga del script
   const WidgetCheckoutClass = await loadWompiScript();
 
@@ -72,9 +88,9 @@ export async function openWompiWidget({ publicKey, currency = "COP", amountInCen
       reference,
       publicKey,
       signature: {
-        integrity: integrity
+        integrity: integrity,
       },
-      "signature:integrity": integrity
+      "signature:integrity": integrity,
     });
 
     checkoutWidget.open((result) => {

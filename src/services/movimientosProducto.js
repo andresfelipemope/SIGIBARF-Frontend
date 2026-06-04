@@ -1,9 +1,9 @@
-import { apiRequest } from '@/lib/api';
+import { apiRequest } from "@/lib/api";
 
 // Helper local para inyectar token de forma robusta
 function authHeaders() {
-  if (typeof window === 'undefined') return {};
-  const token = localStorage.getItem('token') || localStorage.getItem('access');
+  if (typeof window === "undefined") return {};
+  const token = localStorage.getItem("token") || localStorage.getItem("access");
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
@@ -13,8 +13,8 @@ export const movimientosProductoService = {
    * GET /api/inventario/movimientos-producto/
    */
   async getMovimientos() {
-    return apiRequest('/api/inventario/movimientos-producto/', {
-      method: 'GET',
+    return apiRequest("/api/inventario/movimientos-producto/", {
+      method: "GET",
       headers: authHeaders(),
     });
   },
@@ -25,13 +25,13 @@ export const movimientosProductoService = {
    * @param {Object} data - { id_producto, tipo_movimiento, cantidad, comentarios }
    */
   async createMovimiento(data) {
-    return apiRequest('/api/inventario/movimientos-producto/', {
-      method: 'POST',
+    return apiRequest("/api/inventario/movimientos-producto/", {
+      method: "POST",
       body: {
         id_producto: parseInt(data.id_producto, 10),
         tipo_movimiento: data.tipo_movimiento,
         cantidad: parseFloat(data.cantidad),
-        comentarios: data.comentarios || '',
+        comentarios: data.comentarios || "",
       },
       headers: authHeaders(),
     });
@@ -42,17 +42,15 @@ export const movimientosProductoService = {
    * GET /api/inventario/productos/
    */
   async getProductos() {
-    return apiRequest('/api/inventario/productos/', {
-      method: 'GET',
+    return apiRequest("/api/inventario/productos/", {
+      method: "GET",
       headers: authHeaders(),
     });
   },
 
   async getPublicProductos() {
-    return apiRequest('/api/inventario/public/productos/', {
-      method: 'GET',
+    return apiRequest("/api/inventario/public/productos/", {
+      method: "GET",
     });
-  }
+  },
 };
-
-

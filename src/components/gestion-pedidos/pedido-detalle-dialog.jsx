@@ -1,4 +1,12 @@
-import { X, Calendar, User, Mail, CreditCard, Package, ExternalLink } from "lucide-react";
+import {
+  X,
+  Calendar,
+  User,
+  Mail,
+  CreditCard,
+  Package,
+  ExternalLink,
+} from "lucide-react";
 import Link from "next/link";
 import { formatPrice } from "@/lib/format-price";
 import { PedidoEstadoBadge } from "./pedido-estado-badge";
@@ -41,7 +49,6 @@ export function PedidoDetalleDialog({ pedido, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] flex flex-col border border-gray-100">
-
         {/* HEADER */}
         <div className="flex items-center justify-between p-6 border-b border-gray-100">
           <div>
@@ -63,7 +70,6 @@ export function PedidoDetalleDialog({ pedido, onClose }) {
 
         {/* BODY */}
         <div className="p-6 overflow-y-auto space-y-5 flex-1">
-
           {/* ESTADO + TOTAL */}
           <div className="flex items-center justify-between">
             <PedidoEstadoBadge estado={estado} />
@@ -74,7 +80,6 @@ export function PedidoDetalleDialog({ pedido, onClose }) {
 
           {/* INFO CLIENTE */}
           <div className="grid gap-3 text-sm">
-
             <div className="flex items-center gap-2 text-gray-600">
               <User className="size-4 text-gray-400" />
               <span className="font-semibold">{cliente}</span>
@@ -123,7 +128,8 @@ export function PedidoDetalleDialog({ pedido, onClose }) {
                     <span className="font-semibold text-black">
                       {item.producto_nombre}
                       <span className="text-gray-400 font-medium">
-                        {" "}× {item.cantidad}
+                        {" "}
+                        × {item.cantidad}
                       </span>
                     </span>
 
@@ -135,7 +141,6 @@ export function PedidoDetalleDialog({ pedido, onClose }) {
               </ul>
             </div>
           )}
-
         </div>
 
         {/* FOOTER */}
@@ -147,7 +152,6 @@ export function PedidoDetalleDialog({ pedido, onClose }) {
             Cerrar
           </button>
         </div>
-
       </div>
     </div>
   );

@@ -19,7 +19,9 @@ function CreditoEstadoBadge({ estado }) {
   }
 
   return (
-    <span className={`inline-flex rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase ${cls}`}>
+    <span
+      className={`inline-flex rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase ${cls}`}
+    >
       {label}
     </span>
   );
@@ -85,14 +87,12 @@ export function CreditosTable({ creditos, error, onRetry }) {
           <tbody className="divide-y divide-gray-100">
             {creditos.map((c) => {
               const id = c.id;
-              const pedidoNum = c.pedido_numero ?? c.numero_pedido ?? c.pedido_id ?? "—";
+              const pedidoNum =
+                c.pedido_numero ?? c.numero_pedido ?? c.pedido_id ?? "—";
               const pedidoId = c.pedido_id ?? c.pedido;
               const cliente = c.usuario || c.usuario_nombre || "—";
               const total = parseFloat(
-                c.valor_total ??
-                c.total ??
-                c.monto_total ??
-                0
+                c.valor_total ?? c.total ?? c.monto_total ?? 0,
               );
               const cuotas = c.cantidad_cuotas ?? c.cuotas_totales ?? "—";
               const valorCuota = parseFloat(c.valor_cuota || 0);
@@ -103,7 +103,9 @@ export function CreditosTable({ creditos, error, onRetry }) {
                     #{pedidoNum}
                   </td>
                   <td className="py-4 px-4 text-sm font-semibold">{cliente}</td>
-                  <td className="py-4 px-4 text-right font-bold">{formatPrice(total)}</td>
+                  <td className="py-4 px-4 text-right font-bold">
+                    {formatPrice(total)}
+                  </td>
                   <td className="py-4 px-4 text-center text-sm">{cuotas}</td>
                   <td className="py-4 px-4 text-right text-sm font-semibold">
                     {valorCuota ? formatPrice(valorCuota) : "—"}

@@ -17,7 +17,6 @@ export function FiltrosMovimientos({
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-xs space-y-4">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        
         {/* Input de Búsqueda Semántica */}
         <div className="relative flex-1 max-w-lg">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
@@ -32,7 +31,6 @@ export function FiltrosMovimientos({
 
         {/* Filtros Dropdown / Fecha */}
         <div className="flex flex-wrap items-center gap-3">
-          
           {/* Tipo de Movimiento */}
           <div className="flex items-center gap-1.5 min-w-[140px]">
             <Filter className="size-3.5 text-gray-400 shrink-0" />
@@ -76,7 +74,10 @@ export function FiltrosMovimientos({
           </div>
 
           {/* Botón de Reseteo */}
-          {(searchTerm || tipoFilter !== "todos" || productoFilter !== "todos" || fechaFilter) && (
+          {(searchTerm ||
+            tipoFilter !== "todos" ||
+            productoFilter !== "todos" ||
+            fechaFilter) && (
             <button
               onClick={clearFilters}
               className="inline-flex items-center gap-1.5 rounded-xl border border-rose-100 bg-rose-50 px-3 py-2 text-xs font-bold text-rose-700 hover:bg-rose-100/70 transition-all duration-200"

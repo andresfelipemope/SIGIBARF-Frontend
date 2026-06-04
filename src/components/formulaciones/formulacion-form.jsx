@@ -53,7 +53,10 @@ export default function FormulacionForm({
     if (!formData.id_ingrediente) {
       newErrors.id_ingrediente = "El ingrediente es requerido";
     }
-    if (!formData.cantidad_ingrediente || parseFloat(formData.cantidad_ingrediente) <= 0) {
+    if (
+      !formData.cantidad_ingrediente ||
+      parseFloat(formData.cantidad_ingrediente) <= 0
+    ) {
       newErrors.cantidad_ingrediente = "La cantidad debe ser mayor a 0";
     }
     if (!formData.porcentaje_ingrediente) {
@@ -63,7 +66,8 @@ export default function FormulacionForm({
       if (pct <= 0) {
         newErrors.porcentaje_ingrediente = "El porcentaje debe ser mayor a 0";
       } else if (pct > 100) {
-        newErrors.porcentaje_ingrediente = "El porcentaje no puede exceder 100%";
+        newErrors.porcentaje_ingrediente =
+          "El porcentaje no puede exceder 100%";
       }
     }
 
@@ -74,7 +78,7 @@ export default function FormulacionForm({
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    
+
     if (touched[name]) {
       validateField(name, value);
     }
@@ -122,7 +126,7 @@ export default function FormulacionForm({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     setTouched({
       id_producto: true,
       id_ingrediente: true,
@@ -147,11 +151,11 @@ export default function FormulacionForm({
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       {}
-      <div 
+      <div
         className="fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
-      
+
       {}
       <div className="flex min-h-full items-center justify-center p-4">
         <div className="relative w-full max-w-lg transform rounded-2xl bg-white p-6 shadow-2xl transition-all">
@@ -162,7 +166,7 @@ export default function FormulacionForm({
                 {editData ? "Editar Formulación" : "Nueva Formulación"}
               </h2>
               <p className="text-sm text-gray-500 mt-1">
-                {editData 
+                {editData
                   ? "Modifica los valores de esta relación producto-ingrediente"
                   : "Define los ingredientes y cantidades para un producto"}
               </p>
@@ -264,12 +268,13 @@ export default function FormulacionForm({
                       : "border-gray-200 hover:border-gray-300"
                   }`}
                 />
-                {errors.cantidad_ingrediente && touched.cantidad_ingrediente && (
-                  <p className="mt-1.5 flex items-center gap-1 text-xs text-red-600">
-                    <AlertCircle className="size-3" />
-                    {errors.cantidad_ingrediente}
-                  </p>
-                )}
+                {errors.cantidad_ingrediente &&
+                  touched.cantidad_ingrediente && (
+                    <p className="mt-1.5 flex items-center gap-1 text-xs text-red-600">
+                      <AlertCircle className="size-3" />
+                      {errors.cantidad_ingrediente}
+                    </p>
+                  )}
               </div>
 
               <div>
@@ -288,17 +293,19 @@ export default function FormulacionForm({
                   disabled={submitting}
                   placeholder="0.00"
                   className={`w-full rounded-xl border px-4 py-3 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-orange-500/20 disabled:bg-gray-50 disabled:cursor-not-allowed ${
-                    errors.porcentaje_ingrediente && touched.porcentaje_ingrediente
+                    errors.porcentaje_ingrediente &&
+                    touched.porcentaje_ingrediente
                       ? "border-red-300 bg-red-50"
                       : "border-gray-200 hover:border-gray-300"
                   }`}
                 />
-                {errors.porcentaje_ingrediente && touched.porcentaje_ingrediente && (
-                  <p className="mt-1.5 flex items-center gap-1 text-xs text-red-600">
-                    <AlertCircle className="size-3" />
-                    {errors.porcentaje_ingrediente}
-                  </p>
-                )}
+                {errors.porcentaje_ingrediente &&
+                  touched.porcentaje_ingrediente && (
+                    <p className="mt-1.5 flex items-center gap-1 text-xs text-red-600">
+                      <AlertCircle className="size-3" />
+                      {errors.porcentaje_ingrediente}
+                    </p>
+                  )}
               </div>
             </div>
 
@@ -322,8 +329,10 @@ export default function FormulacionForm({
                     <Loader2 className="size-4 animate-spin" />
                     Guardando...
                   </>
+                ) : editData ? (
+                  "Actualizar"
                 ) : (
-                  editData ? "Actualizar" : "Crear Formulación"
+                  "Crear Formulación"
                 )}
               </button>
             </div>

@@ -21,7 +21,7 @@ export function PedidoEstadoBadge({ estado }) {
     <span
       className={cn(
         "inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide",
-        className
+        className,
       )}
     >
       {label}

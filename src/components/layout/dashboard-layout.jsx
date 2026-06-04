@@ -2,7 +2,11 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+import {
+  SidebarProvider,
+  SidebarInset,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 import { AppSidebar } from "./app-sidebar";
 import { ChevronRight, Home, Calendar } from "lucide-react";
 import NotificationBell from "./notification-bell";
@@ -50,18 +54,24 @@ export default function DashboardLayout({ children }) {
 
                 {pathSegments.map((segment, index) => {
                   const isLast = index === pathSegments.length - 1;
-                  const href   = "/" + pathSegments.slice(0, index + 1).join("/");
-                  const label  = labelMap[segment] || segment;
+                  const href = "/" + pathSegments.slice(0, index + 1).join("/");
+                  const label = labelMap[segment] || segment;
 
-                  if (segment === "gestion" && pathSegments.length > 1) return null;
+                  if (segment === "gestion" && pathSegments.length > 1)
+                    return null;
 
                   return (
                     <div key={href} className="flex items-center gap-1.5">
                       <ChevronRight className="size-3 text-gray-300" />
                       {isLast ? (
-                        <span className="font-bold text-green-700">{label}</span>
+                        <span className="font-bold text-green-700">
+                          {label}
+                        </span>
                       ) : (
-                        <Link href={href} className="transition-colors hover:text-green-700">
+                        <Link
+                          href={href}
+                          className="transition-colors hover:text-green-700"
+                        >
                           {label}
                         </Link>
                       )}
@@ -78,8 +88,8 @@ export default function DashboardLayout({ children }) {
                 <span>
                   {new Date().toLocaleDateString("es-ES", {
                     weekday: "long",
-                    day:     "numeric",
-                    month:   "short",
+                    day: "numeric",
+                    month: "short",
                   })}
                 </span>
               </div>
@@ -91,9 +101,7 @@ export default function DashboardLayout({ children }) {
 
           {/* Page content */}
           <main className="flex-1 overflow-y-auto px-6 py-8 md:px-8">
-            <div className="mx-auto max-w-7xl">
-              {children}
-            </div>
+            <div className="mx-auto max-w-7xl">{children}</div>
           </main>
         </SidebarInset>
       </div>

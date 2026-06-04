@@ -92,7 +92,8 @@ export default function GestionPedidosAdminPage() {
               Gestión de Pedidos
             </h1>
             <p className="text-sm text-gray-500 mt-1 font-medium">
-              Administra pedidos del sistema, registra pedidos manuales y confirma pagos.
+              Administra pedidos del sistema, registra pedidos manuales y
+              confirma pagos.
             </p>
           </div>
 

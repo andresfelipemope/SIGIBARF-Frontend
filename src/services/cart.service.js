@@ -1,10 +1,11 @@
-import { apiRequest } from '@/lib/api';
+import { apiRequest } from "@/lib/api";
 
 /**
  * Helper to retrieve Authorization headers using the locally stored JWT access token.
  */
 function authHeaders() {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('access') : null;
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("access") : null;
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
@@ -17,8 +18,8 @@ export const cartService = {
    * GET /api/ventas/carrito/
    */
   async getCart() {
-    return apiRequest('/api/ventas/carrito/', {
-      method: 'GET',
+    return apiRequest("/api/ventas/carrito/", {
+      method: "GET",
       headers: authHeaders(),
     });
   },
@@ -31,7 +32,7 @@ export const cartService = {
    */
   async updateCartItem(productId, cantidad) {
     return apiRequest(`/api/ventas/carrito/productos/${productId}/`, {
-      method: 'PATCH',
+      method: "PATCH",
       body: { cantidad },
       headers: authHeaders(),
     });
@@ -44,7 +45,7 @@ export const cartService = {
    */
   async removeCartItem(productId) {
     return apiRequest(`/api/ventas/carrito/productos/${productId}/`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: authHeaders(),
     });
   },
@@ -54,8 +55,8 @@ export const cartService = {
    * POST /api/ventas/carrito/productos/
    */
   async addToCart(productId, cantidad) {
-    return apiRequest('/api/ventas/carrito/productos/', {
-      method: 'POST',
+    return apiRequest("/api/ventas/carrito/productos/", {
+      method: "POST",
       body: { producto_id: productId, cantidad },
       headers: authHeaders(),
     });
@@ -65,7 +66,8 @@ export const cartService = {
    * Retrieves the current cart and returns product quantities keyed by product ID.
    */
   async syncCart() {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('access') : null;
+    const token =
+      typeof window !== "undefined" ? localStorage.getItem("access") : null;
     if (!token) return {};
 
     try {
@@ -87,8 +89,8 @@ export const cartService = {
    * POST /api/ventas/checkout/
    */
   async checkout() {
-    return apiRequest('/api/ventas/checkout/', {
-      method: 'POST',
+    return apiRequest("/api/ventas/checkout/", {
+      method: "POST",
       headers: authHeaders(),
     });
   },

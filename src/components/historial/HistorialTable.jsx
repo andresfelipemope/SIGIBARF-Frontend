@@ -1,31 +1,30 @@
 "use client";
 
-import { 
-  Beef, 
-  ShoppingBag, 
-  ArrowDownLeft, 
-  ArrowUpRight, 
+import {
+  Beef,
+  ShoppingBag,
+  ArrowDownLeft,
+  ArrowUpRight,
   HelpCircle,
-  AlertTriangle 
+  AlertTriangle,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function HistorialTable({ data = [], loading = false }) {
-  
   // Format Date in standard es-ES format (DD/MM/YYYY HH:MM)
   const formatDate = (dateStr) => {
     if (!dateStr) return "—";
     try {
       const d = new Date(dateStr);
       if (isNaN(d.getTime())) return dateStr;
-      
-      const day = String(d.getDate()).padStart(2, '0');
-      const month = String(d.getMonth() + 1).padStart(2, '0');
+
+      const day = String(d.getDate()).padStart(2, "0");
+      const month = String(d.getMonth() + 1).padStart(2, "0");
       const year = d.getFullYear();
-      
-      const hours = String(d.getHours()).padStart(2, '0');
-      const minutes = String(d.getMinutes()).padStart(2, '0');
-      
+
+      const hours = String(d.getHours()).padStart(2, "0");
+      const minutes = String(d.getMinutes()).padStart(2, "0");
+
       return `${day}/${month}/${year} ${hours}:${minutes}`;
     } catch {
       return dateStr;
@@ -36,14 +35,30 @@ export default function HistorialTable({ data = [], loading = false }) {
   const renderSkeletons = () => {
     return Array.from({ length: 5 }).map((_, idx) => (
       <tr key={idx} className="border-b border-gray-100">
-        <td className="py-4 px-3"><Skeleton className="h-4 w-28 rounded-lg bg-gray-100" /></td>
-        <td className="py-4 px-3"><Skeleton className="h-5 w-24 rounded-full bg-gray-100" /></td>
-        <td className="py-4 px-3"><Skeleton className="h-4 w-40 rounded-lg bg-gray-100" /></td>
-        <td className="py-4 px-3"><Skeleton className="h-5 w-20 rounded-full bg-gray-100" /></td>
-        <td className="py-4 px-3 text-right"><Skeleton className="h-4 w-12 rounded-lg bg-gray-100 ml-auto" /></td>
-        <td className="py-4 px-3 text-right"><Skeleton className="h-4 w-12 rounded-lg bg-gray-100 ml-auto" /></td>
-        <td className="py-4 px-3 text-right"><Skeleton className="h-4 w-12 rounded-lg bg-gray-100 ml-auto" /></td>
-        <td className="py-4 px-3"><Skeleton className="h-4 w-32 rounded-lg bg-gray-100" /></td>
+        <td className="py-4 px-3">
+          <Skeleton className="h-4 w-28 rounded-lg bg-gray-100" />
+        </td>
+        <td className="py-4 px-3">
+          <Skeleton className="h-5 w-24 rounded-full bg-gray-100" />
+        </td>
+        <td className="py-4 px-3">
+          <Skeleton className="h-4 w-40 rounded-lg bg-gray-100" />
+        </td>
+        <td className="py-4 px-3">
+          <Skeleton className="h-5 w-20 rounded-full bg-gray-100" />
+        </td>
+        <td className="py-4 px-3 text-right">
+          <Skeleton className="h-4 w-12 rounded-lg bg-gray-100 ml-auto" />
+        </td>
+        <td className="py-4 px-3 text-right">
+          <Skeleton className="h-4 w-12 rounded-lg bg-gray-100 ml-auto" />
+        </td>
+        <td className="py-4 px-3 text-right">
+          <Skeleton className="h-4 w-12 rounded-lg bg-gray-100 ml-auto" />
+        </td>
+        <td className="py-4 px-3">
+          <Skeleton className="h-4 w-32 rounded-lg bg-gray-100" />
+        </td>
       </tr>
     ));
   };
@@ -105,20 +120,25 @@ export default function HistorialTable({ data = [], loading = false }) {
 
                 // Format numbers elegantly
                 const fmtQty = Number(item.cantidad).toLocaleString("es-ES");
-                const fmtStockAnt = Number(item.stock_anterior).toLocaleString("es-ES");
-                const fmtStockPos = Number(item.stock_posterior).toLocaleString("es-ES");
+                const fmtStockAnt = Number(item.stock_anterior).toLocaleString(
+                  "es-ES",
+                );
+                const fmtStockPos = Number(item.stock_posterior).toLocaleString(
+                  "es-ES",
+                );
 
                 return (
-                  <tr key={item.uniqueId} className="hover:bg-green-50/10 transition-colors group">
+                  <tr
+                    key={item.uniqueId}
+                    className="hover:bg-green-50/10 transition-colors group"
+                  >
                     {/* Fecha */}
                     <td className="py-4 px-3 text-sm font-semibold text-gray-600 group-hover:text-black transition-colors">
                       {formatDate(item.fecha)}
                     </td>
 
                     {/* Tipo Registro */}
-                    <td className="py-4 px-3">
-                      {registryBadge}
-                    </td>
+                    <td className="py-4 px-3">{registryBadge}</td>
 
                     {/* Nombre */}
                     <td className="py-4 px-3 text-sm font-bold text-black">
@@ -126,9 +146,7 @@ export default function HistorialTable({ data = [], loading = false }) {
                     </td>
 
                     {/* Tipo Movimiento */}
-                    <td className="py-4 px-3">
-                      {movementBadge}
-                    </td>
+                    <td className="py-4 px-3">{movementBadge}</td>
 
                     {/* Cantidad */}
                     <td className="py-4 px-3 text-right text-sm font-bold text-black">
@@ -146,18 +164,31 @@ export default function HistorialTable({ data = [], loading = false }) {
                     </td>
 
                     {/* Comentarios */}
-                    <td className="py-4 px-3 text-xs text-gray-500 max-w-xs truncate" title={item.comentarios}>
-                      {item.comentarios || <span className="text-gray-300 italic">Sin comentarios</span>}
+                    <td
+                      className="py-4 px-3 text-xs text-gray-500 max-w-xs truncate"
+                      title={item.comentarios}
+                    >
+                      {item.comentarios || (
+                        <span className="text-gray-300 italic">
+                          Sin comentarios
+                        </span>
+                      )}
                     </td>
                   </tr>
                 );
               })
             ) : (
               <tr>
-                <td colSpan="8" className="py-12 text-center text-sm font-medium text-gray-400">
+                <td
+                  colSpan="8"
+                  className="py-12 text-center text-sm font-medium text-gray-400"
+                >
                   <div className="flex flex-col items-center justify-center gap-2">
                     <AlertTriangle className="size-6 text-orange-400" />
-                    <span>No hay movimientos registrados para los filtros seleccionados.</span>
+                    <span>
+                      No hay movimientos registrados para los filtros
+                      seleccionados.
+                    </span>
                   </div>
                 </td>
               </tr>
