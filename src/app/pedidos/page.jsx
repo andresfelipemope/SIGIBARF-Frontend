@@ -16,10 +16,6 @@ import { Toaster, toast } from "sonner";
 import {
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
-  CardFooter,
-  CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -35,7 +31,6 @@ export default function PedidosPage() {
   const [error, setError] = useState(null);
   const [cancelandoPedido, setCancelandoPedido] = useState(false);
 
-  // Cargar pedidos
   async function fetchPedidos() {
     try {
       setLoading(true);
@@ -99,7 +94,6 @@ export default function PedidosPage() {
     fetchPedidos();
   }, []);
 
-  // Determinar color de badge según estado
   const getStatusBadgeClass = (status) => {
     const s = (status || "").toLowerCase();
     if (
@@ -133,7 +127,6 @@ export default function PedidosPage() {
     return status || "Desconocido";
   };
 
-  // Render Skeletons during initial load
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12 w-full flex-1 flex flex-col justify-start">
@@ -147,7 +140,6 @@ export default function PedidosPage() {
     );
   }
 
-  // Render Error state
   if (error) {
     return (
       <div className="max-w-md mx-auto px-4 sm:px-6 py-16 w-full flex-1 flex flex-col items-center justify-center text-center">
@@ -178,7 +170,8 @@ export default function PedidosPage() {
     const estado = (pedido.estado_pago || pedido.estado || "").toLowerCase();
 
     return (
-      estado === "pending" || estado === "pendiente" || estado === "espera"
+      (estado === "pending" || estado === "pendiente" || estado === "espera") &&
+      !pedido.cliente_presencial
     );
   });
 
@@ -210,7 +203,6 @@ export default function PedidosPage() {
         </div>
 
         {!hasPedidos ? (
-          // Empty State
           <div className="flex flex-col items-center justify-center py-20 text-center flex-1">
             <div className="bg-zinc-50 p-6 rounded-full mb-6">
               <ShoppingBag className="w-16 h-16 text-zinc-400" />
@@ -231,7 +223,6 @@ export default function PedidosPage() {
             </Button>
           </div>
         ) : (
-          // Orders List
           <div className="space-y-4">
             {pedidos.map((pedido) => {
               const pedidoId = pedido.id;
@@ -249,7 +240,6 @@ export default function PedidosPage() {
                   className="overflow-hidden border-zinc-100 shadow-xs hover:shadow-sm transition-all duration-200"
                 >
                   <CardContent className="p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    {/* Detalles Principales */}
                     <div className="space-y-2">
                       <div className="flex flex-wrap items-center gap-3">
                         <span className="font-extrabold text-lg text-zinc-850 font-heading">
@@ -260,6 +250,11 @@ export default function PedidosPage() {
                         >
                           {getStatusText(status)}
                         </span>
+                        {pedido.cliente_presencial && (
+                          <span className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-700">
+                            Presencial
+                          </span>
+                        )}
                       </div>
 
                       <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs text-zinc-500 font-medium">
@@ -280,7 +275,6 @@ export default function PedidosPage() {
                       </div>
                     </div>
 
-                    {/* Botón Ver Detalle */}
                     <div className="w-full sm:w-auto flex justify-end">
                       <Button
                         onClick={() => router.push(`/pedidos/${pedidoId}`)}

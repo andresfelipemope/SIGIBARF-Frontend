@@ -1,3 +1,6 @@
+"use client";
+
+import { useMemo } from "react";
 import Link from "next/link";
 import { Eye, Inbox, AlertTriangle } from "lucide-react";
 import { formatPrice } from "@/lib/format-price";
@@ -40,7 +43,31 @@ function formatFecha(f) {
   }
 }
 
+// Prioridad de estados: vencido primero, luego activo, luego pagado
+function getEstadoPrioridad(estado) {
+  const s = (estado || "").toLowerCase();
+  if (["vencido", "mora"].includes(s)) return 0;
+  if (["activo", "vigente", "en_curso"].includes(s)) return 1;
+  if (["pagado", "cancelado", "finalizado"].includes(s)) return 2;
+  return 3;
+}
+
 export function CreditosTable({ creditos, error, onRetry }) {
+  // Ordenar créditos: por estado (vencido > activo > pagado) y luego por fecha_inicio descendente
+  const creditosOrdenados = useMemo(() => {
+    if (!creditos?.length) return [];
+    return [...creditos].sort((a, b) => {
+      const prioridadA = getEstadoPrioridad(a.estado);
+      const prioridadB = getEstadoPrioridad(b.estado);
+      if (prioridadA !== prioridadB) return prioridadA - prioridadB;
+
+      // Mismo grupo de estado: ordenar por fecha_inicio más reciente primero
+      const fechaA = new Date(a.fecha_inicio || 0).getTime();
+      const fechaB = new Date(b.fecha_inicio || 0).getTime();
+      return fechaB - fechaA;
+    });
+  }, [creditos]);
+
   if (error) {
     return (
       <div className="rounded-2xl border border-red-200 bg-red-50/50 p-8 text-center space-y-4">
@@ -58,7 +85,7 @@ export function CreditosTable({ creditos, error, onRetry }) {
     );
   }
 
-  if (!creditos?.length) {
+  if (!creditosOrdenados.length) {
     return (
       <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center">
         <Inbox className="size-10 text-gray-300 mx-auto mb-3" />
@@ -85,7 +112,7 @@ export function CreditosTable({ creditos, error, onRetry }) {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {creditos.map((c) => {
+            {creditosOrdenados.map((c) => {
               const id = c.id;
               const pedidoNum =
                 c.pedido_numero ?? c.numero_pedido ?? c.pedido_id ?? "—";

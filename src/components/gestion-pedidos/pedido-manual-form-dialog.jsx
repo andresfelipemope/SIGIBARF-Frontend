@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { X, Loader2, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { ClienteSelector } from "./cliente-selector";
+import { formatPrice } from "@/lib/format-price";
 
 const EMPTY_ITEM = { producto_id: "", cantidad: 1 };
 
@@ -15,12 +16,25 @@ export function PedidoManualFormDialog({
 }) {
   const [usuarioId, setUsuarioId] = useState("");
   const [items, setItems] = useState([{ ...EMPTY_ITEM }]);
-  const [tipoPago, setTipoPago] = useState("contado"); // valor real del backend: "contado" (no "efectivo")
+  const [tipoPago, setTipoPago] = useState("contado");
   const [cantidadCuotas, setCantidadCuotas] = useState("6");
   const [frecuenciaDias, setFrecuenciaDias] = useState("30");
   const [observaciones, setObservaciones] = useState("");
   const [formError, setFormError] = useState(null);
   const [creditoCreadoId, setCreditoCreadoId] = useState(null);
+
+  const subtotal = useMemo(() => {
+    return items.reduce((acc, item) => {
+      if (!item.producto_id) return acc;
+      const producto = productos.find(
+        (p) => p.id === parseInt(item.producto_id, 10),
+      );
+      if (!producto) return acc;
+      const precio = parseFloat(producto.precio);
+      const cantidad = parseInt(item.cantidad, 10) || 0;
+      return acc + precio * cantidad;
+    }, 0);
+  }, [items, productos]);
 
   if (!isOpen) return null;
 
@@ -77,7 +91,7 @@ export function PedidoManualFormDialog({
 
     const body = {
       items: parsedItems,
-      tipo_pago: tipoPago, // "contado" o "credito"
+      tipo_pago: tipoPago,
     };
 
     if (usuarioId) {
@@ -174,7 +188,6 @@ export function PedidoManualFormDialog({
                   disabled={creating}
                   className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-2.5 text-sm font-bold cursor-pointer"
                 >
-                  {/* Valor real del backend para efectivo es "contado" (ver TipoPago en models.py) */}
                   <option value="contado">Efectivo</option>
                   <option value="credito">Crédito</option>
                 </select>
@@ -248,11 +261,23 @@ export function PedidoManualFormDialog({
                         disabled={creating}
                       >
                         <option value="">Producto...</option>
-                        {productos.map((p) => (
-                          <option key={p.id} value={p.id}>
-                            {p.nombre} — Stock: {p.stock_actual}
-                          </option>
-                        ))}
+                        {productos.map((p) => {
+                          const isAlreadySelected = items.some(
+                            (otherItem, otherIndex) =>
+                              otherIndex !== index &&
+                              otherItem.producto_id === String(p.id)
+                          );
+                          const precioFormateado = formatPrice(parseFloat(p.precio));
+                          return (
+                            <option
+                              key={p.id}
+                              value={p.id}
+                              disabled={isAlreadySelected}
+                            >
+                              {p.nombre} — {precioFormateado} — Stock: {p.stock_actual}
+                            </option>
+                          );
+                        })}
                       </select>
                       <input
                         type="number"
@@ -280,28 +305,39 @@ export function PedidoManualFormDialog({
               </div>
             </div>
 
-            <div className="p-6 border-t border-gray-100 flex justify-end gap-3">
-              <button
-                type="button"
-                onClick={handleClose}
-                disabled={creating}
-                className="text-xs font-bold text-gray-600 hover:text-black cursor-pointer"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                disabled={creating}
-                className="inline-flex items-center gap-2 rounded-xl bg-orange-500 px-5 py-2.5 text-xs font-bold text-white hover:bg-orange-600 disabled:opacity-70 cursor-pointer"
-              >
-                {creating ? (
-                  <>
-                    <Loader2 className="size-4 animate-spin" /> Registrando...
-                  </>
-                ) : (
-                  "Registrar pedido manual"
-                )}
-              </button>
+            <div className="p-6 border-t border-gray-100 space-y-4">
+              <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
+                <span className="text-sm font-bold text-gray-700">
+                  Subtotal
+                </span>
+                <span className="text-lg font-extrabold text-orange-600">
+                  {formatPrice(subtotal)}
+                </span>
+              </div>
+
+              <div className="flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={handleClose}
+                  disabled={creating}
+                  className="text-xs font-bold text-gray-600 hover:text-black cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={creating}
+                  className="inline-flex items-center gap-2 rounded-xl bg-orange-500 px-5 py-2.5 text-xs font-bold text-white hover:bg-orange-600 disabled:opacity-70 cursor-pointer"
+                >
+                  {creating ? (
+                    <>
+                      <Loader2 className="size-4 animate-spin" /> Registrando...
+                    </>
+                  ) : (
+                    "Registrar pedido manual"
+                  )}
+                </button>
+              </div>
             </div>
           </form>
         )}
