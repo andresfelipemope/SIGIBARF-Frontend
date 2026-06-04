@@ -58,17 +58,18 @@ export default function CreditoDetallePage() {
   const pedidoNum = credito?.pedido_numero ?? credito?.numero_pedido;
   const saldo = parseFloat(credito?.saldo ?? credito?.saldo_restante ?? 0);
   const total = parseFloat(
-    credito?.valor_total ??
-    credito?.total ??
-    credito?.monto_total ??
-    0
+    credito?.valor_total ?? credito?.total ?? credito?.monto_total ?? 0,
   );
   const handleGuardarObs = async () => {
     await guardarObservaciones(observaciones);
   };
 
   const handleEliminar = async () => {
-    if (!window.confirm("¿Eliminar este crédito? Esta acción puede no estar disponible si expiró el plazo.")) {
+    if (
+      !window.confirm(
+        "¿Eliminar este crédito? Esta acción puede no estar disponible si expiró el plazo.",
+      )
+    ) {
       return;
     }
     const result = await eliminarCredito();
@@ -101,9 +102,7 @@ export default function CreditoDetallePage() {
       setPagoError(null);
     } else {
       setPagoError(
-        result.error ||
-        result.message ||
-        "No fue posible registrar el pago."
+        result.error || result.message || "No fue posible registrar el pago.",
       );
     }
   };
@@ -193,21 +192,33 @@ export default function CreditoDetallePage() {
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-xs">
-            <span className="text-[10px] font-bold uppercase text-gray-400">Total</span>
-            <p className="text-xl font-extrabold text-black mt-1">{formatPrice(total)}</p>
+            <span className="text-[10px] font-bold uppercase text-gray-400">
+              Total
+            </span>
+            <p className="text-xl font-extrabold text-black mt-1">
+              {formatPrice(total)}
+            </p>
           </div>
           <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-xs">
-            <span className="text-[10px] font-bold uppercase text-gray-400">Saldo restante</span>
-            <p className="text-xl font-extrabold text-orange-600 mt-1">{formatPrice(saldo)}</p>
+            <span className="text-[10px] font-bold uppercase text-gray-400">
+              Saldo restante
+            </span>
+            <p className="text-xl font-extrabold text-orange-600 mt-1">
+              {formatPrice(saldo)}
+            </p>
           </div>
           <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-xs">
-            <span className="text-[10px] font-bold uppercase text-gray-400">Cuotas</span>
+            <span className="text-[10px] font-bold uppercase text-gray-400">
+              Cuotas
+            </span>
             <p className="text-xl font-extrabold text-black mt-1">
               {credito?.cantidad_cuotas ?? "—"}
             </p>
           </div>
           <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-xs">
-            <span className="text-[10px] font-bold uppercase text-gray-400">Estado</span>
+            <span className="text-[10px] font-bold uppercase text-gray-400">
+              Estado
+            </span>
             <p className="text-lg font-extrabold text-green-700 mt-1 capitalize">
               {credito?.estado || "—"}
             </p>
@@ -216,7 +227,9 @@ export default function CreditoDetallePage() {
 
         {ultimoPago && (
           <div className="rounded-2xl border border-green-200 bg-green-50 p-5 space-y-2">
-            <h3 className="text-sm font-bold text-green-800">Último pago registrado</h3>
+            <h3 className="text-sm font-bold text-green-800">
+              Último pago registrado
+            </h3>
             {ultimoPago.cuotas_afectadas && (
               <p className="text-xs text-green-700">
                 Cuotas afectadas: {JSON.stringify(ultimoPago.cuotas_afectadas)}
@@ -224,7 +237,8 @@ export default function CreditoDetallePage() {
             )}
             {ultimoPago.saldo_restante != null && (
               <p className="text-xs font-bold text-green-800">
-                Saldo restante: {formatPrice(parseFloat(ultimoPago.saldo_restante))}
+                Saldo restante:{" "}
+                {formatPrice(parseFloat(ultimoPago.saldo_restante))}
               </p>
             )}
           </div>
@@ -245,7 +259,11 @@ export default function CreditoDetallePage() {
             disabled={actionLoading}
             className="inline-flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2 text-xs font-bold text-white hover:bg-green-700 disabled:opacity-50 cursor-pointer"
           >
-            {actionLoading ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
+            {actionLoading ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Save className="size-4" />
+            )}
             Guardar observaciones
           </button>
         </div>
@@ -288,10 +306,10 @@ export default function CreditoDetallePage() {
               <div className="flex justify-end gap-2">
                 <button
                   type="button"
-                onClick={() => {
-                  setPagoError(null);
-                  setShowPagoForm(false);
-                }}
+                  onClick={() => {
+                    setPagoError(null);
+                    setShowPagoForm(false);
+                  }}
                   className="text-xs font-bold text-gray-600 cursor-pointer"
                 >
                   Cancelar

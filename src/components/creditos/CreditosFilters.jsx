@@ -19,7 +19,9 @@ export default function CreditosFilters({ filters, setFilters, onReset }) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Filter className="size-4 text-green-600" />
-          <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider">Filtros</h3>
+          <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider">
+            Filtros
+          </h3>
         </div>
         <button
           onClick={onReset}

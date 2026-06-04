@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
-import { creditosService } from '@/services/creditos.service';
-import { toast } from 'sonner';
+import { useState, useEffect, useCallback } from "react";
+import { creditosService } from "@/services/creditos.service";
+import { toast } from "sonner";
 
 export function useCreditoDetalle(creditoId) {
   const [credito, setCredito] = useState(null);
@@ -16,7 +16,7 @@ export function useCreditoDetalle(creditoId) {
       const data = await creditosService.getCredito(creditoId);
       setCredito(data);
     } catch (err) {
-      const msg = err.message || 'No se pudo cargar el crédito';
+      const msg = err.message || "No se pudo cargar el crédito";
       setError(msg);
       toast.error(msg);
     } finally {
@@ -28,29 +28,36 @@ export function useCreditoDetalle(creditoId) {
     fetchCredito();
   }, [fetchCredito]);
 
-  const guardarObservaciones = useCallback(async (observaciones) => {
-    try {
-      setActionLoading(true);
-      const data = await creditosService.patchObservaciones(creditoId, observaciones);
-      setCredito(data);
-      toast.success('Observaciones actualizadas');
-      return { success: true };
-    } catch (err) {
-      toast.error(err.message || 'Error al guardar observaciones');
-      return { success: false, error: err.message };
-    } finally {
-      setActionLoading(false);
-    }
-  }, [creditoId]);
+  const guardarObservaciones = useCallback(
+    async (observaciones) => {
+      try {
+        setActionLoading(true);
+        const data = await creditosService.patchObservaciones(
+          creditoId,
+          observaciones,
+        );
+        setCredito(data);
+        toast.success("Observaciones actualizadas");
+        return { success: true };
+      } catch (err) {
+        toast.error(err.message || "Error al guardar observaciones");
+        return { success: false, error: err.message };
+      } finally {
+        setActionLoading(false);
+      }
+    },
+    [creditoId],
+  );
 
   const eliminarCredito = useCallback(async () => {
     try {
       setActionLoading(true);
       await creditosService.deleteCredito(creditoId);
-      toast.success('Crédito eliminado');
+      toast.success("Crédito eliminado");
       return { success: true };
     } catch (err) {
-      const msg = err.data?.detail || err.message || 'No se pudo eliminar el crédito';
+      const msg =
+        err.data?.detail || err.message || "No se pudo eliminar el crédito";
       toast.error(msg);
       return { success: false, error: msg };
     } finally {
@@ -58,38 +65,38 @@ export function useCreditoDetalle(creditoId) {
     }
   }, [creditoId]);
 
-  const registrarPago = useCallback(async (monto) => {
-    try {
-      setActionLoading(true);
-      const data = await creditosService.registrarPago(creditoId, monto);
-      await fetchCredito();
-      toast.success('Pago registrado correctamente');
-      return { success: true, data };
-    } catch (err) {
-      console.error(err);
+  const registrarPago = useCallback(
+    async (monto) => {
+      try {
+        setActionLoading(true);
+        const data = await creditosService.registrarPago(creditoId, monto);
+        await fetchCredito();
+        toast.success("Pago registrado correctamente");
+        return { success: true, data };
+      } catch (err) {
+        console.error(err);
 
-      const responseData =
-        err?.response?.data ||
-        err?.data ||
-        {};
+        const responseData = err?.response?.data || err?.data || {};
 
-      const message =
-        responseData.error ||
-        responseData.detail ||
-        responseData.message ||
-        err.message ||
-        "Error al registrar el pago";
+        const message =
+          responseData.error ||
+          responseData.detail ||
+          responseData.message ||
+          err.message ||
+          "Error al registrar el pago";
 
-      toast.error(message);
+        toast.error(message);
 
-      return {
-        success: false,
-        error: message,
-      };
-    } finally {
-      setActionLoading(false);
-    }
-  }, [creditoId, fetchCredito]);
+        return {
+          success: false,
+          error: message,
+        };
+      } finally {
+        setActionLoading(false);
+      }
+    },
+    [creditoId, fetchCredito],
+  );
 
   return {
     credito,

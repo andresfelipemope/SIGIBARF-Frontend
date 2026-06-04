@@ -53,10 +53,9 @@ export const pedidosService = {
    * DELETE /api/ventas/pedidos/pending/
    */
   async cancelarPedidoPendiente() {
-    return apiRequest('/api/ventas/pedidos/pending/', {
-      method: 'DELETE',
+    return apiRequest("/api/ventas/pedidos/pending/", {
+      method: "DELETE",
       headers: authHeaders(),
     });
   },
-
 };

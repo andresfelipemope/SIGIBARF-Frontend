@@ -5,12 +5,14 @@ import { Coins, RotateCcw } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import { useCreditos } from "@/hooks/useCreditos";
 import { CreditosTable } from "@/components/creditos/creditos-table";
-import CreditosFilters, { DEFAULT_FILTERS } from "@/components/creditos/CreditosFilters";
+import CreditosFilters, {
+  DEFAULT_FILTERS,
+} from "@/components/creditos/CreditosFilters";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function CreditosPage() {
   const { creditos, count, loading, error, refetch } = useCreditos();
-  
+
   // Filtros adicionales locales
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
 
@@ -26,7 +28,7 @@ export default function CreditosPage() {
       const search = filters.busqueda.toLowerCase();
       const usuarioMatch = credito.usuario?.toLowerCase().includes(search);
       const pedidoMatch = credito.pedido_id?.toString().includes(search);
-      
+
       if (!usuarioMatch && !pedidoMatch) {
         return false;
       }
@@ -39,7 +41,9 @@ export default function CreditosPage() {
 
     // 3. Filtro por fecha inicio
     if (filters.fechaInicio && credito.fecha_inicio) {
-      const creditoDate = new Date(credito.fecha_inicio).toISOString().split("T")[0];
+      const creditoDate = new Date(credito.fecha_inicio)
+        .toISOString()
+        .split("T")[0];
       if (creditoDate < filters.fechaInicio) {
         return false;
       }
@@ -47,7 +51,9 @@ export default function CreditosPage() {
 
     // 4. Filtro por fecha fin
     if (filters.fechaFin && credito.fecha_inicio) {
-      const creditoDate = new Date(credito.fecha_inicio).toISOString().split("T")[0];
+      const creditoDate = new Date(credito.fecha_inicio)
+        .toISOString()
+        .split("T")[0];
       if (creditoDate > filters.fechaFin) {
         return false;
       }
@@ -68,7 +74,8 @@ export default function CreditosPage() {
               Gestión de Créditos
             </h1>
             <p className="text-sm text-gray-500 mt-1 font-medium">
-              Créditos otorgados a clientes por pedidos. Seguimiento de cuotas y pagos.
+              Créditos otorgados a clientes por pedidos. Seguimiento de cuotas y
+              pagos.
             </p>
           </div>
           <button
@@ -81,25 +88,36 @@ export default function CreditosPage() {
         </div>
 
         <div className="rounded-2xl border border-gray-200 bg-white px-6 py-4 shadow-xs">
-          <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Total</span>
-          <p className="text-2xl font-extrabold text-green-700 mt-1">{filteredCreditos.length}</p>
+          <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
+            Total
+          </span>
+          <p className="text-2xl font-extrabold text-green-700 mt-1">
+            {filteredCreditos.length}
+          </p>
         </div>
 
         {/* Filtros */}
-        <CreditosFilters 
-          filters={filters} 
-          setFilters={setFilters} 
-          onReset={handleResetFilters} 
+        <CreditosFilters
+          filters={filters}
+          setFilters={setFilters}
+          onReset={handleResetFilters}
         />
 
         {loading ? (
           <div className="space-y-3">
             {[1, 2, 3, 4].map((i) => (
-              <Skeleton key={i} className="h-14 w-full rounded-xl bg-gray-100" />
+              <Skeleton
+                key={i}
+                className="h-14 w-full rounded-xl bg-gray-100"
+              />
             ))}
           </div>
         ) : (
-          <CreditosTable creditos={filteredCreditos} error={error} onRetry={refetch} />
+          <CreditosTable
+            creditos={filteredCreditos}
+            error={error}
+            onRetry={refetch}
+          />
         )}
       </div>
     </>

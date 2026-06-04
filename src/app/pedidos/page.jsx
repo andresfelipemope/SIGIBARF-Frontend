@@ -58,11 +58,7 @@ export default function PedidosPage() {
         </p>
 
         <div className="flex justify-end gap-2 mt-3">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => toast.dismiss(t)}
-          >
+          <Button variant="outline" size="sm" onClick={() => toast.dismiss(t)}>
             No
           </Button>
 
@@ -83,9 +79,9 @@ export default function PedidosPage() {
               } catch (err) {
                 toast.error(
                   err.data?.error ||
-                  err.data?.detail ||
-                  err.message ||
-                  "No se pudo cancelar el pedido"
+                    err.data?.detail ||
+                    err.message ||
+                    "No se pudo cancelar el pedido",
                 );
               } finally {
                 setCancelandoPedido(false);
@@ -182,9 +178,7 @@ export default function PedidosPage() {
     const estado = (pedido.estado_pago || pedido.estado || "").toLowerCase();
 
     return (
-      estado === "pending" ||
-      estado === "pendiente" ||
-      estado === "espera"
+      estado === "pending" || estado === "pendiente" || estado === "espera"
     );
   });
 
@@ -194,9 +188,7 @@ export default function PedidosPage() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12 w-full flex-1 flex flex-col justify-start">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 border-b border-zinc-100 pb-4">
-          <h1 className="text-3xl font-bold text-zinc-800">
-            Mis Pedidos
-          </h1>
+          <h1 className="text-3xl font-bold text-zinc-800">Mis Pedidos</h1>
 
           {tienePedidoPendiente && (
             <Button

@@ -1,22 +1,30 @@
 "use client";
 
-import { 
-  Beef, 
-  ShoppingBag, 
-  ArrowDownLeft, 
+import {
+  Beef,
+  ShoppingBag,
+  ArrowDownLeft,
   ArrowUpRight,
-  ClipboardCheck
+  ClipboardCheck,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function HistorialStats({ data = [], loading = false }) {
   // Compute metrics in frontend
-  const totalIngredientes = data.filter(item => item.registroTipo === "Ingrediente").length;
-  const totalProductos = data.filter(item => item.registroTipo === "Producto").length;
-  const totalEntradas = data.filter(item => item.tipo_movimiento === "ENTRADA").length;
-  const totalSalidas = data.filter(item => item.tipo_movimiento === "SALIDA").length;
+  const totalIngredientes = data.filter(
+    (item) => item.registroTipo === "Ingrediente",
+  ).length;
+  const totalProductos = data.filter(
+    (item) => item.registroTipo === "Producto",
+  ).length;
+  const totalEntradas = data.filter(
+    (item) => item.tipo_movimiento === "ENTRADA",
+  ).length;
+  const totalSalidas = data.filter(
+    (item) => item.tipo_movimiento === "SALIDA",
+  ).length;
   const totalAjustes = data.filter(
-    item => item.tipo_movimiento === "AJUSTE"
+    (item) => item.tipo_movimiento === "AJUSTE",
   ).length;
 
   const stats = [
@@ -55,15 +63,17 @@ export default function HistorialStats({ data = [], loading = false }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
       {stats.map((stat, idx) => (
-        <div 
-          key={idx} 
+        <div
+          key={idx}
           className="rounded-2xl border border-gray-200 bg-white p-5 shadow-xs transition-all duration-200 hover:shadow-md hover:border-green-100"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
               {stat.label}
             </span>
-            <div className={`flex size-9 items-center justify-center rounded-xl border ${stat.color}`}>
+            <div
+              className={`flex size-9 items-center justify-center rounded-xl border ${stat.color}`}
+            >
               <stat.icon className="size-4.5" />
             </div>
           </div>
