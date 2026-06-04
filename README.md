@@ -1,36 +1,243 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# SIGIBARF - Frontend
 
-## Getting Started
+## Propósito del Proyecto
 
-First, run the development server:
+SIGIBARF (Sistema de Información y Gestión de Inventario para Alimentos BARF) es una plataforma web desarrollada para la administración integral de la producción de alimentos BARF (Biologically Appropriate Raw Food). Su objetivo principal es proporcionar herramientas avanzadas de gestión, balanceo de recetas y control de macronutrientes, monitoreo de inventario, registros de producción, alertas críticas y seguimiento de pedidos y créditos.
+
+---
+
+## Tecnologías Utilizadas
+
+- Next.js 16 (Turbopack)
+- React 19
+- TailwindCSS 4
+- PNPM (Gestor de Paquetes)
+- Docker
+- ESLint
+
+---
+
+## Requisitos Previos
+
+Antes de ejecutar el proyecto, asegúrate de tener instalado:
+
+- Node.js 22 o superior
+- PNPM
+- Docker (opcional)
+
+---
+
+## Instalación de PNPM
+
+### Linux
+
+#### Arch Linux / CachyOS / Manjaro
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+sudo pacman -S pnpm
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+#### Debian / Ubuntu
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+Primero instala Node.js y npm (si no los tienes):
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+sudo apt update
+sudo apt install nodejs npm
+```
 
-## Learn More
+Luego instala pnpm globalmente:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+sudo npm install -g pnpm
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+#### Fedora
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+sudo dnf install pnpm
+```
 
-## Deploy on Vercel
+### Windows
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**Opción recomendada (winget):**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```powershell
+winget install pnpm.pnpm
+```
+
+**Alternativa usando npm:**
+
+Primero instala Node.js desde https://nodejs.org/, luego ejecuta:
+
+```powershell
+npm install -g pnpm
+```
+
+**Alternativa usando PowerShell Script:**
+
+```powershell
+Invoke-WebRequest https://get.pnpm.io/install.ps1 -UseBasicParsing | Invoke-Expression
+```
+
+### Verificar instalación
+
+```bash
+pnpm --version
+```
+
+---
+
+## Migración desde NPM (IMPORTANTE)
+
+Este proyecto fue migrado de `npm` a `pnpm`. Antes de instalar dependencias, todos los integrantes del equipo deben eliminar los archivos y carpetas generados por npm.
+
+**Linux / macOS:**
+
+```bash
+rm -rf node_modules package-lock.json
+```
+
+**Windows (PowerShell):**
+
+```powershell
+Remove-Item -Recurse -Force node_modules
+Remove-Item -Force package-lock.json
+```
+
+Si aparece un archivo `package-lock.json` en cualquier momento, debe eliminarse.
+
+---
+
+## Cómo Ejecutar el Proyecto
+
+### 1. Clonar el repositorio
+
+```bash
+git clone <URL_DEL_REPOSITORIO>
+cd SIGIBARF-Frontend
+```
+
+### 2. Instalar dependencias
+
+Este proyecto utiliza `pnpm` como gestor de paquetes. Para garantizar versiones exactas y evitar modificaciones accidentales del lockfile, utiliza:
+
+```bash
+pnpm install --frozen-lockfile
+```
+
+No utilices `npm install`.
+
+### 3. Configurar variables de entorno
+
+Crea un archivo `.env.local` en la raíz del proyecto y define la URL del backend:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
+
+### 4. Ejecutar el entorno de desarrollo
+
+```bash
+pnpm dev
+```
+
+### 5. Acceder a la aplicación
+
+```
+http://localhost:3000
+```
+
+---
+
+## Scripts Disponibles
+
+| Comando | Descripción |
+|---|---|
+| `pnpm dev` | Ejecutar en modo desarrollo |
+| `pnpm build` | Generar build de producción |
+| `pnpm start` | Ejecutar build de producción |
+| `pnpm lint` | Ejecutar linter |
+
+---
+
+## Ejecución con Docker
+
+**Construir la imagen:**
+
+```bash
+docker build -t sigibarf-frontend .
+```
+
+**Ejecutar el contenedor:**
+
+```bash
+docker run -p 3000:3000 sigibarf-frontend
+```
+
+La aplicación estará disponible en `http://localhost:3000`.
+
+---
+
+## Reglas del Proyecto
+
+**Comandos permitidos:**
+
+```bash
+pnpm install --frozen-lockfile
+pnpm dev
+pnpm build
+pnpm start
+pnpm lint
+```
+
+**Comandos NO permitidos:**
+
+```bash
+npm install
+npm ci
+npm run dev
+```
+
+Estos comandos pueden modificar dependencias y generar inconsistencias entre entornos de desarrollo.
+
+---
+
+## Instalación de nuevas dependencias
+
+Para agregar dependencias al proyecto, usa siempre `pnpm`:
+
+```bash
+# Dependencia de producción
+pnpm add <paquete>
+
+# Dependencia de desarrollo
+pnpm add -D <paquete>
+```
+
+---
+
+## Estructura General del Proyecto
+
+```
+SIGIBARF-Frontend/
+├── src/
+│   ├── app/                # Páginas y rutas de la aplicación (App Router)
+│   ├── components/         # Componentes UI reutilizables
+│   ├── hooks/              # Hooks personalizados (useFormulaciones, etc.)
+│   ├── lib/                # Utilidades y configuración de API (api.js)
+│   └── services/           # Servicios de comunicación con backend
+├── public/                 # Recursos estáticos
+├── package.json
+├── pnpm-lock.yaml
+├── next.config.mjs
+├── postcss.config.mjs
+├── Dockerfile
+└── README.md
+```
+
+El proyecto utiliza `pnpm-lock.yaml` para asegurar instalaciones consistentes entre todos los miembros del equipo. El directorio `node_modules/` no debe subirse al repositorio.
+
+---
+
+Proyecto desarrollado para el sistema académico y de gestión de inventario y producción de alimentos BARF, SIGIBARF.
