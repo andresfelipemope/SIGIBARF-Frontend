@@ -551,7 +551,11 @@ export default function FormulacionRecetaForm({
               ) : (
                 <button
                   onClick={handleSave}
-                  disabled={loading || ingredientesAgregados.length === 0 || Math.abs(totalPorcentaje - 100) > 0.001}
+                  disabled={
+                    loading ||
+                    ingredientesAgregados.length === 0 ||
+                    Math.abs(totalPorcentaje - 100) > 0.001
+                  }
                   className="inline-flex items-center gap-1.5 rounded-lg bg-green-500 px-4 py-1.5 text-xs font-bold text-white hover:bg-green-600 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? (

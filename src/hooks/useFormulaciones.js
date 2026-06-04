@@ -44,13 +44,17 @@ export function useFormulaciones() {
     setError(null);
 
     try {
-      const [formulacionesData, productosData, productosSinRecetaData, ingredientesData] =
-        await Promise.all([
-          FormulacionesService.getFormulaciones(),
-          FormulacionesService.getProductos(),
-          FormulacionesService.getProductos(true),
-          FormulacionesService.getIngredientes(),
-        ]);
+      const [
+        formulacionesData,
+        productosData,
+        productosSinRecetaData,
+        ingredientesData,
+      ] = await Promise.all([
+        FormulacionesService.getFormulaciones(),
+        FormulacionesService.getProductos(),
+        FormulacionesService.getProductos(true),
+        FormulacionesService.getIngredientes(),
+      ]);
 
       setFormulaciones(formulacionesData || []);
       setProductos(productosData || []);
@@ -64,42 +68,52 @@ export function useFormulaciones() {
     }
   }, [getErrorMessage]);
 
-  const createFormulacion = useCallback(async (formData) => {
-    try {
-      const nueva = await FormulacionesService.createFormulacion(formData);
-      await loadAllData();
-      return { success: true, data: nueva };
-    } catch (err) {
-      console.error("❌ Error creando:", err);
-      return { success: false, error: getErrorMessage(err) };
-    }
-  }, [loadAllData, getErrorMessage]);
+  const createFormulacion = useCallback(
+    async (formData) => {
+      try {
+        const nueva = await FormulacionesService.createFormulacion(formData);
+        await loadAllData();
+        return { success: true, data: nueva };
+      } catch (err) {
+        console.error("❌ Error creando:", err);
+        return { success: false, error: getErrorMessage(err) };
+      }
+    },
+    [loadAllData, getErrorMessage],
+  );
 
-  const updateFormulacion = useCallback(async (id, formData) => {
-    try {
-      // In the new backend, updates also register the entire list of ingredients in a single POST.
-      // So we call createFormulacion with the new ingredient list.
-      const actualizada = await FormulacionesService.createFormulacion(formData);
-      await loadAllData();
-      return { success: true, data: actualizada };
-    } catch (err) {
-      console.error("❌ Error actualizando:", err);
-      return { success: false, error: getErrorMessage(err) };
-    }
-  }, [loadAllData, getErrorMessage]);
+  const updateFormulacion = useCallback(
+    async (id, formData) => {
+      try {
+        // In the new backend, updates also register the entire list of ingredients in a single POST.
+        // So we call createFormulacion with the new ingredient list.
+        const actualizada =
+          await FormulacionesService.createFormulacion(formData);
+        await loadAllData();
+        return { success: true, data: actualizada };
+      } catch (err) {
+        console.error("❌ Error actualizando:", err);
+        return { success: false, error: getErrorMessage(err) };
+      }
+    },
+    [loadAllData, getErrorMessage],
+  );
 
-  const deleteFormulacion = useCallback(async (id) => {
-    try {
-      await FormulacionesService.deleteFormulacion(id);
-      setFormulaciones((prev) => prev.filter((f) => f.id !== id));
-      // Reload in case product recipes status changes
-      await loadAllData();
-      return { success: true };
-    } catch (err) {
-      console.error("❌ Error eliminando:", err);
-      return { success: false, error: getErrorMessage(err) };
-    }
-  }, [loadAllData, getErrorMessage]);
+  const deleteFormulacion = useCallback(
+    async (id) => {
+      try {
+        await FormulacionesService.deleteFormulacion(id);
+        setFormulaciones((prev) => prev.filter((f) => f.id !== id));
+        // Reload in case product recipes status changes
+        await loadAllData();
+        return { success: true };
+      } catch (err) {
+        console.error("❌ Error eliminando:", err);
+        return { success: false, error: getErrorMessage(err) };
+      }
+    },
+    [loadAllData, getErrorMessage],
+  );
 
   const clearMessages = useCallback(() => {
     setError(null);
